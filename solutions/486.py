@@ -1,0 +1,23 @@
+
+def main():
+    with open('INPUT.TXT', 'r') as f:
+        data = f.read().split()
+        N = int(data[0])
+        K = int(data[1])
+    
+    x = 1
+    while True:
+        total = x
+        valid = True
+        for i in range(N):
+            if (total - K) % N != 0:
+                valid = False
+                break
+            total = (total - K) * (N - 1) // N
+        if valid and total >= 0:
+            print(x)
+            return
+        x += 1
+
+if __name__ == '__main__':
+    main()
