@@ -1,31 +1,37 @@
 
 def main():
     with open('INPUT.TXT', 'r') as f:
-        s1 = f.readline().strip()
-        s2 = f.readline().strip()
+        s = f.readline().strip()
+        t = f.readline().strip()
     
-    if len(s1) != len(s2):
+    n = len(s)
+    if len(t) != n:
         with open('OUTPUT.TXT', 'w') as f:
             f.write("No\n")
         return
     
-    n = len(s1)
-    if n == 0:
+    if s == t:
         with open('OUTPUT.TXT', 'w') as f:
-            f.write("Yes\n0\n")
+            f.write("Yes\n0")
         return
     
-    doubled = s1 + s1
-    pos = doubled.find(s2)
+    doubled = s + s
+    found = False
+    min_k = n
     
-    if pos == -1:
+    for k in range(1, n):
+        candidate = doubled[k:k+n]
+        reversed_prefix = s[k-1::-1] if k > 0 else ""
+        if candidate == t:
+            found = True
+            min_k = min(min_k, k)
+    
+    if found:
         with open('OUTPUT.TXT', 'w') as f:
-            f.write("No\n")
+            f.write(f"Yes\n{min_k}")
     else:
-        k = n - pos
         with open('OUTPUT.TXT', 'w') as f:
-            f.write("Yes\n")
-            f.write(f"{k}\n")
+            f.write("No\n")
 
 if __name__ == "__main__":
     main()

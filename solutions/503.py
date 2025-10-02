@@ -9,49 +9,55 @@ def main():
     for i in range(1, n+1):
         parts = data[i].split()
         p_type = parts[0]
-        c_to = int(parts[1])
-        p_to = int(parts[2])
-        c_from = int(parts[3])
-        p_from = int(parts[4])
-        planets.append((p_type, c_to, p_to, c_from, p_from))
+        to_planet_chatl = int(parts[1])
+        to_planet_pac = int(parts[2])
+        from_planet_chatl = int(parts[3])
+        from_planet_pac = int(parts[4])
+        planets.append((p_type, to_planet_chatl, to_planet_pac, from_planet_chatl, from_planet_pac))
     
-    min_cak = float('inf')
-    best_route = None
+    min_cost = float('inf')
+    best_order = []
     
     for perm in permutations(range(n)):
-        total_cak = 0
+        cost = 0
         current_chatlans = 0
-        current_patsaks = 0
+        current_pacs = 0
         
-        for planet_idx in perm:
-            p_type, c_to, p_to, c_from, p_from = planets[planet_idx]
+        for idx in perm:
+            p_type, to_chatl, to_pac, from_chatl, from_pac = planets[idx]
             
-            if p_type == 'C':
-                total_cak += current_patsaks * c_to
+            if p_type == 'P':
+                cost += current_chatlans
             else:
-                total_cak += current_chatlans * p_to
+                cost += current_pacs
             
-            current_chatlans += c_to
-            current_patsaks += p_to
-            
-            if p_type == 'C':
-                total_cak += current_patsaks * c_from
-            else:
-                total_cak += current_chatlans * p_from
-            
-            current_chatlans -= c_from
-            current_patsaks -= p_from
+            current_chatlans += to_chatl
+            current_pacs += to_pac
         
-        if total_cak < min_cak:
-            min_cak = total_cak
-            best_route = perm
-        elif total_cak == min_cak:
-            if best_route is None or perm < best_route:
-                best_route = perm
+        for idx in perm:
+            p_type, to_chatl, to_pac, from_chatl, from_pac = planets[idx]
+            
+            current_chatlans -= to_chatl
+            current_pacs -= to_pac
+            
+            if p_type == 'P':
+                cost += current_chatlans
+            else:
+                cost += current_pacs
+            
+            current_chatlans += from_chatl
+            current_pacs += from_pac
+        
+        if cost < min_cost:
+            min_cost = cost
+            best_order = list(perm)
+        elif cost == min_cost:
+            if tuple(best_order) > tuple(perm):
+                best_order = list(perm)
     
-    result_route = [0] + [x+1 for x in best_route] + [0]
-    print(min_cak)
-    print(" ".join(map(str, result_route)))
+    best_order = [x+1 for x in best_order]
+    print(min_cost)
+    print("0", " ".join(map(str, best_order)), "0")
 
 if __name__ == "__main__":
     main()

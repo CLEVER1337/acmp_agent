@@ -5,19 +5,18 @@ def main():
         print(0)
         return
         
-    sequence = [0]
+    a = [0]
     for i in range(1, n):
-        prev_digits = set(str(sequence[-1]))
-        current = sequence[-1] + 1
-        
+        prev_digits = set(str(a[-1]))
+        current = a[-1] + 1
         while True:
             current_digits = set(str(current))
             if not current_digits.intersection(prev_digits):
-                sequence.append(current)
                 break
             current += 1
-            
-    print(sequence[-1])
+        a.append(current)
+    
+    print(a[-1])
 
 if __name__ == "__main__":
     main()

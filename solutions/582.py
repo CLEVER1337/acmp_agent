@@ -6,40 +6,46 @@ def main():
     
     def generate_rotations(cube):
         rotations = []
-        # Исходная ориентация
-        rotations.append(cube)
+        # Основные вращения вокруг осей
+        # Вращения вокруг вертикальной оси (верх-низ)
+        def rotate_y(c):
+            return [c[2], c[3], c[1], c[0], c[4], c[5]]
         
-        # Повороты вокруг вертикальной оси
-        for _ in range(3):
-            cube = [cube[0], cube[1], cube[2], cube[3], cube[5], cube[4]]
-            rotations.append(cube)
+        # Вращения вокруг горизонтальной оси (лево-право)
+        def rotate_x(c):
+            return [c[4], c[5], c[2], c[3], c[1], c[0]]
         
-        # Повороты вокруг горизонтальной оси (вперед-назад)
-        cube_rot = [cube[2], cube[3], cube[1], cube[0], cube[4], cube[5]]
-        rotations.append(cube_rot)
-        for _ in range(3):
-            cube_rot = [cube_rot[0], cube_rot[1], cube_rot[2], cube_rot[3], cube_rot[5], cube_rot[4]]
-            rotations.append(cube_rot)
+        # Вращения вокруг передне-задней оси
+        def rotate_z(c):
+            return [c[0], c[1], c[5], c[4], c[2], c[3]]
         
-        # Повороты вокруг оси лево-право
-        cube_rot = [cube[4], cube[5], cube[2], cube[3], cube[1], cube[0]]
-        rotations.append(cube_rot)
-        for _ in range(3):
-            cube_rot = [cube_rot[0], cube_rot[1], cube_rot[2], cube_rot[3], cube_rot[5], cube_rot[4]]
-            rotations.append(cube_rot)
+        # Генерируем все возможные ориентации
+        for _ in range(4):
+            for _ in range(4):
+                rotations.append(tuple(cube))
+                cube = rotate_z(cube)
+            cube = rotate_x(cube)
         
-        return rotations
+        cube = rotate_y(cube)
+        for _ in range(4):
+            rotations.append(tuple(cube))
+            cube = rotate_z(cube)
+        
+        cube = rotate_y(cube)
+        cube = rotate_y(cube)
+        for _ in range(4):
+            rotations.append(tuple(cube))
+            cube = rotate_z(cube)
+        
+        return set(rotations)
     
     rotations1 = generate_rotations(cube1)
     
-    for rot in rotations1:
-        if rot == cube2:
-            with open('OUTPUT.TXT', 'w') as f:
-                f.write('YES')
-            return
-    
     with open('OUTPUT.TXT', 'w') as f:
-        f.write('NO')
+        if tuple(cube2) in rotations1:
+            f.write('YES')
+        else:
+            f.write('NO')
 
 if __name__ == '__main__':
     main()

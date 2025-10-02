@@ -7,14 +7,15 @@ def main():
         print(0)
         return
         
-    # Ищем минимальный делитель K-1, больший 1
     for L in range(2, K):
-        if (K - 1) % L == 0:
-            print(L)
-            return
-            
-    # Если K-1 простое число больше 2
-    print(K - 1)
+        if K % (L + 1) == 0:
+            result = L
+            break
+    else:
+        result = 0
+        
+    with open("OUTPUT.TXT", "w") as f:
+        f.write(str(result))
 
 if __name__ == "__main__":
     main()

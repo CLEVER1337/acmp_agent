@@ -5,11 +5,11 @@ def main():
     
     count = 0
     num = 6
-    
     while count < n:
         num += 1
         binary = bin(num)[2:]
-        if binary.count('1') == 3:
+        ones = binary.count('1')
+        if ones == 3 and '111' not in binary:
             count += 1
     
     with open('OUTPUT.TXT', 'w') as f:

@@ -1,23 +1,28 @@
 
 def main():
     with open("INPUT.TXT", "r") as f:
-        m, n = map(int, f.read().split())
+        m, n = map(int, f.readline().split())
     
-    def dfs(remaining_m, remaining_n, start, path):
-        if remaining_m == 0:
+    def find_decomposition(current_m, current_n, start, path):
+        if current_m == 0:
             return path
-        if remaining_m * start > remaining_n:
+        if current_n * current_m < start * current_m:
             return None
         
-        for x in range(start, 2 * remaining_n + 1):
-            if remaining_m * x < remaining_n:
+        for i in range(start, 2 * current_n * current_n + 1):
+            if i < start:
                 continue
-            new_n = remaining_n * x
-            new_m = remaining_m * x - remaining_n
+            if current_m * i < current_n:
+                continue
+            new_m = current_m * i - current_n
+            new_n = current_n * i
+            if new_m < 0:
+                continue
             gcd_val = gcd(new_m, new_n)
-            new_m //= gcd_val
-            new_n //= gcd_val
-            result = dfs(new_m, new_n, x + 1, path + [x])
+            if gcd_val > 1:
+                new_m //= gcd_val
+                new_n //= gcd_val
+            result = find_decomposition(new_m, new_n, i + 1, path + [i])
             if result is not None:
                 return result
         return None
@@ -27,7 +32,7 @@ def main():
             a, b = b, a % b
         return a
     
-    result = dfs(m, n, 2, [])
+    result = find_decomposition(m, n, 2, [])
     with open("OUTPUT.TXT", "w") as f:
         f.write(" ".join(map(str, result)))
 

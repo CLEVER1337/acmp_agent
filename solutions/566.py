@@ -1,6 +1,6 @@
 
 def main():
-    with open("INPUT.TXT", "r") as f:
+    with open('INPUT.TXT', 'r') as f:
         data = f.read().split()
         A = int(data[0])
         B = int(data[1])
@@ -8,18 +8,10 @@ def main():
         K = int(data[3])
     
     total_stars = A * 1 + B * 2 + C * 3
-    if total_stars < K:
-        print(0)
-        return
+    max_t_shirts = min(total_stars // K, A + B + C)
     
-    shirts = 0
-    stars_needed = K
-    
-    while stars_needed <= total_stars:
-        shirts += 1
-        stars_needed += K
-    
-    print(shirts)
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write(str(max_t_shirts))
 
 if __name__ == "__main__":
     main()

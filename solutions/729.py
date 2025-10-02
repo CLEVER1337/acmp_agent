@@ -1,53 +1,53 @@
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        data = f.read().splitlines()
+    import sys
+    data = sys.stdin.read().split()
+    if not data:
+        return
     
-    n, m = map(int, data[0].split())
-    volumes = list(map(int, data[1].split()))
+    n = int(data[0])
+    m = int(data[1])
+    volumes = list(map(int, data[2:2+n]))
+    actions = []
+    index = 2 + n
+    for i in range(m):
+        a = int(data[index]); b = int(data[index+1])
+        index += 2
+        actions.append((a, b))
     
-    # Инициализация: каждая колба принадлежит своей собственной компоненте
-    parent = list(range(n))
-    rank = [0] * n
+    parent = list(range(n + 1))
+    volume_map = [0] * (n + 1)
+    for i in range(1, n + 1):
+        volume_map[i] = volumes[i - 1]
     
     def find(x):
         if parent[x] != x:
             parent[x] = find(parent[x])
         return parent[x]
     
-    def union(x, y):
-        rx = find(x)
-        ry = find(y)
-        
-        if rx == ry:
-            return
+    for a, b in actions:
+        root_a = find(a)
+        root_b = find(b)
+        if root_a == root_b:
+            continue
             
-        # Газ из колбы с меньшим номером уничтожается
-        if rx < ry:
-            parent[ry] = rx
-            volumes[rx] += volumes[ry]
-            volumes[ry] = 0
+        if root_a < root_b:
+            parent[root_a] = root_b
+            volume_map[root_b] += volume_map[root_a]
+            volume_map[root_a] = 0
         else:
-            parent[rx] = ry
-            volumes[ry] += volumes[rx]
-            volumes[rx] = 0
+            parent[root_b] = root_a
+            volume_map[root_a] += volume_map[root_b]
+            volume_map[root_b] = 0
     
-    # Обрабатываем все соединения
-    for i in range(2, 2 + m):
-        a, b = map(int, data[i].split())
-        union(a-1, b-1)
-    
-    # Собираем результаты
     result = []
-    for i in range(n):
-        if parent[i] == i and volumes[i] > 0:
-            result.append((i+1, volumes[i]))
+    for i in range(1, n + 1):
+        if parent[i] == i and volume_map[i] > 0:
+            result.append((i, volume_map[i]))
     
     result.sort()
-    
-    with open("OUTPUT.TXT", "w") as f:
-        for num, vol in result:
-            f.write(f"{num} {vol}\n")
+    for num, vol in result:
+        print(f"{num} {vol}")
 
 if __name__ == "__main__":
     main()

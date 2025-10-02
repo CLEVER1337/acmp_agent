@@ -1,32 +1,32 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        N = int(f.readline().strip())
+    n = int(input().strip())
+    if n == 1:
+        print("10 0")
+        return
     
-    if N == 1:
-        count = 1
-        min_num = 0
-    else:
-        count = 0
-        min_num = None
-        
-        start = 10**(N-1)
-        end = 10**N
-        
-        for num in range(start, end):
-            digits = [int(d) for d in str(num)]
-            sum_digits = sum(digits)
-            prod_digits = 1
-            for d in digits:
-                prod_digits *= d
-            
-            if sum_digits == prod_digits:
+    count = 0
+    min_num = float('inf')
+    
+    def dfs(digits, pos, s, p):
+        nonlocal count, min_num
+        if pos == n:
+            if s == p:
+                num = int(''.join(map(str, digits)))
                 count += 1
-                if min_num is None or num < min_num:
+                if num < min_num:
                     min_num = num
+            return
+        
+        start = 1 if pos == 0 else 0
+        for d in range(start, 10):
+            digits[pos] = d
+            dfs(digits, pos + 1, s + d, p * d if p != 0 else d)
     
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(f"{count} {min_num}")
+    digits = [0] * n
+    dfs(digits, 0, 0, 1)
+    
+    print(f"{count} {min_num}")
 
 if __name__ == "__main__":
     main()

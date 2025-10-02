@@ -9,40 +9,31 @@ def main():
     n, m = map(int, data[0].split())
     grid = []
     for i in range(1, 1 + n):
-        grid.append(data[i].strip())
+        grid.append(list(data[i].strip()))
     
     if n == 0 or m == 0:
         print(0)
         return
         
-    size = n * m
-    dp = [0] * (1 << size)
-    dp[0] = 1
+    size_lim = min(n, m)
+    ways = 0
     
-    for mask in range(1 << size):
-        if dp[mask] == 0:
-            continue
-            
-        pos = 0
-        while pos < size and (mask & (1 << pos)):
-            pos += 1
-            
-        if pos >= size:
-            continue
-            
-        i, j = pos // m, pos % m
-        if grid[i][j] == '#':
-            continue
-            
-        if j + 1 < m and i < n and not (mask & (1 << pos)) and not (mask & (1 << (pos + 1))) and grid[i][j] == '.' and grid[i][j+1] == '.':
-            new_mask = mask | (1 << pos) | (1 << (pos + 1))
-            dp[new_mask] += dp[mask]
-            
-        if i + 1 < n and j < m and not (mask & (1 << pos)) and not (mask & (1 << (pos + m))) and grid[i][j] == '.' and grid[i+1][j] == '.':
-            new_mask = mask | (1 << pos) | (1 << (pos + m))
-            dp[new_mask] += dp[mask]
-            
-    print(dp[(1 << size) - 1])
+    for size in range(1, size_lim + 1):
+        valid = True
+        for i in range(n - size + 1):
+            for j in range(m - size + 1):
+                square_valid = True
+                for di in range(size):
+                    for dj in range(size):
+                        if grid[i + di][j + dj] != '.':
+                            square_valid = False
+                            break
+                    if not square_valid:
+                        break
+                if square_valid:
+                    ways += 1
+                    
+    print(ways)
 
 if __name__ == "__main__":
     main()

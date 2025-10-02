@@ -3,9 +3,6 @@ import sys
 
 def main():
     data = sys.stdin.read().split()
-    if not data:
-        return
-    
     n = int(data[0])
     points = []
     index = 1
@@ -20,7 +17,7 @@ def main():
     min_y = min(p[1] for p in points)
     max_y = max(p[1] for p in points)
     
-    result_points = [
+    fence = [
         (min_x - 1, min_y - 1),
         (max_x + 1, min_y - 1),
         (max_x + 1, max_y + 1),
@@ -28,7 +25,7 @@ def main():
     ]
     
     print(4)
-    for p in result_points:
+    for p in fence:
         print(f"{p[0]} {p[1]}")
 
 if __name__ == "__main__":

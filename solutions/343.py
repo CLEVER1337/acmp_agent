@@ -2,29 +2,30 @@
 n, m = map(int, input().split())
 k = int(input())
 
-grid = [[False] * m for _ in range(n)]
+floor = [[False] * m for _ in range(n)]
+covered_area = 0
 
 for _ in range(k):
-    t, y, x = map(int, input().split())
+    tile_type, y, x = map(int, input().split())
     
-    if t == 1:
-        squares = [(y, x), (y, x+1), (y+1, x)]
-    elif t == 2:
-        squares = [(y, x), (y, x+1), (y+1, x+1)]
-    elif t == 3:
-        squares = [(y, x), (y+1, x), (y+1, x+1)]
-    elif t == 4:
-        squares = [(y, x+1), (y+1, x), (y+1, x+1)]
+    if tile_type == 1:
+        cells = [(y, x+1), (y+1, x), (y+1, x+1)]
+    elif tile_type == 2:
+        cells = [(y, x), (y+1, x), (y+1, x+1)]
+    elif tile_type == 3:
+        cells = [(y, x), (y, x+1), (y+1, x)]
+    elif tile_type == 4:
+        cells = [(y, x), (y, x+1), (y+1, x+1)]
     
     valid = True
-    for i, j in squares:
-        if i < 0 or i >= n or j < 0 or j >= m or grid[i][j]:
+    for cy, cx in cells:
+        if cy < 0 or cy >= n or cx < 0 or cx >= m or floor[cy][cx]:
             valid = False
             break
     
     if valid:
-        for i, j in squares:
-            grid[i][j] = True
+        for cy, cx in cells:
+            floor[cy][cx] = True
+            covered_area += 1
 
-count = sum(sum(row) for row in grid)
-print(count)
+print(covered_area)

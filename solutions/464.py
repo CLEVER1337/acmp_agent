@@ -1,22 +1,20 @@
 
 def main():
     with open("INPUT.TXT", "r") as f:
-        n = int(f.read().strip())
+        n = int(f.readline().strip())
     
     if n == 1:
         result = 0
     else:
         length = 1
         k = 0
-        while length < n:
-            k += 1
-            length = length * 2 + 1
         
-        pos = n - length // 2 - 1
-        if k == 0:
-            result = 0
-        else:
-            result = (k % 3 + pos) % 3
+        while length * 2 < n:
+            length *= 2
+            k += 1
+        
+        pos_in_block = n - length - 1
+        result = (k % 3 + pos_in_block) % 3
     
     with open("OUTPUT.TXT", "w") as f:
         f.write(str(result))

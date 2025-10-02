@@ -1,15 +1,15 @@
 
-from collections import Counter
-
 def main():
     with open('INPUT.TXT', 'r') as f:
         n = int(f.readline().strip())
         colors = list(map(int, f.readline().split()))
     
-    counter = Counter(colors)
-    max_count = max(counter.values())
+    count = {}
+    for color in colors:
+        count[color] = count.get(color, 0) + 1
     
-    candidates = [color for color, count in counter.items() if count == max_count]
+    max_count = max(count.values())
+    candidates = [color for color, cnt in count.items() if cnt == max_count]
     
     if len(candidates) == 1:
         result = candidates[0]

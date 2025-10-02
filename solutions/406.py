@@ -5,43 +5,39 @@ def main():
     data = sys.stdin.read().splitlines()
     n, m = map(int, data[0].split())
     
-    freq_expected = []
-    letters = []
-    for i in range(1, n+1):
+    freq_known = []
+    for i in range(1, 1 + n):
         parts = data[i].split()
-        letter = parts[0]
+        char = parts[0]
         freq = float(parts[1])
-        letters.append(letter)
-        freq_expected.append(freq)
+        freq_known.append((char, freq))
     
-    cipher_text = data[n+1].strip()
+    encrypted_text = data[1 + n].strip()
     
-    freq_observed = [0] * n
-    total_chars = len(cipher_text)
+    freq_encrypted = {}
+    for char in encrypted_text:
+        freq_encrypted[char] = freq_encrypted.get(char, 0) + 1
     
-    char_to_index = {}
-    for i, c in enumerate(letters):
-        char_to_index[c] = i
+    total_chars = len(encrypted_text)
+    freq_encrypted_normalized = []
+    for char, count in freq_encrypted.items():
+        freq_encrypted_normalized.append((char, count / total_chars))
     
-    for c in cipher_text:
-        if c in char_to_index:
-            idx = char_to_index[c]
-            freq_observed[idx] += 1
-    
-    for i in range(n):
-        freq_observed[i] /= total_chars
-    
-    sorted_expected_indices = sorted(range(n), key=lambda i: freq_expected[i])
-    sorted_observed_indices = sorted(range(n), key=lambda i: freq_observed[i])
+    freq_encrypted_normalized.sort(key=lambda x: x[1], reverse=True)
+    freq_known.sort(key=lambda x: x[1], reverse=True)
     
     mapping = {}
-    for obs_idx, exp_idx in zip(sorted_observed_indices, sorted_expected_indices):
-        cipher_char = letters[obs_idx]
-        plain_char = letters[exp_idx]
-        mapping[cipher_char] = plain_char
+    for i in range(len(freq_encrypted_normalized)):
+        encrypted_char = freq_encrypted_normalized[i][0]
+        known_char = freq_known[i][0]
+        mapping[encrypted_char] = known_char
     
-    for letter in letters:
-        print(mapping[letter])
+    result = []
+    for encrypted_char, _ in freq_encrypted_normalized:
+        result.append(mapping[encrypted_char])
+    
+    for char in result:
+        print(char)
 
 if __name__ == "__main__":
     main()

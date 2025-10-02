@@ -1,33 +1,36 @@
 
-with open('INPUT.TXT', 'r') as f:
+with open("INPUT.TXT", "r") as f:
     a, b, c = map(int, f.read().split())
 
-result = []
-
+terms = []
 if a != 0:
-    result.append(str(a))
-
+    terms.append(str(a))
+    
 if b != 0:
     if b == 1:
-        result.append('x')
+        terms.append("x")
     elif b == -1:
-        result.append('-x')
+        terms.append("-x")
     else:
-        result.append(f"{b}x")
-
+        terms.append(f"{b:+}x".replace("+", "+").replace("-", "-"))
+        
 if c != 0:
     if c == 1:
-        result.append('+y')
+        terms.append("y")
     elif c == -1:
-        result.append('-y')
+        terms.append("-y")
     else:
-        if c > 0 and result:
-            result.append(f"+{c}y")
+        terms.append(f"{c:+}y".replace("+", "+").replace("-", "-"))
+
+if not terms:
+    result = "0"
+else:
+    result = terms[0]
+    for term in terms[1:]:
+        if term.startswith("-"):
+            result += term
         else:
-            result.append(f"{c}y")
+            result += "+" + term
 
-if not result:
-    result.append('0')
-
-with open('OUTPUT.TXT', 'w') as f:
-    f.write(''.join(result))
+with open("OUTPUT.TXT", "w") as f:
+    f.write(result)

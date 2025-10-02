@@ -1,10 +1,10 @@
 
-def matrix_mult(a, b, mod):
+def matrix_mult(A, B, mod):
     return [
-        [(a[0][0]*b[0][0] + a[0][1]*b[1][0]) % mod,
-         (a[0][0]*b[0][1] + a[0][1]*b[1][1]) % mod],
-        [(a[1][0]*b[0][0] + a[1][1]*b[1][0]) % mod,
-         (a[1][0]*b[0][1] + a[1][1]*b[1][1]) % mod]
+        [(A[0][0]*B[0][0] + A[0][1]*B[1][0]) % mod,
+         (A[0][0]*B[0][1] + A[0][1]*B[1][1]) % mod],
+        [(A[1][0]*B[0][0] + A[1][1]*B[1][0]) % mod,
+         (A[1][0]*B[0][1] + A[1][1]*B[1][1]) % mod]
     ]
 
 def matrix_pow(matrix, power, mod):
@@ -21,16 +21,20 @@ def matrix_pow(matrix, power, mod):
 
 def main():
     with open('INPUT.TXT', 'r') as f:
-        n, m = map(int, f.read().split())
+        data = f.read().split()
+        if len(data) < 2:
+            return
+        N = int(data[0])
+        M = int(data[1])
     
-    if n == 0:
+    if N == 0:
         result = 0
-    elif n == 1:
-        result = 1 % m
+    elif N == 1:
+        result = 1 % M
     else:
-        transform = [[1, 1], [1, 0]]
-        powered = matrix_pow(transform, n - 1, m)
-        result = powered[0][0]
+        T = [[1, 1], [1, 0]]
+        T_pow = matrix_pow(T, N - 1, M)
+        result = T_pow[0][0] % M
     
     with open('OUTPUT.TXT', 'w') as f:
         f.write(str(result))

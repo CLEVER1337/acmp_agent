@@ -1,15 +1,16 @@
 
 s = input().strip()
-a = 0
-ab = 0
-abc = 0
+
+a_count = 0
+ab_count = 0
+abc_count = 0
 
 for char in s:
     if char == 'a':
-        a += 1
+        a_count += 1
     elif char == 'b':
-        ab += a
+        ab_count += a_count
     elif char == 'c':
-        abc += ab
+        abc_count += ab_count
 
-print(abc)
+print(abc_count)

@@ -8,31 +8,21 @@ def main():
         a, b = map(float, data[i].split())
         sheets.append((a, b, i))
     
-    def key_func(x):
-        a, b, idx = x
-        return a * b, a
+    def time_for_order(order):
+        total_a = 0
+        total_b = 0
+        for idx in order:
+            a, b, _ = sheets[idx - 1]
+            total_a += a
+            total_b += b
+        return min(total_a, total_b)
     
-    sheets_sorted = sorted(sheets, key=key_func)
+    sorted_sheets = sorted(sheets, key=lambda x: x[0] * x[1], reverse=True)
+    best_order = [sheet[2] for sheet in sorted_sheets]
+    best_time = time_for_order(best_order)
     
-    total_time = 0.0
-    sum_a = 0.0
-    for sheet in sheets_sorted:
-        a, b, idx = sheet
-        total_time += a
-        sum_a += a
-    
-    current_sum = 0.0
-    for i in range(len(sheets_sorted)):
-        a, b, idx = sheets_sorted[i]
-        current_sum += a
-        time_from_b = current_sum * b
-        if time_from_b > total_time:
-            total_time = time_from_b
-    
-    order = [str(idx) for a, b, idx in sheets_sorted]
-    
-    print(f"{total_time:.6f}")
-    print(" ".join(order))
+    print("{:.15f}".format(best_time))
+    print(" ".join(map(str, best_order)))
 
 if __name__ == "__main__":
     main()

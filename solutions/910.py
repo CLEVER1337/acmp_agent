@@ -11,7 +11,7 @@ def main():
     
     for k in range(1, N + 1):
         fact = (fact * k) % M
-        term = (fact * 2 * k) % M
+        term = (fact * (2 * k)) % M
         total = (total + term) % M
         
     print(total)

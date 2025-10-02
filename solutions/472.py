@@ -14,7 +14,7 @@ def main():
         gifts.sort()
     
     with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(min(gifts)))
+        f.write(str(gifts[0]))
 
 if __name__ == "__main__":
     main()

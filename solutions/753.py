@@ -2,11 +2,12 @@
 def main():
     s = input().strip()
     n = len(s)
-    distinct_substrings = set()
+    seen = set()
     for i in range(n):
         for j in range(i, n):
-            distinct_substrings.add(s[i:j+1])
-    print(len(distinct_substrings))
+            substring = s[i:j+1]
+            seen.add(substring)
+    print(len(seen))
 
 if __name__ == "__main__":
     main()

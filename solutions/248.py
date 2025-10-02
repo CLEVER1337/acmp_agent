@@ -2,73 +2,51 @@
 import re
 
 def process_year1(word):
-    i = 0
-    result = []
-    n = len(word)
-    
-    while i < n:
-        if word[i] == 'c':
-            if i + 1 < n:
-                if word[i+1] in 'ie':
-                    result.append('s')
-                    i += 1
-                elif word[i+1] == 'k':
-                    result.append('')
-                    i += 1
-                else:
-                    result.append('k')
-            else:
-                result.append('k')
-            i += 1
-        else:
-            result.append(word[i])
-            i += 1
-            
-    return ''.join(result)
+    word = re.sub(r'ck', '', word)
+    word = re.sub(r'ci', 'si', word)
+    word = re.sub(r'ce', 'se', word)
+    word = re.sub(r'c', 'k', word)
+    return word
 
 def process_year2(word):
-    i = 0
-    result = []
-    n = len(word)
-    
-    while i < n:
-        if i + 1 < n and word[i] == word[i+1]:
-            if word[i] == 'e':
-                result.append('i')
-                i += 2
-            elif word[i] == 'o':
-                result.append('u')
-                i += 2
-            else:
-                result.append(word[i])
-                i += 1
-        else:
-            result.append(word[i])
-            i += 1
-            
-    return ''.join(result)
+    while True:
+        original = word
+        word = re.sub(r'ee', 'i', word)
+        word = re.sub(r'oo', 'u', word)
+        word = re.sub(r'([a-z])\1', r'\1', word)
+        if word == original:
+            break
+    return word
 
 def process_year3(word):
     if len(word) > 1 and word.endswith('e'):
-        return word[:-1]
+        word = word[:-1]
     return word
 
+def process_year4(text):
+    words = text.split()
+    result = []
+    i = 0
+    while i < len(words):
+        if words[i] in ['a', 'an', 'the']:
+            i += 1
+        else:
+            result.append(words[i])
+            i += 1
+    return ' '.join(result)
+
 def process_word(word):
-    if not word:
+    if not word.isalpha():
         return word
     
-    original_word = word
-    is_capital = word[0].isupper()
-    word_lower = word.lower()
+    original_case = word[0].isupper()
+    lower_word = word.lower()
     
-    if word_lower in ['a', 'an', 'the']:
-        return ''
-    
-    processed = process_year1(word_lower)
+    processed = process_year1(lower_word)
     processed = process_year2(processed)
     processed = process_year3(processed)
     
-    if is_capital and processed:
+    if original_case and processed:
         processed = processed[0].upper() + processed[1:]
     
     return processed
@@ -77,22 +55,20 @@ def main():
     with open('INPUT.TXT', 'r', encoding='utf-8') as f:
         text = f.read().strip()
     
-    pattern = r'([a-zA-Z]+|[^a-zA-Z\s]+)'
-    tokens = re.findall(pattern, text)
+    words_and_punct = re.findall(r'\w+|[^\w\s]|\s+', text)
     
-    result_tokens = []
-    for token in tokens:
-        if token.isalpha():
-            processed = process_word(token)
-            if processed:
-                result_tokens.append(processed)
+    processed_parts = []
+    for part in words_and_punct:
+        if part.isspace() or not part.isalnum():
+            processed_parts.append(part)
         else:
-            result_tokens.append(token)
+            processed_parts.append(process_word(part))
     
-    result = ''.join(result_tokens)
+    intermediate_text = ''.join(processed_parts)
+    final_text = process_year4(intermediate_text)
     
     with open('OUTPUT.TXT', 'w', encoding='utf-8') as f:
-        f.write(result)
+        f.write(final_text)
 
 if __name__ == '__main__':
     main()

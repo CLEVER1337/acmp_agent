@@ -17,89 +17,101 @@ def main():
     
     symp_set = set(symp)
     
-    possible_entries = []
+    possible_scores = {}
+    for name in names:
+        for problem in problems:
+            possible_scores[(name, problem)] = []
+    
     for mask in masks:
         parts = mask.split('-')
         if len(parts) < 3:
-            possible_entries.append([])
             continue
             
-        name_mask, prob_mask, score_mask = parts[0], parts[1], '-'.join(parts[2:])
+        name_mask, problem_mask, score_mask = parts[0], parts[1], parts[2]
         
-        possible_names = []
         for name in names:
-            if len(name) != len(name_mask):
+            if len(name_mask) != len(name):
                 continue
-            match = True
-            for i in range(len(name)):
-                if name_mask[i] != '?' and name_mask[i] != name[i]:
-                    match = False
+            match_name = True
+            for i, char in enumerate(name_mask):
+                if char != '?' and char != name[i]:
+                    match_name = False
                     break
-            if match:
-                possible_names.append(name)
-                
-        possible_probs = []
-        for prob in problems:
-            if len(prob) != len(prob_mask):
+            if not match_name:
                 continue
-            match = True
-            for i in range(len(prob)):
-                if prob_mask[i] != '?' and prob_mask[i] != prob[i]:
-                    match = False
-                    break
-            if match:
-                possible_probs.append(prob)
                 
-        possible_scores = []
-        if all(c == '?' for c in score_mask):
-            possible_scores = list(range(0, 100000))
-        else:
-            score_digits = []
-            for char in score_mask:
-                if char == '?':
-                    score_digits.append([str(i) for i in range(10)])
+            for problem in problems:
+                if len(problem_mask) != len(problem):
+                    continue
+                match_problem = True
+                for i, char in enumerate(problem_mask):
+                    if char != '?' and char != problem[i]:
+                        match_problem = False
+                        break
+                if not match_problem:
+                    continue
+                    
+                if score_mask == '?':
+                    possible_scores[(name, problem)].append((0, float('inf')))
                 else:
-                    score_digits.append([char])
+                    score_min = 0
+                    score_max = 0
+                    valid_score = True
+                    for char in score_mask:
+                        if char == '?':
+                            score_min = score_min * 10
+                            score_max = score_max * 10 + 9
+                        elif '0' <= char <= '9':
+                            digit = int(char)
+                            score_min = score_min * 10 + digit
+                            score_max = score_max * 10 + digit
+                        else:
+                            valid_score = False
+                            break
+                    if valid_score:
+                        possible_scores[(name, problem)].append((score_min, score_max))
+    
+    max_possible = {}
+    for (name, problem), ranges in possible_scores.items():
+        if ranges:
+            max_val = max(max_val for _, max_val in ranges)
+            max_possible[(name, problem)] = max_val
+        else:
+            max_possible[(name, problem)] = 0
+    
+    best_score = 0
+    for assignment in product(*[possible_scores.get((name, problem), [(0, 0)]) for name in names for problem in problems]):
+        scores = {}
+        idx = 0
+        valid = True
+        for i, name in enumerate(names):
+            for j, problem in enumerate(problems):
+                min_val, max_val = assignment[idx]
+                if min_val > max_val:
+                    valid = False
+                    break
+                score_val = max_val
+                if (name, problem) in scores:
+                    valid = False
+                    break
+                scores[(name, problem)] = score_val
+                idx += 1
+            if not valid:
+                break
+        
+        if not valid:
+            continue
             
-            for comb in product(*score_digits):
-                num_str = ''.join(comb)
-                if num_str and not num_str.startswith('0') or len(num_str) == 1:
-                    possible_scores.append(int(num_str))
+        total = 0
+        for i in symp_set:
+            name = names[i-1]
+            for problem in problems:
+                total += scores.get((name, problem), 0)
         
-        entries = []
-        for name in possible_names:
-            for prob in possible_probs:
-                for score in possible_scores:
-                    entries.append((name, prob, score))
-        possible_entries.append(entries)
+        if total > best_score:
+            best_score = total
     
-    best = -10**18
-    
-    def backtrack(idx, current_status, used_pairs):
-        nonlocal best
-        if idx == len(masks):
-            total_score = 0
-            scores = {name: 0 for name in names}
-            for entry in current_status:
-                name, prob, score = entry
-                scores[name] += score
-            for i in symp_set:
-                total_score += scores[names[i-1]]
-            if total_score > best:
-                best = total_score
-            return
-        
-        for entry in possible_entries[idx]:
-            name, prob, score = entry
-            if (name, prob) not in used_pairs:
-                used_pairs.add((name, prob))
-                current_status.append(entry)
-                backtrack(idx+1, current_status, used_pairs)
-                current_status.pop()
-                used_pairs.remove((name, prob))
-    
-    backtrack(0, [], set())
-    print(best)
+    print(best_score)
 
 if __name__ == "__main__":
     main()

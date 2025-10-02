@@ -1,15 +1,13 @@
 
 import sys
 
-def time_to_seconds(time_str):
-    h, m, s = map(int, time_str.split(':'))
+def to_seconds(h, m, s):
     return h * 3600 + m * 60 + s
 
-def seconds_to_time(total_seconds):
+def to_time(total_seconds):
     h = total_seconds // 3600
-    total_seconds %= 3600
-    m = total_seconds // 60
-    s = total_seconds %= 60
+    m = (total_seconds % 3600) // 60
+    s = total_seconds % 60
     return f"{h:02d}:{m:02d}:{s:02d}"
 
 def main():
@@ -17,67 +15,60 @@ def main():
     if not data:
         return
     
-    N, K = map(int, data[0].split())
+    n, k = map(int, data[0].split())
     processes = []
+    for i in range(1, n + 1):
+        parts = data[i].split()
+        if len(parts) < 2:
+            continue
+        time_str = parts[0]
+        duration = int(parts[1])
+        h, m, s = map(int, time_str.split(':'))
+        arrival_time = to_seconds(h, m, s)
+        processes.append((arrival_time, duration))
     
-    for i in range(1, N + 1):
-        time_str, duration = data[i].split()
-        processes.append({
-            'arrival': time_to_seconds(time_str),
-            'duration': int(duration),
-            'remaining': int(duration),
-            'start': -1,
-            'end': -1,
-            'index': i - 1
-        })
+    packages = []
+    for i in range(0, n, k):
+        package = []
+        for j in range(k):
+            idx = i + j
+            if idx < n:
+                package.append({
+                    'arrival': processes[idx][0],
+                    'duration': processes[idx][1],
+                    'remaining': processes[idx][1],
+                    'start': -1,
+                    'end': -1,
+                    'completed': False
+                })
+        packages.append(package)
     
     current_time = 0
-    batch = []
-    completed = 0
-    i = 0
-    
-    while completed < N:
-        while i < N and processes[i]['arrival'] <= current_time:
-            batch.append(processes[i])
-            i += 1
-        
-        if not batch:
-            if i < N:
-                current_time = processes[i]['arrival']
-                continue
-            else:
-                break
-        
-        process = batch.pop(0)
-        
-        if process['start'] == -1:
-            process['start'] = current_time
-        
-        quantum = 10
-        if len(batch) == 0 and i == N:
-            quantum = process['remaining']
-        
-        time_used = min(quantum, process['remaining'])
-        current_time += time_used
-        process['remaining'] -= time_used
-        
-        if process['remaining'] == 0:
-            process['end'] = current_time
-            completed += 1
-        else:
-            batch.append(process)
-        
-        while i < N and processes[i]['arrival'] <= current_time:
-            batch.append(processes[i])
-            i += 1
-    
     results = []
-    for p in processes:
-        start_time = seconds_to_time(p['start'])
-        end_time = seconds_to_time(p['end'])
-        results.append(f"{start_time} {end_time}")
     
-    print("\n".join(results))
+    for package in packages:
+        queue = package.copy()
+        while queue:
+            process = queue.pop(0)
+            
+            if process['start'] == -1:
+                process['start'] = max(current_time, process['arrival'])
+                current_time = process['start']
+            
+            if process['remaining'] <= 10:
+                process['end'] = current_time + process['remaining']
+                current_time = process['end']
+                process['remaining'] = 0
+                process['completed'] = True
+                results.append((process['start'], process['end']))
+            else:
+                process['remaining'] -= 10
+                current_time += 10
+                if process['remaining'] > 0:
+                    queue.append(process)
+    
+    for start, end in results:
+        print(f"{to_time(start)} {to_time(end)}")
 
 if __name__ == "__main__":
     main()

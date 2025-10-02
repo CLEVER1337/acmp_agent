@@ -1,39 +1,35 @@
 
-import collections
+import sys
+from collections import deque
 
 def main():
-    import sys
     data = sys.stdin.read().splitlines()
     n, k = map(int, data[0].split())
     s = data[1].strip()
     
-    dp = [float('inf')] * n
+    INF = float('inf')
+    dp = [INF] * n
     dp[0] = 0
     
-    dq = collections.deque()
-    dq.append(0)
-    
     last_occurrence = {}
+    queue = deque()
     
-    for i in range(1, n):
-        while dq and dq[0] < i - k:
-            dq.popleft()
+    for i in range(n):
+        char = s[i]
+        if char in last_occurrence:
+            dp[i] = min(dp[i], dp[last_occurrence[char]])
+        
+        while queue and queue[0] < i - k:
+            queue.popleft()
             
-        if dq:
-            prev_index = dq[0]
-            cost = dp[prev_index] + (1 if s[i] != s[prev_index] else 0)
-            dp[i] = min(dp[i], cost)
+        if queue:
+            dp[i] = min(dp[i], dp[queue[0]] + 1)
+            
+        while queue and dp[queue[-1]] >= dp[i]:
+            queue.pop()
+        queue.append(i)
         
-        if s[i] in last_occurrence:
-            prev_same_char_index = last_occurrence[s[i]]
-            if dp[prev_same_char_index] <= dp[i]:
-                dp[i] = dp[prev_same_char_index]
-        
-        last_occurrence[s[i]] = i
-        
-        while dq and dp[dq[-1]] >= dp[i]:
-            dq.pop()
-        dq.append(i)
+        last_occurrence[char] = i
     
     print(dp[n-1])
 

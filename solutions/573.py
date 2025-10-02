@@ -2,9 +2,13 @@
 def main():
     import sys
     data = sys.stdin.read().splitlines()
+    if not data:
+        print(0)
+        return
+        
     n, v = map(int, data[0].split())
-    
     observations = []
+    
     for i in range(1, n + 1):
         parts = data[i].split()
         time_str = parts[0]
@@ -20,36 +24,40 @@ def main():
     graph = [[] for _ in range(n)]
     
     for i in range(n):
-        t1, x1, y1 = observations[i]
+        time_i, x_i, y_i = observations[i]
         for j in range(i + 1, n):
-            t2, x2, y2 = observations[j]
-            dt = (t2 - t1) / 60.0
-            if dt == 0:
+            time_j, x_j, y_j = observations[j]
+            time_diff_hours = (time_j - time_i) / 60.0
+            
+            if time_diff_hours <= 0:
                 continue
                 
-            distance = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
-            required_speed = distance / dt
+            distance = ((x_j - x_i)**2 + (y_j - y_i)**2)**0.5
+            required_speed = distance / time_diff_hours
             
             if required_speed <= v:
                 graph[i].append(j)
                 graph[j].append(i)
     
+    def dfs(u, visited):
+        stack = [u]
+        visited[u] = True
+        while stack:
+            node = stack.pop()
+            for neighbor in graph[node]:
+                if not visited[neighbor]:
+                    visited[neighbor] = True
+                    stack.append(neighbor)
+    
     visited = [False] * n
-    count = 0
+    components = 0
     
     for i in range(n):
         if not visited[i]:
-            count += 1
-            stack = [i]
-            visited[i] = True
-            while stack:
-                node = stack.pop()
-                for neighbor in graph[node]:
-                    if not visited[neighbor]:
-                        visited[neighbor] = True
-                        stack.append(neighbor)
+            components += 1
+            dfs(i, visited)
     
-    print(count)
+    print(components)
 
 if __name__ == "__main__":
     main()

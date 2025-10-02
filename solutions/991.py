@@ -1,91 +1,80 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        n, k = map(int, f.read().split())
+    import sys
+    data = sys.stdin.read().split()
+    n = int(data[0])
+    k = int(data[1])
     
     if k == 0:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write('')
+        for i in range(n-1):
+            print(0)
         return
+            
+    clients = [set() for _ in range(n+1)]
+    clients[1] = set(range(1, k+1))
     
-    clients = [set() for _ in range(n)]
-    clients[0] = set(range(1, k+1))
-    rounds = [0] * n
-    received_from = [[0] * n for _ in range(n)]
+    rounds = [0] * (n+1)
+    received_from = [dict() for _ in range(n+1)]
+    upload_count = [0] * (n+1)
+    
     current_round = 0
+    completed = 1
     
-    while any(len(client) < k for client in clients):
+    while completed < n:
         current_round += 1
-        requests = []
-        providers_requests = [[] for _ in range(n)]
         
-        for i in range(n):
-            if len(clients[i]) == k:
-                continue
+        requests = {}
+        for i in range(1, n+1):
+            if len(clients[i]) < k:
+                available_fragments = set(range(1, k+1)) - clients[i]
+                fragment_counts = {}
+                for frag in available_fragments:
+                    count = sum(1 for j in range(1, n+1) if frag in clients[j])
+                    fragment_counts[frag] = count
                 
-            available_frags = clients[i]
-            needed_frags = set(range(1, k+1)) - available_frags
-            
-            frag_counts = {}
-            for frag in needed_frags:
-                count = sum(1 for client in clients if frag in client)
-                frag_counts[frag] = count
-            
-            if not frag_counts:
-                continue
+                min_count = min(fragment_counts.values())
+                candidate_frags = [frag for frag in fragment_counts if fragment_counts[frag] == min_count]
+                chosen_frag = min(candidate_frags)
                 
-            min_count = min(frag_counts.values())
-            candidate_frags = [frag for frag, count in frag_counts.items() if count == min_count]
-            chosen_frag = min(candidate_frags)
-            
-            possible_providers = []
-            for j in range(n):
-                if i != j and chosen_frag in clients[j]:
-                    upload_count = sum(1 for req in providers_requests[j] if req is not None)
-                    possible_providers.append((upload_count, j))
-            
-            if not possible_providers:
-                requests.append((i, None, chosen_frag))
-                continue
-                
-            min_upload_count = min(prov[0] for prov in possible_providers)
-            candidate_providers = [j for upload_count, j in possible_providers if upload_count == min_upload_count]
-            chosen_provider = min(candidate_providers)
-            
-            requests.append((i, chosen_provider, chosen_frag))
-            providers_requests[chosen_provider].append(i)
+                providers = [j for j in range(1, n+1) if chosen_frag in clients[j] and j != i]
+                if providers:
+                    provider_uploads = [upload_count[j] for j in providers]
+                    min_uploads = min(provider_uploads)
+                    candidate_providers = [j for j in providers if upload_count[j] == min_uploads]
+                    chosen_provider = min(candidate_providers)
+                    
+                    if chosen_provider not in requests:
+                        requests[chosen_provider] = []
+                    requests[chosen_provider].append((i, chosen_frag))
         
-        satisfied = set()
-        for provider in range(n):
-            if not providers_requests[provider]:
+        satisfied_requests = []
+        for provider, req_list in requests.items():
+            if not req_list:
                 continue
                 
-            requests_to_provider = providers_requests[provider]
-            if not requests_to_provider:
-                continue
-                
-            request_metrics = []
-            for requester in requests_to_provider:
-                value = received_from[provider][requester]
-                frag_count = len(clients[requester])
-                request_metrics.append((value, frag_count, requester))
+            best_requests = []
+            for req in req_list:
+                requester, frag = req
+                value = received_from[provider].get(requester, 0)
+                best_requests.append((value, -len(clients[requester]), -requester, requester, frag))
             
-            request_metrics.sort(key=lambda x: (-x[0], x[1], x[2]))
-            satisfied_requester = request_metrics[0][2]
-            satisfied.add((satisfied_requester, provider))
+            best_requests.sort(reverse=True)
+            best_request = best_requests[0]
+            satisfied_requests.append((best_request[3], best_request[4], provider))
+            upload_count[provider] += 1
         
-        for i, provider, frag in requests:
-            if provider is None:
-                continue
-            if (i, provider) in satisfied:
-                clients[i].add(frag)
-                received_from[i][provider] += 1
-                if len(clients[i]) == k and rounds[i] == 0:
-                    rounds[i] = current_round
+        for requester, frag, provider in satisfied_requests:
+            clients[requester].add(frag)
+            if requester not in received_from[provider]:
+                received_from[provider][requester] = 0
+            received_from[provider][requester] += 1
+            
+            if len(clients[requester]) == k and rounds[requester] == 0:
+                rounds[requester] = current_round
+                completed += 1
     
-    with open('OUTPUT.TXT', 'w') as f:
-        for i in range(1, n):
-            f.write(f"{rounds[i]}\n")
+    for i in range(2, n+1):
+        print(rounds[i])
 
 if __name__ == "__main__":
     main()

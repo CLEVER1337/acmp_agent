@@ -1,6 +1,7 @@
 
+import sys
+
 def main():
-    import sys
     data = sys.stdin.read().split()
     n = int(data[0])
     m = int(data[1])
@@ -15,11 +16,13 @@ def main():
             count += 1
             if arr[i] == query:
                 break
+                
         result.append(str(count))
         
-        arr.remove(query)
-        arr.insert(0, query)
-    
+        if count > 1:
+            arr.remove(query)
+            arr.insert(0, query)
+            
     print(' '.join(result))
 
 if __name__ == "__main__":

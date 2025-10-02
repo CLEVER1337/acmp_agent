@@ -14,86 +14,54 @@ def main():
     
     def get_char(pos, k_level, char):
         if k_level == 0:
-            if pos <= len(char):
-                return char[pos - 1]
+            if pos < len(char):
+                return char[pos]
             return '-'
         
-        if char.isalpha():
-            char_idx = ord(char) - ord('A')
-            if char_idx < 0 or char_idx >= len(morphisms):
-                return '-'
-            morph = morphisms[char_idx]
-        else:
-            morph = char
-            
-        if k_level == 0:
-            if pos <= len(morph):
-                return morph[pos - 1]
+        if char not in 'ABCDEFGHIJ'[:n]:
             return '-'
-        
-        total_len = 0
-        for c in morph:
-            if k_level == 0:
-                char_len = 1
-            else:
-                if c.isalpha():
-                    char_idx = ord(c) - ord('A')
-                    if char_idx < 0 or char_idx >= len(morphisms):
-                        char_len = 1
-                    else:
-                        char_len = len(get_expanded_length(c, k_level - 1))
-                else:
-                    char_len = 1
             
-            if total_len + char_len >= pos:
-                return get_char(pos - total_len, k_level - 1, c)
-            total_len += char_len
+        idx = ord(char) - ord('A')
+        expansion = morphisms[idx]
+        
+        for c in expansion:
+            if pos < len_expansion(c, k_level - 1):
+                return get_char(pos, k_level - 1, c)
+            pos -= len_expansion(c, k_level - 1)
         
         return '-'
     
-    def get_expanded_length(s, level):
-        if level == 0:
-            return s
+    memo = {}
+    def len_expansion(char, k_level):
+        if k_level == 0:
+            return 1
             
-        result = []
-        for char in s:
-            if char.isalpha():
-                char_idx = ord(char) - ord('A')
-                if 0 <= char_idx < len(morphisms):
-                    result.append(get_expanded_length(morphisms[char_idx], level - 1))
-                else:
-                    result.append(char)
-            else:
-                result.append(char)
-        return ''.join(result)
+        key = (char, k_level)
+        if key in memo:
+            return memo[key]
+            
+        if char not in 'ABCDEFGHIJ'[:n]:
+            memo[key] = 0
+            return 0
+            
+        idx = ord(char) - ord('A')
+        expansion = morphisms[idx]
+        total = 0
+        for c in expansion:
+            total += len_expansion(c, k_level - 1)
+            
+        memo[key] = total
+        return total
     
-    if k == 0:
-        if p <= len(w):
-            print(w[p - 1])
-        else:
-            print('-')
-        return
-            
-    total_len = 0
+    pos = p - 1
     for char in w:
-        if k == 0:
-            char_len = 1
-        else:
-            if char.isalpha():
-                char_idx = ord(char) - ord('A')
-                if char_idx < 0 or char_idx >= len(morphisms):
-                    char_len = 1
-                else:
-                    char_len = len(get_expanded_length(morphisms[char_idx], k - 1))
-            else:
-                char_len = 1
-        
-        if total_len + char_len >= p:
-            result_char = get_char(p - total_len, k - 1, char)
-            print(result_char)
+        char_len = len_expansion(char, k)
+        if pos < char_len:
+            result = get_char(pos, k, char)
+            print(result)
             return
-        total_len += char_len
-    
+        pos -= char_len
+        
     print('-')
 
 if __name__ == "__main__":

@@ -1,16 +1,19 @@
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        M, N = map(int, f.readline().split())
+    with open('INPUT.TXT', 'r') as f:
+        m, n = map(int, f.read().split())
     
-    if M == N:
-        winner = 2 if (M - 1) % 2 == 1 else 1
+    if m == n:
+        if (m - 1) % 2 == 0:
+            print(2)
+        else:
+            print(1)
     else:
-        min_val = min(M, N)
-        winner = 2 if min_val % 2 == 1 else 1
-    
-    with open("OUTPUT.TXT", "w") as f:
-        f.write(str(winner))
+        min_val = min(m, n)
+        if min_val % 2 == 1:
+            print(1)
+        else:
+            print(2)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

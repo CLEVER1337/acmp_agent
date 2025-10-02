@@ -8,36 +8,43 @@ def main():
     app_windows = {}
     
     for i in range(1, n + 1):
-        app_id, window_pos = map(int, data[i].split())
-        windows.append((app_id, window_pos))
+        parts = data[i].split()
+        app_id = int(parts[0])
+        window_id = int(parts[1])
+        windows.append((app_id, window_id))
         
         if app_id not in app_windows:
             app_windows[app_id] = []
-        app_windows[app_id].append(window_pos)
+        app_windows[app_id].append(window_id)
     
     for app_id in app_windows:
         app_windows[app_id].sort()
     
-    result = []
+    results = []
     current_pos = 0
     
     for i in range(n):
-        app_id, window_pos = windows[i]
+        app_id, window_id = windows[i]
+        
         app_list = app_windows[app_id]
         m = len(app_list)
         
-        idx = app_list.index(window_pos)
+        pos_in_app = app_list.index(window_id)
         
-        dist_in_app = min(idx, m - idx)
+        dist1 = abs(current_pos - i)
+        dist2 = n - dist1
+        dist_main = min(dist1, dist2)
         
-        dist_in_global = min(abs(i - current_pos), n - abs(i - current_pos))
+        dist_app1 = pos_in_app
+        dist_app2 = m - pos_in_app
+        dist_app = min(dist_app1, dist_app2)
         
-        total = dist_in_global + dist_in_app
-        result.append(str(total))
+        total = dist_main + dist_app
+        results.append(str(total))
         
         current_pos = i
     
-    print(' '.join(result))
+    print(" ".join(results))
 
 if __name__ == "__main__":
     main()

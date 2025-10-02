@@ -2,45 +2,68 @@
 import sys
 
 def solve():
-    data = sys.stdin.read().splitlines()
-    results = []
-    for line in data:
-        if line.strip() == "0 0":
+    data = sys.stdin.read().split()
+    index = 0
+    output_lines = []
+    while index < len(data):
+        n = int(data[index])
+        k = int(data[index + 1])
+        index += 2
+        if n == 0 and k == 0:
             break
-        parts = line.split()
-        if len(parts) < 2:
-            continue
-        N = int(parts[0])
-        K = int(parts[1])
-        
-        if K == 1:
-            results.append("1")
+            
+        if k == 1:
+            output_lines.append("1")
             continue
             
-        min_lex = None
-        
-        def dfs(current):
-            nonlocal min_lex
-            if current > N:
-                return
-            if current % K == 0:
-                if min_lex is None or str(current) < str(min_lex):
-                    min_lex = current
-                return
-            for digit in range(10):
-                next_num = current * 10 + digit
-                if next_num > N:
-                    continue
-                dfs(next_num)
-        
-        for start in range(1, 10):
-            dfs(start)
+        if n < k:
+            output_lines.append("-1")
+            continue
             
-        if min_lex is not None:
-            results.append(str(min_lex))
-        else:
-            results.append(str(K))
+        def lex_min():
+            if k <= n:
+                candidate = k
+                min_lex = str(candidate)
+                
+                length = len(str(k))
+                prefix = str(k)
+                
+                for l in range(length, len(str(n)) + 1):
+                    low = 10**(l-1)
+                    high = min(n, 10**l - 1)
+                    
+                    if low > n:
+                        break
+                        
+                    start = (low + k - 1) // k * k
+                    if start > high:
+                        continue
+                        
+                    num_str = str(start)
+                    if len(num_str) == l:
+                        if num_str < min_lex:
+                            min_lex = num_str
+                            
+                    if l > length:
+                        for first_digit in range(1, 10):
+                            base = first_digit * (10**(l-1))
+                            remainder = base % k
+                            if remainder == 0:
+                                candidate_num = base
+                            else:
+                                candidate_num = base + (k - remainder)
+                                
+                            if candidate_num <= high and candidate_num >= low:
+                                num_str = str(candidate_num)
+                                if num_str < min_lex:
+                                    min_lex = num_str
+                
+                return min_lex
+            return "-1"
             
-    sys.stdout.write("\n".join(results))
+        result = lex_min()
+        output_lines.append(result)
+    
+    sys.stdout.write("\n".join(output_lines))
 
 solve()

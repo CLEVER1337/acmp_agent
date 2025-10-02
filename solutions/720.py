@@ -2,33 +2,27 @@
 import math
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        data = f.readline().split()
-        R = float(data[0])
-        L = int(data[1])
+    data = input().split()
+    R = float(data[0])
+    L = int(data[1])
     
-    cells = 0
-    half_L = L / 2.0
+    count = 0
+    max_grid = math.floor(R / L)
     
-    max_grid = int(math.floor(R / L)) + 1
-    
-    for i in range(max_grid):
-        x = i * L + half_L
-        if x > R:
-            continue
+    for x in range(-max_grid, max_grid + 1):
+        for y in range(-max_grid, max_grid + 1):
+            x_left = x * L
+            y_bottom = y * L
+            x_right = (x + 1) * L
+            y_top = (y + 1) * L
             
-        for j in range(max_grid):
-            y = j * L + half_L
-            if y > R:
-                continue
+            farthest_x = max(abs(x_left), abs(x_right))
+            farthest_y = max(abs(y_bottom), abs(y_top))
+            
+            if math.sqrt(farthest_x**2 + farthest_y**2) <= R:
+                count += 1
                 
-            distance = math.sqrt(x*x + y*y)
-            if distance <= R:
-                cells += 1
-                
-    cells = cells * 4 - 4 * max_grid + 1
-    
-    print(cells)
+    print(count)
 
 if __name__ == "__main__":
     main()

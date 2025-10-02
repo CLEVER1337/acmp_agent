@@ -12,12 +12,12 @@ def is_prime(n):
     return True
 
 def main():
-    with open("INPUT.TXT", "r") as f:
+    with open('INPUT.TXT', 'r') as f:
         x = int(f.read().strip())
     
-    if x <= 2 or x % 2 != 0:
-        with open("OUTPUT.TXT", "w") as f:
-            f.write("0")
+    if x < 4 or x % 2 != 0:
+        with open('OUTPUT.TXT', 'w') as f:
+            f.write('0')
         return
     
     count = 0
@@ -27,13 +27,15 @@ def main():
             primes.append(i)
     
     seen = set()
-    for prime in primes:
-        complement = x - prime
-        if complement >= prime and complement in primes:
+    for p in primes:
+        if p > x // 2:
+            break
+        q = x - p
+        if q in primes and q >= p:
             count += 1
     
-    with open("OUTPUT.TXT", "w") as f:
+    with open('OUTPUT.TXT', 'w') as f:
         f.write(str(count))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

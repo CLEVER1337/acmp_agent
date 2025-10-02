@@ -10,17 +10,11 @@ def main():
         components = set(parts[1:1+k])
         juices.append(components)
     
-    washes = 0
-    current_components = set()
-    
-    for juice in juices:
-        if not current_components.issubset(juice):
+    washes = 1
+    for i in range(1, n):
+        if not juices[i].issuperset(juices[i-1]):
             washes += 1
-            current_components = juice.copy()
-        else:
-            current_components = juice.copy()
-    
-    washes += 1
+            
     print(washes)
 
 if __name__ == "__main__":

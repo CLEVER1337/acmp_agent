@@ -1,34 +1,50 @@
 
-import sys
-import math
+n = int(input().strip())
+circles = []
+for i in range(n):
+    r, c = map(int, input().split())
+    circles.append((r, c, i))
 
-def main():
-    data = sys.stdin.read().split()
-    n = int(data[0])
-    circles = []
-    index = 1
-    for i in range(n):
-        r = int(data[index])
-        c = int(data[index + 1])
-        index += 2
-        circles.append((r, c, i))
-    
-    centers = []
-    for i in range(n):
-        if i == 0:
-            centers.append((0.0, 0.0))
-        else:
-            r_prev, c_prev, idx_prev = circles[i-1]
-            r_curr, c_curr, idx_curr = circles[i]
-            min_dist = r_prev + r_curr + 0.01
-            x_prev, y_prev = centers[i-1]
-            angle = math.pi * (i - 1) / 10.0
-            x_curr = x_prev + min_dist * math.cos(angle)
-            y_curr = y_prev + min_dist * math.sin(angle)
-            centers.append((x_curr, y_curr))
-    
-    for center in centers:
-        print(f"{center[0]:.6f} {center[1]:.6f}")
+circles.sort(key=lambda x: x[0], reverse=True)
 
-if __name__ == "__main__":
-    main()
+coords = []
+for i in range(n):
+    r, c, idx = circles[i]
+    if i == 0:
+        coords.append((0.0, 0.0, idx))
+    else:
+        x = 0.0
+        y = 0.0
+        best_score = -10**18
+        best_pos = (0.0, 0.0)
+        
+        for j in range(i):
+            rx, ry, jdx = coords[j]
+            rj, cj, _ = circles[j]
+            dist = r + rj + 0.01
+            
+            for angle in [0, 45, 90, 135, 180, 225, 270, 315]:
+                rad = angle * 3.141592653589793 / 180.0
+                nx = rx + dist * math.cos(rad)
+                ny = ry + dist * math.sin(rad)
+                
+                if abs(nx) > 10000 or abs(ny) > 10000:
+                    continue
+                    
+                score = 0
+                for k in range(i):
+                    cx, cy, kdx = coords[k]
+                    rk, ck, _ = circles[k]
+                    d = math.sqrt((nx - cx)**2 + (ny - cy)**2)
+                    if d < r + rk:
+                        score += ck
+                
+                if score > best_score:
+                    best_score = score
+                    best_pos = (nx, ny)
+        
+        coords.append((best_pos[0], best_pos[1], idx))
+
+coords.sort(key=lambda x: x[2])
+for x, y, idx in coords:
+    print(f"{x:.10f} {y:.10f}")

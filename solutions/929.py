@@ -1,15 +1,14 @@
 
 n = int(input().strip())
 
-if n == 0:
+if n <= 0:
     print("0 0")
 else:
-    min_second = (n + 5) // 6
-    max_second = n * 6
+    min_second = (n + 5) // 6 * 2
+    max_second = (n + 1) // 2 * 7
     
-    if n % 6 != 0:
-        min_second = (n // 6) + 1
-    else:
-        min_second = n // 6
-        
+    if n % 2 == 1:
+        min_second = max(min_second, 7)
+        max_second = max_second - 1
+    
     print(f"{min_second} {max_second}")

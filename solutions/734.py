@@ -11,15 +11,17 @@ def main():
     dp[0] = 1
     for i in range(1, N + 1):
         dp[i] = dp[i - 1] * K % MOD
+        if i >= 2:
+            dp[i] = (dp[i] + dp[i - 2] * K * (K - 1)) % MOD
     
-    total = 0
+    total_strings = dp[N]
+    
+    count_sets = 1
     for i in range(1, N + 1):
-        total = (total + dp[i]) % MOD
+        count_sets = count_sets * (total_strings - dp[i - 1]) % MOD
     
-    count = dp[N]
-    
-    print(total)
-    print(count)
+    print(total_strings)
+    print(count_sets)
 
 if __name__ == "__main__":
     main()

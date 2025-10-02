@@ -6,23 +6,22 @@ def main():
     data = sys.stdin.read().split()
     n = int(data[0])
     points = []
+    index = 1
     for i in range(n):
-        x = float(data[1 + 2*i])
-        y = float(data[2 + 2*i])
+        x = float(data[index])
+        y = float(data[index + 1])
+        index += 2
         points.append((x, y))
-    
-    def dist_sq(a, b):
-        dx = a[0] - b[0]
-        dy = a[1] - b[1]
-        return dx*dx + dy*dy
     
     edges = []
     for i in range(n):
-        for j in range(i+1, n):
-            d_sq = dist_sq(points[i], points[j])
-            edges.append((d_sq, i, j))
+        for j in range(i + 1, n):
+            dx = points[i][0] - points[j][0]
+            dy = points[i][1] - points[j][1]
+            dist = math.sqrt(dx*dx + dy*dy)
+            edges.append((dist, i, j))
     
-    edges.sort()
+    edges.sort(key=lambda x: x[0])
     
     parent = list(range(n))
     rank = [0] * n
@@ -47,38 +46,35 @@ def main():
         return True
     
     mst_edges = []
-    for d_sq, u, v in edges:
+    for dist, u, v in edges:
         if union(u, v):
-            mst_edges.append((d_sq, u, v))
+            mst_edges.append((dist, u, v))
     
     graph = [[] for _ in range(n)]
-    for d_sq, u, v in mst_edges:
-        graph[u].append((v, d_sq))
-        graph[v].append((u, d_sq))
+    for dist, u, v in mst_edges:
+        graph[u].append((v, dist))
+        graph[v].append((u, dist))
     
-    color = [0] * n
-    color[0] = 1
+    color = [-1] * n
+    color[0] = 0
     
     stack = [0]
     while stack:
         u = stack.pop()
-        for v, d_sq in graph[u]:
-            if color[v] == 0:
-                color[v] = 3 - color[u]
+        for v, dist in graph[u]:
+            if color[v] == -1:
+                color[v] = 1 - color[u]
                 stack.append(v)
     
-    min_edge = float('inf')
-    for i in range(n):
-        for j in range(i+1, n):
-            if color[i] == color[j]:
-                d_sq = dist_sq(points[i], points[j])
-                if d_sq < min_edge:
-                    min_edge = d_sq
+    critical_dist = float('inf')
+    for dist, u, v in edges:
+        if color[u] == color[v]:
+            critical_dist = min(critical_dist, dist)
     
-    max_power = math.sqrt(min_edge) / 2.0
+    max_power = critical_dist / 2.0
     
     print(f"{max_power:.10f}")
-    print(" ".join(str(c) for c in color))
+    print(" ".join(str(c + 1) for c in color))
 
 if __name__ == "__main__":
     main()

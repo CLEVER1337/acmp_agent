@@ -4,6 +4,7 @@ def f(n):
         return 0
     if n == 1:
         return 1
+    
     if n % 2 == 0:
         return f(n // 2)
     else:
@@ -12,9 +13,9 @@ def f(n):
 
 def main():
     with open('INPUT.TXT', 'r') as f_in:
-        N = int(f_in.read().strip())
+        n = int(f_in.read().strip())
     
-    result = f(N)
+    result = f(n)
     
     with open('OUTPUT.TXT', 'w') as f_out:
         f_out.write(str(result))

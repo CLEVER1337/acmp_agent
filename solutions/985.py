@@ -16,7 +16,7 @@ def main():
     m = int(data[index])
     index += 1
     arrays = []
-    for i in range(m):
+    for _ in range(m):
         arrays.append(data[index])
         index += 1
     
@@ -24,22 +24,27 @@ def main():
     for arr_desc in arrays:
         parts = arr_desc.split()
         base_type = parts[0]
-        dims = []
-        i = 1
-        while '[' in parts[i]:
-            dim_str = parts[i].strip('[];')
-            dims.append(int(dim_str))
-            i += 1
+        name_part = parts[1]
+        
+        dimensions = []
+        current = name_part
+        while '[' in current:
+            start = current.find('[')
+            end = current.find(']')
+            dim = int(current[start+1:end])
+            dimensions.append(dim)
+            current = current[:start]
         
         base_size = type_sizes[base_type]
         total_size = 0
-        prev_size = base_size
         
-        for dim in reversed(dims):
-            array_size = 16 + 4 + dim * prev_size
-            prev_size = array_size
+        for i in range(len(dimensions)):
+            dims = dimensions[i:]
+            size_for_level = base_size
+            for dim in dims[1:]:
+                size_for_level = 4 + 16 + 4 + dim * size_for_level
+            total_size = 4 + 16 + 4 + dims[0] * size_for_level
         
-        total_size = 4 + prev_size
         results.append(str(total_size))
     
     print('\n'.join(results))

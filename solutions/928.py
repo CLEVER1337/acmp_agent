@@ -1,7 +1,6 @@
 
-import sys
-
 def main():
+    import sys
     data = sys.stdin.read().split()
     if not data:
         print(0)
@@ -14,46 +13,40 @@ def main():
     M = int(data[3+N])
     right_trees = list(map(int, data[4+N:4+N+M]))
     
-    if L < 2 * W + 2:
-        print(0)
-        return
-        
-    def perimeter(points_left, points_right):
-        if not points_left or not points_right:
+    def perimeter(left_indices, right_indices):
+        if not left_indices or not right_indices:
             return float('inf')
             
-        min_left = min(points_left)
-        max_left = max(points_left)
-        min_right = min(points_right)
-        max_right = max(points_right)
+        left_min = min(left_indices)
+        left_max = max(left_indices)
+        right_min = min(right_indices)
+        right_max = max(right_indices)
         
-        width = W
-        min_y = min(min_left, min_right)
-        max_y = max(max_left, max_right)
+        min_x = min(left_min, right_min)
+        max_x = max(left_max, right_max)
         
-        horizontal = max_right - min_left + width
-        vertical = max_y - min_y
+        horizontal = 2 * (max_x - min_x)
+        vertical = 2 * W
         
-        return 2 * (horizontal + vertical)
+        return horizontal + vertical
     
-    max_total = 0
+    max_trees = 0
     
     for left_count in range(1, N + 1):
         for right_count in range(1, M + 1):
-            if left_count + right_count <= max_total:
+            if left_count + right_count <= max_trees:
                 continue
                 
-            for i in range(N - left_count + 1):
-                selected_left = left_trees[i:i+left_count]
+            left_selected = left_trees[:left_count]
+            right_selected = right_trees[:right_count]
+            
+            p = perimeter(left_selected, right_selected)
+            if p <= L:
+                max_trees = max(max_trees, left_count + right_count)
+            else:
+                break
                 
-                for j in range(M - right_count + 1):
-                    selected_right = right_trees[j:j+right_count]
-                    
-                    p = perimeter(selected_left, selected_right)
-                    if p <= L:
-                        max_total = max(max_total, left_count + right_count)
-    
-    print(max_total)
+    print(max_trees)
 
 if __name__ == "__main__":
     main()

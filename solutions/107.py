@@ -2,42 +2,38 @@
 def main():
     s = input().strip()
     patterns = {
-        'aa': 3, 'aaa': 20, 'aaaa': 25,
-        'ab': 0, 'aab': 10, 'aaab': 15,
-        'abb': 5, 'abbb': 15, 'abba': 20,
-        'abc': 0, 'aabb': 15, 'aabc': 10,
-        'abcc': 10, 'abbc': 10, 'abcd': 0
+        'aabb': 15, 'abba': 15, 'aaaa': 10, 'aaba': 8, 'abab': 8, 'aaab': 6, 'abaa': 6, 'abbb': 6, 'aabc': 4, 'abbc': 4, 'abcc': 4, 'abcd': 2
     }
     
     n = len(s)
     dp = [-10**9] * (n + 1)
-    dp[0] = 0
     path = [None] * (n + 1)
+    dp[0] = 0
     
     for i in range(n + 1):
+        if dp[i] == -10**9:
+            continue
         for size in [2, 3, 4]:
-            if i - size >= 0:
-                group = s[i-size:i]
+            if i + size <= n:
+                group = s[i:i+size]
                 pattern = get_pattern(group)
                 score = patterns.get(pattern, 0)
-                if dp[i] < dp[i-size] + score:
-                    dp[i] = dp[i-size] + score
-                    path[i] = (i-size, group)
+                if dp[i + size] < dp[i] + score:
+                    dp[i + size] = dp[i] + score
+                    path[i + size] = (i, size)
     
     parts = []
-    i = n
-    while i > 0:
-        prev, group = path[i]
-        parts.append(group)
-        i = prev
-    
+    pos = n
+    while pos > 0:
+        prev, size = path[pos]
+        parts.append(s[prev:pos])
+        pos = prev
     parts.reverse()
     result = '-'.join(parts)
     print(result)
     print(dp[n])
 
 def get_pattern(s):
-    from collections import defaultdict
     mapping = {}
     pattern = []
     for char in s:
@@ -46,5 +42,5 @@ def get_pattern(s):
         pattern.append(mapping[char])
     return ''.join(pattern)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

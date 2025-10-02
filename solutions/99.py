@@ -8,55 +8,63 @@ def main():
     h, m, n = map(int, data[0].split())
     levels = []
     index = 1
-    prince_pos = None
-    princess_pos = None
+    
+    for i in range(h):
+        level = []
+        for j in range(m):
+            level.append(data[index].strip())
+            index += 1
+        levels.append(level)
+        if i < h - 1:
+            index += 1
+    
+    start_level = 0
+    start_i = 0
+    start_j = 0
+    end_level = h - 1
+    end_i = 0
+    end_j = 0
     
     for level_idx in range(h):
-        grid = []
         for i in range(m):
-            line = data[index].strip()
-            index += 1
-            grid.append(list(line))
-            
-            if '1' in line:
-                prince_pos = (level_idx, i, line.index('1'))
-            if '2' in line:
-                princess_pos = (level_idx, i, line.index('2'))
-        
-        levels.append(grid)
-        if index < len(data) and data[index].strip() == '':
-            index += 1
+            for j in range(n):
+                if levels[level_idx][i][j] == '1':
+                    start_level = level_idx
+                    start_i = i
+                    start_j = j
+                elif levels[level_idx][i][j] == '2':
+                    end_level = level_idx
+                    end_i = i
+                    end_j = j
     
     directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
     
-    visited = [[[float('inf')] * n for _ in range(m)] for __ in range(h)]
-    lvl, row, col = prince_pos
-    visited[lvl][row][col] = 0
-    
-    queue = deque([(lvl, row, col)])
+    visited = [[[-1] * n for _ in range(m)] for __ in range(h)]
+    queue = deque()
+    queue.append((start_level, start_i, start_j))
+    visited[start_level][start_i][start_j] = 0
     
     while queue:
-        lvl, row, col = queue.popleft()
-        current_time = visited[lvl][row][col]
+        level, i, j = queue.popleft()
+        current_time = visited[level][i][j]
         
-        if (lvl, row, col) == princess_pos:
+        if level == end_level and i == end_i and j == end_j:
             print(current_time)
             return
+            
+        for dx, dy in directions:
+            ni, nj = i + dx, j + dy
+            if 0 <= ni < m and 0 <= nj < n and levels[level][ni][nj] != 'o':
+                if visited[level][ni][nj] == -1:
+                    visited[level][ni][nj] = current_time + 5
+                    queue.append((level, ni, nj))
         
-        for dr, dc in directions:
-            new_row, new_col = row + dr, col + dc
-            if 0 <= new_row < m and 0 <= new_col < n:
-                if levels[lvl][new_row][new_col] != 'o':
-                    if visited[lvl][new_row][new_col] > current_time + 5:
-                        visited[lvl][new_row][new_col] = current_time + 5
-                        queue.append((lvl, new_row, new_col))
-        
-        if lvl < h - 1 and levels[lvl][row][col] != 'o':
-            if visited[lvl + 1][row][col] > current_time + 5:
-                visited[lvl + 1][row][col] = current_time + 5
-                queue.append((lvl + 1, row, col))
+        if level < h - 1 and levels[level + 1][i][j] != 'o':
+            if visited[level + 1][i][j] == -1:
+                visited[level + 1][i][j] = current_time + 5
+                queue.append((level + 1, i, j))
     
-    print(visited[princess_pos[0]][princess_pos[1]][princess_pos[2]])
+    print(visited[end_level][end_i][end_j])
 
 if __name__ == "__main__":
     main()

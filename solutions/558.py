@@ -8,38 +8,27 @@ def main():
     radii = list(map(int, data[1:1+n]))
     
     radii.sort(reverse=True)
-    
     count = 0
     
     for i in range(n):
         for j in range(i+1, n):
             for k in range(j+1, n):
-                r_i = radii[i]
-                r_j = radii[j]
-                r_k = radii[k]
+                r1, r2, r3 = radii[i], radii[j], radii[k]
                 
-                if r_i <= r_j or r_j <= r_k:
+                # Проверяем, можно ли составить треугольник из трех касающихся кругов
+                if r1 >= r2 + r3:
                     continue
+                    
+                # Вычисляем радиус вписанной окружности (круга Декарта)
+                # Формула Декарта для трех касающихся кругов
+                k1, k2, k3 = 1/r1, 1/r2, 1/r3
+                k4 = k1 + k2 + k3 + 2 * math.sqrt(k1*k2 + k2*k3 + k3*k1)
+                r4 = 1 / k4
                 
-                dist_ij = r_i + r_j
-                dist_ik = r_i + r_k
-                dist_jk = r_j + r_k
-                
-                angle_i = math.acos((dist_ij**2 + dist_ik**2 - dist_jk**2) / (2 * dist_ij * dist_ik))
-                angle_j = math.acos((dist_ij**2 + dist_jk**2 - dist_ik**2) / (2 * dist_ij * dist_jk))
-                angle_k = math.acos((dist_ik**2 + dist_jk**2 - dist_ij**2) / (2 * dist_ik * dist_jk))
-                
-                area_triangle = 0.5 * dist_ij * dist_ik * math.sin(angle_i)
-                
-                inradius = (2 * area_triangle) / (dist_ij + dist_ik + dist_jk)
-                
+                # Проверяем все меньшие круги
                 for l in range(k+1, n):
-                    r_l = radii[l]
-                    
-                    if r_l >= inradius:
-                        continue
-                    
-                    count += 1
+                    if radii[l] <= r4:
+                        count += 1
     
     print(count)
 

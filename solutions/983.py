@@ -17,26 +17,19 @@ def main():
     result = [0] * n
     stack = []
     
-    for i in range(n):
-        t, w, idx = people[i]
-        if not stack:
-            stack.append((t, w, idx))
-            result[idx] = t * w
-        else:
-            last_t, last_w, last_idx = stack[-1]
-            if t < last_t:
-                stack.append((t, w, idx))
-                result[idx] = t * w
-            else:
-                total_time = result[last_idx]
-                while stack and t >= stack[-1][0]:
-                    prev_t, prev_w, prev_idx = stack.pop()
-                    total_time = result[prev_idx]
-                stack.append((t, w, idx))
-                result[idx] = total_time
+    for t, w, idx in people:
+        current_time = t * w
+        while stack:
+            prev_t, prev_w, prev_idx, prev_total = stack[-1]
+            if prev_t * prev_w >= current_time:
+                break
+            stack.pop()
+            current_time = max(current_time, prev_total + t * (w - prev_w))
+        stack.append((t, w, idx, current_time))
+        result[idx] = current_time
     
-    for i in range(n):
-        print(result[i])
+    for res in result:
+        print(res)
 
 if __name__ == "__main__":
     main()

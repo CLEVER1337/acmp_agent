@@ -2,12 +2,12 @@
 import math
 
 def convex_hull(points):
+    def cross(o, a, b):
+        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+    
     points = sorted(set(points))
     if len(points) <= 1:
         return points
-    
-    def cross(o, a, b):
-        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
     
     lower = []
     for p in points:
@@ -41,15 +41,12 @@ def main():
             points.append((x, y))
     
     if n <= 2:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write('0')
+        print(0)
         return
     
     hull = convex_hull(points)
     area = polygon_area(hull)
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(round(area)))
+    print(round(area))
 
 if __name__ == '__main__':
     main()

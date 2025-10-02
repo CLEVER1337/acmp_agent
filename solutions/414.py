@@ -7,43 +7,40 @@ def main():
     n = int(data[0])
     target1 = int(data[1])
     target2 = int(data[2])
-    parents = list(map(int, data[3:3+n-1]))
+    parents = [0] * (n + 1)
     
-    graph = [[] for _ in range(n+1)]
-    for i in range(2, n+1):
-        parent = parents[i-2]
-        graph[parent].append(i)
-        graph[i].append(parent)
+    for i in range(3, len(data)):
+        parents[i - 2] = int(data[i])
     
-    def bfs(start):
-        dist = [-1] * (n+1)
-        queue = deque()
-        dist[start] = 0
-        queue.append(start)
-        
-        while queue:
-            u = queue.popleft()
-            for v in graph[u]:
-                if dist[v] == -1:
-                    dist[v] = dist[u] + 1
-                    queue.append(v)
-        return dist
+    parents[1] = 0
     
-    dist1 = bfs(target1)
-    dist2 = bfs(target2)
+    def get_path(start):
+        path = []
+        current = start
+        while current != 0:
+            path.append(current)
+            current = parents[current]
+        return path
     
-    min_max_dist = float('inf')
-    result = 0
+    path1 = get_path(target1)
+    path2 = get_path(target2)
     
-    for i in range(1, n+1):
-        max_dist = max(dist1[i], dist2[i])
-        if max_dist < min_max_dist:
-            min_max_dist = max_dist
-            result = i
-        elif max_dist == min_max_dist and i < result:
-            result = i
-            
-    print(result)
+    i = len(path1) - 1
+    j = len(path2) - 1
+    
+    while i >= 0 and j >= 0 and path1[i] == path2[j]:
+        i -= 1
+        j -= 1
+    
+    lca = path1[i + 1]
+    
+    dist1 = len(path1) - (i + 2)
+    dist2 = len(path2) - (j + 2)
+    
+    if dist1 <= dist2:
+        print(target1)
+    else:
+        print(target2)
 
 if __name__ == "__main__":
     main()

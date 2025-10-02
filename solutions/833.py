@@ -12,8 +12,11 @@ def main():
             j = i + 1
             while j < n and s[j] != t[i]:
                 j += 1
-            operations.append((i+1, j+1))
-            s = s[:i] + s[i:j+1][::-1] + s[j+1:]
+            
+            operations.append((i + 1, j + 1))
+            substring = s[i:j+1]
+            reversed_substring = substring[::-1]
+            s = s[:i] + reversed_substring + s[j+1:]
     
     with open("OUTPUT.TXT", "w") as f:
         f.write(str(len(operations)) + "\n")

@@ -14,201 +14,180 @@ def main():
     for i in range(1, 1 + size):
         grid.append(list(data[i].strip()))
     
-    start_x, start_y = n, n
-    start_dir = (-1, 0)
+    start_pos = (n, n)
+    start_dir = (n-1, n)
     
     enemy_ships = []
     islands = []
-    for y in range(size):
-        for x in range(size):
-            if grid[y][x] == '+':
-                start_x, start_y = x, y
-            elif grid[y][x] == '!':
-                enemy_ships.append((x, y))
-            elif grid[y][x] == '@':
-                islands.append((x, y))
+    for i in range(size):
+        for j in range(size):
+            if grid[i][j] == '@':
+                enemy_ships.append((i, j))
+            elif grid[i][j] == '#':
+                islands.append((i, j))
     
-    directions = [(-1, -1), (-1, 0), (-1, 1),
-                 (0, -1),           (0, 1),
-                 (1, -1),  (1, 0),  (1, 1)]
+    def get_direction(from_pos, to_pos):
+        dx = to_pos[0] - from_pos[0]
+        dy = to_pos[1] - from_pos[1]
+        return (dx, dy)
     
-    def is_valid(x, y):
+    def normalize_direction(dx, dy):
+        if dx == 0 and dy == 0:
+            return (0, 0)
+        if dx == 0:
+            return (0, 1 if dy > 0 else -1)
+        if dy == 0:
+            return (1 if dx > 0 else -1, 0)
+        return (1 if dx > 0 else -1, 1 if dy > 0 else -1)
+    
+    def get_perpendicular_directions(dx, dy):
+        if dx == 0:
+            return [(1, 0), (-1, 0)]
+        if dy == 0:
+            return [(0, 1), (0, -1)]
+        return [(dy, -dx), (-dy, dx)]
+    
+    def is_valid_pos(x, y):
         return 0 <= x < size and 0 <= y < size
     
-    def can_move_to(x, y, obstacles):
-        if not is_valid(x, y):
-            return False
-        for ox, oy in obstacles:
-            if x == ox and y == oy:
-                return False
-        return True
-    
-    def get_shoot_targets(ship_x, ship_y, dir_x, dir_y, obstacles):
-        targets = []
-        perp_dirs = []
-        if dir_x == 0:
-            perp_dirs = [(1, 0), (-1, 0)]
-        elif dir_y == 0:
-            perp_dirs = [(0, 1), (0, -1)]
-        else:
-            perp_dirs = [(1, -1), (-1, 1)]
-        
-        for dx, dy in perp_dirs:
-            for dist in range(1, 4):
-                tx, ty = ship_x + dx * dist, ship_y + dy * dist
-                if not is_valid(tx, ty):
-                    break
-                hit = False
-                for ex, ey in enemy_ships:
-                    if tx == ex and ty == ey:
-                        targets.append((tx, ty))
-                        hit = True
-                        break
-                if hit:
-                    break
-                for ox, oy in obstacles:
-                    if tx == ox and ty == oy:
-                        break
-        return targets
-    
-    def move_enemy_ships(player_x, player_y, obstacles):
-        new_enemies = []
+    def simulate_shot(grid_copy, pos, direction):
+        x, y = pos
+        dx, dy = direction
+        perp_dirs = get_perpendicular_directions(dx, dy)
         destroyed = set()
-        for ex, ey in enemy_ships:
-            best_dist = float('inf')
-            best_move = None
-            for dx, dy in directions:
-                nx, ny = ex + dx, ey + dy
-                if not is_valid(nx, ny):
-                    continue
-                dist = abs(player_x - nx) + abs(player_y - ny)
-                if dist < best_dist:
-                    best_dist = dist
-                    best_move = (nx, ny)
-            
-            if best_move:
-                mx, my = best_move
-                collision = False
-                for ox, oy in obstacles:
-                    if mx == ox and my == oy:
-                        collision = True
-                        break
-                if collision:
-                    destroyed.add((ex, ey))
-                else:
-                    new_enemies.append((mx, my))
+        new_wrecks = []
         
-        return new_enemies, destroyed
+        for pdx, pdy in perp_dirs:
+            for dist in range(1, 4):
+                tx, ty = x + pdx * dist, y + pdy * dist
+                if not is_valid_pos(tx, ty):
+                    break
+                    
+                cell = grid_copy[tx][ty]
+                if cell == '@':
+                    destroyed.add((tx, ty))
+                    new_wrecks.append((tx, ty))
+                    break
+                elif cell == '#' or cell == '*':
+                    break
+        
+        return destroyed, new_wrecks
+    
+    def move_enemy_ships(grid_copy, player_pos):
+        new_enemies = []
+        wrecks_created = []
+        enemy_positions = {}
+        
+        for i in range(size):
+            for j in range(size):
+                if grid_copy[i][j] == '@':
+                    px, py = player_pos
+                    best_dist = float('inf')
+                    best_move = None
+                    
+                    for dx, dy in [(0,1),(1,0),(0,-1),(-1,0),(1,1),(1,-1),(-1,1),(-1,-1)]:
+                        nx, ny = i + dx, j + dy
+                        if is_valid_pos(nx, ny):
+                            dist = abs(px - nx) + abs(py - ny)
+                            if dist < best_dist:
+                                best_dist = dist
+                                best_move = (nx, ny)
+                    
+                    if best_move:
+                        nx, ny = best_move
+                        if grid_copy[nx][ny] == '.':
+                            enemy_positions[(nx, ny)] = enemy_positions.get((nx, ny), 0) + 1
+                        elif grid_copy[nx][ny] == '+':
+                            return None
+                        elif grid_copy[nx][ny] == '#':
+                            wrecks_created.append((nx, ny))
+        
+        for (x, y), count in enemy_positions.items():
+            if count == 1:
+                new_enemies.append((x, y))
+            else:
+                wrecks_created.append((x, y))
+                
+        return new_enemies, wrecks_created
+    
+    def state_hash(player_pos, player_dir, enemies_set, wrecks_set):
+        return (player_pos, player_dir, frozenset(enemies_set), frozenset(wrecks_set))
     
     visited = set()
     queue = deque()
-    initial_state = (start_x, start_y, start_dir[0], start_dir[1], tuple(enemy_ships), tuple(islands))
-    queue.append((initial_state, []))
-    visited.add(initial_state)
+    initial_enemies = set(enemy_ships)
+    initial_wrecks = set()
     
-    solution = None
+    initial_state = (start_pos, get_direction(start_dir, start_pos), initial_enemies, initial_wrecks)
+    visited.add(state_hash(*initial_state))
+    queue.append((initial_state, []))
     
     while queue:
-        state, path = queue.popleft()
-        x, y, dir_x, dir_y, enemies, obst = state
+        current_state, path = queue.popleft()
+        player_pos, player_dir, enemies, wrecks = current_state
         
         if not enemies:
-            solution = (len(path), path)
-            break
+            print(len(path))
+            for pos in path:
+                print(f"{pos[0]} {pos[1]}")
+            return
         
-        enemies_list = list(enemies)
-        obstacles_list = list(obst)
+        grid_copy = [['.' for _ in range(size)] for _ in range(size)]
+        grid_copy[player_pos[0]][player_pos[1]] = '+'
         
-        for dx, dy in directions:
-            nx, ny = x + dx, y + dy
-            if can_move_to(nx, ny, obstacles_list + enemies_list):
-                new_dir = (dx, dy)
-                new_enemies, destroyed = move_enemy_ships(nx, ny, obstacles_list)
+        for ex, ey in enemies:
+            grid_copy[ex][ey] = '@'
+        
+        for wx, wy in wrecks:
+            grid_copy[wx][wy] = '*'
+        
+        for ix, iy in islands:
+            grid_copy[ix][iy] = '#'
+        
+        for dx, dy in [(0,1),(1,0),(0,-1),(-1,0),(1,1),(1,-1),(-1,1),(-1,-1)]:
+            nx, ny = player_pos[0] + dx, player_pos[1] + dy
+            if is_valid_pos(nx, ny) and grid_copy[nx][ny] == '.':
+                new_dir = normalize_direction(dx, dy)
+                new_pos = (nx, ny)
+                new_enemies = set(enemies)
+                new_wrecks = set(wrecks)
                 
-                player_collision = False
-                for ex, ey in new_enemies:
-                    if ex == nx and ey == ny:
-                        player_collision = True
-                        break
-                
-                if player_collision:
+                enemy_result = move_enemy_ships(grid_copy, new_pos)
+                if enemy_result is None:
                     continue
+                    
+                moved_enemies, new_wrecks_from_move = enemy_result
+                new_enemies = set(moved_enemies)
+                new_wrecks.update(new_wrecks_from_move)
                 
-                new_obstacles = obstacles_list + list(destroyed)
-                new_enemies_set = set(new_enemies)
-                final_enemies = []
-                seen_positions = set()
-                collisions = set()
+                new_state = (new_pos, new_dir, new_enemies, new_wrecks)
+                state_key = state_hash(*new_state)
                 
-                for enemy in new_enemies:
-                    if enemy in seen_positions:
-                        collisions.add(enemy)
-                    else:
-                        seen_positions.add(enemy)
-                
-                for enemy in new_enemies:
-                    if enemy not in collisions:
-                        final_enemies.append(enemy)
-                
-                new_obstacles.extend(collisions)
-                
-                new_state = (nx, ny, new_dir[0], new_dir[1], tuple(final_enemies), tuple(new_obstacles))
-                if new_state not in visited:
-                    visited.add(new_state)
-                    new_path = path + [(nx, ny)]
-                    queue.append((new_state, new_path))
+                if state_key not in visited:
+                    visited.add(state_key)
+                    queue.append((new_state, path + [new_pos]))
         
-        shoot_targets = get_shoot_targets(x, y, dir_x, dir_y, obstacles_list)
-        if shoot_targets:
-            new_enemies_set = set(enemies_list)
-            new_obstacles = obstacles_list.copy()
+        destroyed, new_wrecks_from_shot = simulate_shot(grid_copy, player_pos, player_dir)
+        new_enemies = set(enemies) - destroyed
+        new_wrecks = set(wrecks)
+        new_wrecks.update(new_wrecks_from_shot)
+        
+        enemy_result = move_enemy_ships(grid_copy, player_pos)
+        if enemy_result is None:
+            continue
             
-            for tx, ty in shoot_targets:
-                if (tx, ty) in new_enemies_set:
-                    new_enemies_set.remove((tx, ty))
-                    new_obstacles.append((tx, ty))
-            
-            new_enemies, destroyed = move_enemy_ships(x, y, new_obstacles)
-            
-            player_collision = False
-            for ex, ey in new_enemies:
-                if ex == x and ey == y:
-                    player_collision = True
-                    break
-            
-            if player_collision:
-                continue
-            
-            new_enemies_set = set(new_enemies)
-            seen_positions = set()
-            collisions = set()
-            
-            for enemy in new_enemies:
-                if enemy in seen_positions:
-                    collisions.add(enemy)
-                else:
-                    seen_positions.add(enemy)
-            
-            final_enemies = []
-            for enemy in new_enemies:
-                if enemy not in collisions:
-                    final_enemies.append(enemy)
-            
-            new_obstacles.extend(collisions)
-            
-            new_state = (x, y, dir_x, dir_y, tuple(final_enemies), tuple(new_obstacles))
-            if new_state not in visited:
-                visited.add(new_state)
-                new_path = path + [(x, y)]
-                queue.append((new_state, new_path))
+        moved_enemies, new_wrecks_from_move = enemy_result
+        new_enemies = set(moved_enemies)
+        new_wrecks.update(new_wrecks_from_move)
+        
+        new_state = (player_pos, player_dir, new_enemies, new_wrecks)
+        state_key = state_hash(*new_state)
+        
+        if state_key not in visited:
+            visited.add(state_key)
+            queue.append((new_state, path))
     
-    if solution:
-        moves_count, path = solution
-        print(moves_count)
-        for x, y in path:
-            print(f"{x} {y}")
-    else:
-        print("IMPOSSIBLE")
+    print("IMPOSSIBLE")
 
 if __name__ == "__main__":
     main()

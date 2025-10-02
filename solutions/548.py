@@ -1,28 +1,28 @@
 
 def main():
     with open('INPUT.TXT', 'r') as f:
-        a = f.readline().strip()
-        b = f.readline().strip()
+        num1 = f.readline().strip()
+        num2 = f.readline().strip()
     
+    i, j = 0, 0
     result = []
-    i = j = 0
     
-    while i < len(a) and j < len(b):
-        if a[i:] < b[j:]:
-            result.append(a[i])
+    while i < len(num1) and j < len(num2):
+        if num1[i:] < num2[j:]:
+            result.append(num1[i])
             i += 1
         else:
-            result.append(b[j])
+            result.append(num2[j])
             j += 1
     
-    while i < len(a):
-        result.append(a[i])
+    while i < len(num1):
+        result.append(num1[i])
         i += 1
         
-    while j < len(b):
-        result.append(b[j])
+    while j < len(num2):
+        result.append(num2[j])
         j += 1
-        
+    
     with open('OUTPUT.TXT', 'w') as f:
         f.write(''.join(result))
 

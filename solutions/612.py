@@ -19,23 +19,29 @@ def main():
     normX = normalize(X)
     normY = normalize(Y)
     
+    best_pos = -1
     best_len = float('inf')
-    best_word = None
     
-    for i in range(len(normX) + 1):
-        for j in range(len(normY) + 1):
-            prefix = normX[:i]
-            suffix = normY[j:]
-            
-            candidate = prefix + normY + suffix
-            normalized_candidate = normalize(candidate)
-            
-            if normalized_candidate == normalize(normX + normY[j:]):
-                if len(candidate) < best_len:
-                    best_len = len(candidate)
-                    best_word = candidate
+    for i in range(len(normY) + 1):
+        left = normY[:i]
+        right = normY[i:]
+        
+        candidate_left = normalize(normX + left)
+        if candidate_left.endswith(left):
+            candidate = candidate_left[:-len(left)] + normY
+            if len(candidate) < best_len:
+                best_len = len(candidate)
+                best_candidate = candidate
+                
+        candidate_right = normalize(right + normX)
+        if candidate_right.startswith(right):
+            candidate = normY + candidate_right[len(right):]
+            if len(candidate) < best_len:
+                best_len = len(candidate)
+                best_candidate = candidate
     
-    print(best_word)
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write(best_candidate)
 
 if __name__ == '__main__':
     main()

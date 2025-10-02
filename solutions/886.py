@@ -17,12 +17,21 @@ def main():
             l = i
             r = i + z[i] - 1
             
-    count = 0
-    for i in range(n):
-        if z[i] == n - i:
-            count += 1
+    period = n
+    for i in range(1, n):
+        if i + z[i] == n and n % i == 0:
+            period = i
+            break
             
+    count = 0
+    for i in range(0, n):
+        if z[i] >= n - i:
+            count += 1
+        else:
+            if s[z[i]] > s[i + z[i]]:
+                count += 1
+                
     print(count)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

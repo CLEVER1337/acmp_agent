@@ -2,46 +2,52 @@
 def main():
     import sys
     data = sys.stdin.read().split()
-    idx = 0
-    N = int(data[idx]); K = int(data[idx+1]); idx += 2
+    if not data:
+        return
     
-    initial_coins = list(map(int, data[idx:idx+N]))
-    idx += N
-    
-    final_coins = list(map(int, data[idx:idx+N-1]))
-    idx += N-1
-    
-    protocol = list(map(int, data[idx:idx+K]))
-    idx += K
+    n = int(data[0])
+    k = int(data[1])
+    initial_coins = list(map(int, data[2:2+n]))
+    final_coins = list(map(int, data[2+n:2+n+n-1]))
+    protocol = list(map(int, data[2+n+n-1:2+n+n-1+k]))
     
     initial_state = {}
     for coin in initial_coins:
-        abs_coin = abs(coin)
-        side = 1 if coin > 0 else -1
-        initial_state[abs_coin] = initial_state.get(abs_coin, 0) + side
+        nominal = abs(coin)
+        side = 1 if coin < 0 else 0
+        initial_state[nominal] = initial_state.get(nominal, 0) + (1 if side == 1 else 0)
     
     final_state = {}
     for coin in final_coins:
-        abs_coin = abs(coin)
-        side = 1 if coin > 0 else -1
-        final_state[abs_coin] = final_state.get(abs_coin, 0) + side
+        nominal = abs(coin)
+        side = 1 if coin < 0 else 0
+        final_state[nominal] = final_state.get(nominal, 0) + (1 if side == 1 else 0)
     
-    protocol_count = {}
+    flip_count = {}
     for nominal in protocol:
-        protocol_count[nominal] = protocol_count.get(nominal, 0) + 1
+        flip_count[nominal] = flip_count.get(nominal, 0) + 1
     
-    all_nominals = set(initial_state.keys()) | set(final_state.keys()) | set(protocol_count.keys())
+    all_nominals = set(initial_state.keys()) | set(final_state.keys()) | set(flip_count.keys())
     
     for nominal in all_nominals:
-        initial_side = initial_state.get(nominal, 0)
-        final_side = final_state.get(nominal, 0)
-        flips = protocol_count.get(nominal, 0)
+        initial_heads = initial_state.get(nominal, 0)
+        final_heads = final_state.get(nominal, 0)
+        flips = flip_count.get(nominal, 0)
         
-        expected_final_side = initial_side * ((-1) ** flips)
+        expected_final_heads = (initial_heads + flips) % 2
         
-        if expected_final_side != final_side:
-            result = nominal if expected_final_side > 0 else -nominal
-            print(result)
+        if nominal not in final_state:
+            if expected_final_heads == 0:
+                print(nominal)
+            else:
+                print(-nominal)
+            return
+        
+        if expected_final_heads != final_heads:
+            if expected_final_heads == 0:
+                print(nominal)
+            else:
+                print(-nominal)
             return
 
 if __name__ == "__main__":

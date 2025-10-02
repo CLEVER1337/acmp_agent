@@ -1,25 +1,36 @@
 
-import sys
-
 def main():
-    data = sys.stdin.readline().split()
+    import sys
+    data = sys.stdin.read().split()
     N = int(data[0])
     K1 = int(data[1])
     K2 = int(data[2])
     S = int(data[3])
     
-    dp = [[0.0] * (N + 1) for _ in range(N + 1)]
+    from decimal import Decimal, getcontext
+    getcontext().prec = 10000
     
-    for i in range(N):
-        dp[N][i] = 1.0
-        dp[i][N] = 0.0
+    def probability(n, i, j):
+        if i >= n:
+            return Decimal(1)
+        if j >= n:
+            return Decimal(0)
+        
+        dp = [[Decimal(0) for _ in range(n)] for __ in range(n)]
+        
+        for a in range(n-1, -1, -1):
+            for b in range(n-1, -1, -1):
+                if a == n-1 and b < n-1:
+                    dp[a][b] = Decimal(1)
+                elif b == n-1 and a < n-1:
+                    dp[a][b] = Decimal(0)
+                else:
+                    dp[a][b] = (dp[a+1][b] + dp[a][b+1]) / Decimal(2)
+        
+        return dp[i][j]
     
-    for i in range(N - 1, -1, -1):
-        for j in range(N - 1, -1, -1):
-            dp[i][j] = 0.5 * dp[i + 1][j] + 0.5 * dp[i][j + 1]
-    
-    p = dp[K1][K2]
-    petya_coins = round(p * S)
+    prob = probability(N, K1, K2)
+    petya_coins = (S * prob).to_integral_value(rounding='ROUND_HALF_UP')
     vasya_coins = S - petya_coins
     
     print(f"{petya_coins} {vasya_coins}")

@@ -1,61 +1,68 @@
 
 def main():
-    from collections import deque
-    import sys
-
-    def remove_balls(s):
-        if len(s) < 3:
-            return s
-        stack = []
-        for ch in s:
-            if stack and stack[-1][0] == ch:
-                count = stack[-1][1] + 1
-                stack.pop()
-                stack.append((ch, count))
-            else:
-                stack.append((ch, 1))
-            while len(stack) >= 2 and stack[-1][0] == stack[-2][0]:
-                count = stack[-1][1] + stack[-2][1]
-                ch1 = stack[-1][0]
-                stack.pop()
-                stack.pop()
-                stack.append((ch1, count))
-        result = []
-        for ch, cnt in stack:
-            if cnt < 3:
-                result.extend([ch] * cnt)
-            else:
-                pass
-        return ''.join(result)
-
-    def dfs(state, shots):
-        nonlocal best_shots, best_count
-        if not state:
-            if len(shots) < best_count:
-                best_count = len(shots)
-                best_shots = shots[:]
-            return
-        if len(shots) >= best_count:
-            return
-        n = len(state)
-        for pos in range(n + 1):
-            for color in colors:
-                new_state = state[:pos] + color + state[pos:]
-                new_state = remove_balls(new_state)
-                shots.append((color, pos))
-                dfs(new_state, shots)
-                shots.pop()
-
-    data = sys.stdin.read().strip()
-    colors = sorted(set(data))
-    best_count = float('inf')
-    best_shots = []
-    dfs(data, [])
+    with open('INPUT.TXT', 'r') as f:
+        initial = f.readline().strip()
     
-    output = [str(len(best_shots))]
-    for color, pos in best_shots:
-        output.append(f"{color}{pos}")
-    sys.stdout.write(' '.join(output))
+    from collections import deque
+    import heapq
 
-if __name__ == '__main__':
+    def remove_groups(state):
+        changed = True
+        while changed:
+            changed = False
+            n = len(state)
+            if n < 3:
+                break
+            i = 0
+            while i < n:
+                j = i
+                while j < n and state[j] == state[i]:
+                    j += 1
+                if j - i >= 3:
+                    state = state[:i] + state[j:]
+                    changed = True
+                    break
+                i = j
+        return state
+
+    visited = set()
+    heap = []
+    heapq.heappush(heap, (len(initial), 0, initial, []))
+    best_moves = None
+    best_len = float('inf')
+    
+    while heap:
+        cost, shots, state, moves = heapq.heappop(heap)
+        if state == "":
+            if len(moves) < best_len:
+                best_len = len(moves)
+                best_moves = moves
+            continue
+        
+        if len(moves) >= 10:
+            continue
+            
+        state_str = state
+        if state_str in visited:
+            continue
+        visited.add(state_str)
+        
+        n = len(state)
+        for pos in range(0, n+1):
+            for color in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+                new_state = state[:pos] + color + state[pos:]
+                new_state = remove_groups(new_state)
+                new_moves = moves + [(color, pos)]
+                heapq.heappush(heap, (len(new_state), len(new_moves), new_state, new_moves))
+    
+    if best_moves is None:
+        print("0")
+    else:
+        result = str(len(best_moves))
+        for move in best_moves:
+            result += f" {move[0]}{move[1]}"
+        with open('OUTPUT.TXT', 'w') as f:
+            f.write(result)
+
+if __name__ == "__main__":
     main()

@@ -1,5 +1,5 @@
 
-n = int(input())
+n = int(input().strip())
 result = [''] * n
 left, right = 0, n - 1
 for i in range(n):

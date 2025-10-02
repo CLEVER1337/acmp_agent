@@ -2,20 +2,17 @@
 n = int(input())
 s = input().strip()
 
-count = 0
-prefix_sum = 0
-prefix_map = {0: 1}
-
+prefix_sum = [0]
 for char in s:
-    if char == 'a':
-        prefix_sum += 1
-    else:
-        prefix_sum -= 1
-        
-    if prefix_sum in prefix_map:
-        count += prefix_map[prefix_sum]
-        prefix_map[prefix_sum] += 1
-    else:
-        prefix_map[prefix_sum] = 1
+    prefix_sum.append(prefix_sum[-1] + (1 if char == 'a' else -1))
 
-print(count)
+count = {}
+for val in prefix_sum:
+    count[val] = count.get(val, 0) + 1
+
+result = 0
+for val in count:
+    k = count[val]
+    result += k * (k - 1) // 2
+
+print(result)

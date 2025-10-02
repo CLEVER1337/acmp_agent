@@ -10,15 +10,16 @@ def main():
     best_end = 0
     
     for i in range(n):
-        for j in range(i+1, n):
-            count = j - i + 1
+        for j in range(i + 1, n):
             length = points[j] - points[i]
-            ratio = length / count
+            count = j - i + 1
             
-            if ratio < min_ratio:
-                min_ratio = ratio
-                best_start = points[i]
-                best_end = points[j]
+            if count >= 2:
+                ratio = length / count
+                if ratio < min_ratio:
+                    min_ratio = ratio
+                    best_start = points[i]
+                    best_end = points[j]
     
     print(f"{best_start} {best_end}")
 

@@ -1,31 +1,23 @@
 
 def main():
     with open('INPUT.TXT', 'r') as f:
-        S = int(f.read().strip())
+        s = int(f.read().strip())
     
     result = []
-    current = S
-    
-    while current >= 1:
-        result.append(str(current))
-        if current == 1:
+    while s > 0:
+        result.append(str(s))
+        if s == 1:
             break
-        
         layer = 1
-        fib_prev, fib_curr = 1, 1
         total = 1
-        
-        while total < current:
+        while total < s:
             layer += 1
-            fib_prev, fib_curr = fib_curr, fib_prev + fib_curr
-            total += fib_curr
-        
-        pos_in_layer = current - (total - fib_curr)
-        
-        if pos_in_layer <= fib_prev:
-            current = total - fib_curr - fib_prev + pos_in_layer
+            total += layer
+        pos_in_layer = s - (total - layer)
+        if pos_in_layer % 2 == 1:
+            s = total - layer + (pos_in_layer + 1) // 2
         else:
-            current = total - fib_curr - fib_prev + (pos_in_layer - fib_prev)
+            s = total - layer + layer + (pos_in_layer // 2)
     
     with open('OUTPUT.TXT', 'w') as f:
         f.write(' '.join(result))

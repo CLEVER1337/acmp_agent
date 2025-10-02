@@ -1,18 +1,10 @@
 
-def main():
-    import sys
-    data = sys.stdin.read().split()
-    N = int(data[0])
-    K = int(data[1])
-    
-    total = 0
-    for i in range(1, K + 1):
+n, k = map(int, input().split())
+if k == 1:
+    print(n)
+else:
+    total = n
+    for i in range(2, k + 1):
         rooms_per_side = i + 1
-        total += N * rooms_per_side
-    
-    corners = N * (K - 1)
-    result = total - corners
-    print(result)
-
-if __name__ == "__main__":
-    main()
+        total += n * (rooms_per_side - 2)
+    print(total)

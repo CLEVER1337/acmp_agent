@@ -8,28 +8,28 @@ def main():
     for i in range(1, n + 1):
         parts = data[i].split()
         if parts[0] == 'forward':
-            commands.append(('f', int(parts[1])))
+            commands.append(('forward', int(parts[1])))
         elif parts[0] == 'left':
-            commands.append(('l',))
+            commands.append(('left',))
         elif parts[0] == 'right':
-            commands.append(('r',))
+            commands.append(('right',))
     
     directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-    dir_idx = 0
+    current_dir = 0
     x, y = 0, 0
-    points = [(x, y)]
+    points = [(0, 0)]
     
     for cmd in commands:
-        if cmd[0] == 'f':
+        if cmd[0] == 'forward':
             dist = cmd[1]
-            dx, dy = directions[dir_idx]
+            dx, dy = directions[current_dir]
             x += dx * dist
             y += dy * dist
             points.append((x, y))
-        elif cmd[0] == 'l':
-            dir_idx = (dir_idx - 1) % 4
-        elif cmd[0] == 'r':
-            dir_idx = (dir_idx + 1) % 4
+        elif cmd[0] == 'left':
+            current_dir = (current_dir - 1) % 4
+        elif cmd[0] == 'right':
+            current_dir = (current_dir + 1) % 4
     
     if points[0] != points[-1]:
         print("FALSE")
@@ -40,42 +40,60 @@ def main():
     min_y = min(p[1] for p in points)
     max_y = max(p[1] for p in points)
     
-    vertical_segments = []
-    horizontal_segments = []
-    
+    segments = []
     for i in range(len(points) - 1):
-        x1, y1 = points[i]
-        x2, y2 = points[i + 1]
-        if x1 == x2:
-            vertical_segments.append((x1, min(y1, y2), max(y1, y2)))
-        else:
-            horizontal_segments.append((y1, min(x1, x2), max(x1, x2)))
+        p1 = points[i]
+        p2 = points[i + 1]
+        segments.append((p1, p2))
     
-    for seg in vertical_segments:
-        x, y_min, y_max = seg
-        for test_y in range(y_min + 1, y_max):
-            found = False
-            for h_seg in horizontal_segments:
-                y, x_min, x_max = h_seg
-                if y == test_y and x_min <= x <= x_max:
-                    found = True
-                    break
-            if not found:
-                print("FALSE")
-                return
-    
-    for seg in horizontal_segments:
-        y, x_min, x_max = seg
-        for test_x in range(x_min + 1, x_max):
-            found = False
-            for v_seg in vertical_segments:
-                x, y_min, y_max = v_seg
-                if x == test_x and y_min <= y <= y_max:
-                    found = True
-                    break
-            if not found:
-                print("FALSE")
-                return
+    for i in range(len(segments)):
+        for j in range(i + 1, len(segments)):
+            s1 = segments[i]
+            s2 = segments[j]
+            
+            if s1[0][0] == s1[1][0]:
+                vertical = s1
+                horizontal = s2
+                if horizontal[0][1] != horizontal[1][1]:
+                    continue
+            elif s1[0][1] == s1[1][1]:
+                horizontal = s1
+                vertical = s2
+                if vertical[0][0] != vertical[1][0]:
+                    continue
+            else:
+                continue
+                
+            if horizontal[0][1] != vertical[0][1] and horizontal[0][1] != vertical[1][1]:
+                continue
+            if vertical[0][0] != horizontal[0][0] and vertical[0][0] != horizontal[1][0]:
+                continue
+            
+            hx1, hx2 = sorted([horizontal[0][0], horizontal[1][0]])
+            hy = horizontal[0][1]
+            vx = vertical[0][0]
+            vy1, vy2 = sorted([vertical[0][1], vertical[1][1]])
+            
+            if hx1 <= vx <= hx2 and vy1 <= hy <= vy2:
+                found = False
+                for seg in segments:
+                    p1, p2 = seg
+                    if p1[0] == p2[0]:
+                        seg_x = p1[0]
+                        seg_y1, seg_y2 = sorted([p1[1], p2[1]])
+                        if seg_x == vx and seg_y1 <= hy <= seg_y2:
+                            found = True
+                            break
+                    elif p1[1] == p2[1]:
+                        seg_y = p1[1]
+                        seg_x1, seg_x2 = sorted([p1[0], p2[0]])
+                        if seg_y == hy and seg_x1 <= vx <= seg_x2:
+                            found = True
+                            break
+                
+                if not found:
+                    print("FALSE")
+                    return
     
     print("TRUE")
 

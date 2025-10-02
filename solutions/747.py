@@ -5,56 +5,69 @@ def main():
     
     n = len(S)
     dp = [0] * (n + 1)
-    parent = [None] * (n + 1)
-    dp[0] = 0
+    parent = [(-1, -1)] * (n + 1)
+    period = [0] * (n + 1)
     
-    for i in range(1, n + 1):
-        dp[i] = float('inf')
-        for j in range(i):
-            substr = S[j:i]
-            len_sub = i - j
-            period = get_period(substr)
-            if period < len_sub and len_sub % period == 0:
-                count = len_sub // period
-                cost = period + dp[j]
-                if cost < dp[i]:
-                    dp[i] = cost
-                    parent[i] = (j, period, count)
-            cost = len_sub + dp[j]
-            if cost < dp[i]:
-                dp[i] = cost
-                parent[i] = (j, len_sub, 1)
+    for i in range(n + 1):
+        dp[i] = i
+        parent[i] = (-1, 1)
+        period[i] = i
     
-    result = []
+    for i in range(n):
+        p = [0] * (n + 1)
+        k = 0
+        for j in range(i + 1, n):
+            while k > 0 and S[j] != S[i + k]:
+                k = p[i + k - 1]
+            if S[j] == S[i + k]:
+                k += 1
+            else:
+                k = 0
+            p[j] = k
+        
+        for j in range(i, n):
+            len_sub = j - i + 1
+            per = len_sub - p[j]
+            if len_sub % per == 0:
+                period[j] = per
+            else:
+                period[j] = len_sub
+    
+    for i in range(n):
+        for j in range(i, n):
+            len_sub = j - i + 1
+            per = period[j]
+            if len_sub % per == 0:
+                cnt = len_sub // per
+                cost = per
+                if dp[i] + cost < dp[j + 1]:
+                    dp[j + 1] = dp[i] + cost
+                    parent[j + 1] = (i, cnt)
+            else:
+                cost = len_sub
+                if dp[i] + cost < dp[j + 1]:
+                    dp[j + 1] = dp[i] + cost
+                    parent[j + 1] = (i, 1)
+    
+    res = []
     pos = n
     while pos > 0:
-        j, len_s, count = parent[pos]
-        substr = S[j:j+len_s]
-        result.append((substr, count))
-        pos = j
+        prev, cnt = parent[pos]
+        substr = S[prev:pos]
+        if cnt > 1:
+            per = period[pos - 1]
+            actual_sub = S[prev:prev + per]
+            res.append((actual_sub, cnt))
+        else:
+            res.append((substr, 1))
+        pos = prev
     
-    result.reverse()
+    res.reverse()
     
     with open('OUTPUT.TXT', 'w') as f:
         f.write(str(dp[n]) + '\n')
-        for s, d in result:
-            f.write(f"{s} {d}\n")
-
-def get_period(s):
-    n = len(s)
-    pi = [0] * n
-    for i in range(1, n):
-        j = pi[i-1]
-        while j > 0 and s[i] != s[j]:
-            j = pi[j-1]
-        if s[i] == s[j]:
-            j += 1
-        pi[i] = j
-    
-    period = n - pi[-1]
-    if n % period == 0:
-        return period
-    return n
+        for s, cnt in res:
+            f.write(f"{s} {cnt}\n")
 
 if __name__ == '__main__':
     main()

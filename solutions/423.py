@@ -4,23 +4,18 @@ def main():
         s = f.readline().strip()
     
     n = len(s)
-    if n == 0:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write('0')
-        return
-            
     dp = [0] * (n + 1)
     dp[0] = 1
     
     for i in range(1, n + 1):
         if s[i-1] != '0':
             dp[i] += dp[i-1]
-            
-        if i >= 2 and s[i-2] != '0':
+        
+        if i >= 2:
             num = int(s[i-2:i])
             if 10 <= num <= 33:
                 dp[i] += dp[i-2]
-                
+    
     with open('OUTPUT.TXT', 'w') as f:
         f.write(str(dp[n]))
 

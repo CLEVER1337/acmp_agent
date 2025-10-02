@@ -14,14 +14,14 @@ def main():
             if digits[i] >= digits[i + 1]:
                 is_valid = False
                 break
-        
+                
         if is_valid:
             sequence.append(num)
-        
+            
         num += 1
     
     with open('OUTPUT.TXT', 'w') as f:
         f.write(str(sequence[-1]))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

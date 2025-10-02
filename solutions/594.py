@@ -35,10 +35,9 @@ def main():
     
     segments.sort(key=lambda x: x[0])
     lengths = [seg[0] for seg in segments]
-    indices = [seg[1] for seg in segments]
     
     max_area = 0
-    best_triangle = []
+    best_triplet = None
     
     for i in range(len(lengths) - 2):
         a = lengths[i]
@@ -49,11 +48,44 @@ def main():
             area = heron(a, b, c)
             if area > max_area:
                 max_area = area
-                best_triangle = [indices[i], indices[i + 1], indices[i + 2]]
+                best_triplet = (segments[i][1], segments[i+1][1], segments[i+2][1])
     
-    area_in_talang_wahah = max_area / 4
-    print(f"{area_in_talang_wahah:.10f}")
-    print(f"{best_triangle[0]} {best_triangle[1]} {best_triangle[2]}")
+    for i in range(len(lengths) - 3):
+        a = lengths[i]
+        b = lengths[i + 1]
+        c = lengths[i + 3]
+        
+        if a + b > c:
+            area = heron(a, b, c)
+            if area > max_area:
+                max_area = area
+                best_triplet = (segments[i][1], segments[i+1][1], segments[i+3][1])
+    
+    for i in range(len(lengths) - 3):
+        a = lengths[i]
+        b = lengths[i + 2]
+        c = lengths[i + 3]
+        
+        if a + b > c:
+            area = heron(a, b, c)
+            if area > max_area:
+                max_area = area
+                best_triplet = (segments[i][1], segments[i+2][1], segments[i+3][1])
+    
+    for i in range(len(lengths) - 4):
+        a = lengths[i]
+        b = lengths[i + 2]
+        c = lengths[i + 4]
+        
+        if a + b > c:
+            area = heron(a, b, c)
+            if area > max_area:
+                max_area = area
+                best_triplet = (segments[i][1], segments[i+2][1], segments[i+4][1])
+    
+    area_in_talang = max_area / 4
+    print(f"{area_in_talang:.10f}")
+    print(f"{best_triplet[0]} {best_triplet[1]} {best_triplet[2]}")
 
 if __name__ == "__main__":
     main()

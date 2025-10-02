@@ -2,10 +2,6 @@
 def main():
     import sys
     data = sys.stdin.read().split()
-    if not data:
-        print(0)
-        return
-        
     n = int(data[0])
     events = []
     for i in range(n):
@@ -13,33 +9,34 @@ def main():
         b = int(data[2 + 2*i])
         events.append((a, 1))
         events.append((b, -1))
-        
+    
     events.sort()
     
     balance = 0
-    start = None
-    max_len = 0
-    prev_pos = 0
+    start_white = None
+    max_white_len = 0
+    prev = 0
     
     for pos, event_type in events:
         if balance == 0:
-            if start is not None:
-                white_len = pos - start
-                if white_len > max_len:
-                    max_len = white_len
-            start = pos
-            
+            white_len = pos - prev
+            if white_len > max_white_len:
+                max_white_len = white_len
+            start_white = pos
+        elif balance == 1 and event_type == -1:
+            start_white = pos
+        
         balance += event_type
         
         if balance == 0:
-            start = pos
-            
-    if balance == 0 and start is not None:
-        white_len = 10**9 - start
-        if white_len > max_len:
-            max_len = white_len
-            
-    print(max_len)
+            prev = pos
+    
+    if balance == 0:
+        white_len = 10**9 - prev
+        if white_len > max_white_len:
+            max_white_len = white_len
+    
+    print(max_white_len)
 
 if __name__ == "__main__":
     main()

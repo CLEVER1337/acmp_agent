@@ -1,14 +1,13 @@
 
 with open('INPUT.TXT', 'r') as f:
-    card = list(map(int, f.readline().split()))
-    envelope = list(map(int, f.readline().split()))
+    a, b = map(int, f.readline().split())
+    c, d = map(int, f.readline().split())
 
-card.sort()
-envelope.sort()
-
-if card[0] <= envelope[0] and card[1] <= envelope[1]:
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write('Possible')
+if (a <= c and b <= d) or (a <= d and b <= c) or \
+   (b <= c and a <= d) or (b <= d and a <= c):
+    result = "Possible"
 else:
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write('Impossible')
+    result = "Impossible"
+
+with open('OUTPUT.TXT', 'w') as f:
+    f.write(result)

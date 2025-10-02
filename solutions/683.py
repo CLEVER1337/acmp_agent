@@ -12,7 +12,7 @@ def main():
     dp = [[0] * n for _ in range(n)]
     
     for length in range(2, n):
-        for i in range(0, n - length):
+        for i in range(n - length):
             j = i + length
             dp[i][j] = float('inf')
             for k in range(i + 1, j):

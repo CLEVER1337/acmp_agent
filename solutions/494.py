@@ -5,42 +5,44 @@ def main():
     with open('INPUT.TXT', 'r') as f:
         x1, y1, x2, y2 = map(int, f.read().split())
     
-    def distance_to_line(x0, y0):
-        dx = x2 - x1
-        dy = y2 - y1
-        length_sq = dx*dx + dy*dy
-        
-        if length_sq == 0:
-            return math.sqrt((x0-x1)**2 + (y0-y1)**2)
-        
-        t = max(0, min(1, ((x0-x1)*dx + (y0-y1)*dy) / length_sq))
-        proj_x = x1 + t * dx
-        proj_y = y1 + t * dy
-        return math.sqrt((x0-proj_x)**2 + (y0-proj_y)**2)
+    def distance_to_origin(x, y):
+        return math.sqrt(x*x + y*y)
+    
+    d1 = distance_to_origin(x1, y1)
+    d2 = distance_to_origin(x2, y2)
+    
+    min_d = min(d1, d2)
+    max_d = max(d1, d2)
     
     count = 0
-    max_r = max(abs(x1), abs(y1), abs(x2), abs(y2)) + 1
     
-    for r in range(1, max_r + 1):
-        d = distance_to_line(0, 0)
-        
-        if d > r:
+    k = math.floor(max_d)
+    while k >= math.ceil(min_d):
+        if k == 0:
+            k -= 1
             continue
             
-        if d == r:
-            count += 1
-        else:
-            d1 = math.sqrt(x1*x1 + y1*y1)
-            d2 = math.sqrt(x2*x2 + y2*y2)
+        r = k
+        A = y2 - y1
+        B = x1 - x2
+        C = x2 * y1 - x1 * y2
+        
+        distance = abs(C) / math.sqrt(A*A + B*B)
+        
+        if distance <= r:
+            d1_to_line = abs(A*x1 + B*y1 + C) / math.sqrt(A*A + B*B)
+            d2_to_line = abs(A*x2 + B*y2 + C) / math.sqrt(A*A + B*B)
             
-            if (d1 <= r and d2 >= r) or (d1 >= r and d2 <= r):
+            if d1_to_line <= r and d2_to_line <= r:
                 count += 1
-            elif d1 < r and d2 < r:
-                pass
             else:
-                count += 2
+                dot1 = x1*x1 + y1*y1
+                dot2 = x2*x2 + y2*y2
+                if (dot1 <= r*r and dot2 >= r*r) or (dot1 >= r*r and dot2 <= r*r):
+                    count += 1
+        k -= 1
     
     print(count)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

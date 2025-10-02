@@ -7,23 +7,25 @@ def main():
     c = int(data[2])
     d = int(data[3])
     
-    n0 = a * c + 1
-    n = n0
+    n_start = a * c + 1
     
-    def check(n_val):
-        min_u = max(a, (n_val + d - 1) // d)
-        max_u = min(b, n_val // c)
+    def can_represent(n):
+        min_u = max(a, (n + d - 1) // d)
+        max_u = min(b, n // c)
+        
         if min_u > max_u:
-            return True
+            return False
+            
         for u in range(min_u, max_u + 1):
-            if n_val % u == 0:
-                v = n_val // u
+            if n % u == 0:
+                v = n // u
                 if c <= v <= d:
-                    return False
-        return True
+                    return True
+        return False
     
+    n = n_start
     while True:
-        if check(n):
+        if not can_represent(n):
             print(n)
             return
         n += 1

@@ -2,7 +2,7 @@
 from collections import deque
 
 def knight_moves(pos):
-    x, y = pos
+    x, y = ord(pos[0]) - ord('a'), int(pos[1]) - 1
     moves = []
     for dx, dy in [(1,2),(2,1),(2,-1),(1,-2),(-1,-2),(-2,-1),(-2,1),(-1,2)]:
         nx, ny = x + dx, y + dy
@@ -11,53 +11,56 @@ def knight_moves(pos):
     return moves
 
 def solve():
-    with open('input.txt', 'r') as f:
+    with open('INPUT.TXT', 'r') as f:
         data = f.read().split()
-        red_pos = data[0]
-        green_pos = data[1]
+        red_pos, green_pos = data[0], data[1]
     
-    def pos_to_coords(pos):
-        col = ord(pos[0]) - ord('a')
-        row = int(pos[1]) - 1
-        return (col, row)
+    if red_pos == green_pos:
+        with open('OUTPUT.TXT', 'w') as f:
+            f.write('0')
+        return
     
-    red_start = pos_to_coords(red_pos)
-    green_start = pos_to_coords(green_pos)
+    red_start = (ord(red_pos[0]) - ord('a'), int(red_pos[1]) - 1)
+    green_start = (ord(green_pos[0]) - ord('a'), int(green_pos[1]) - 1)
     
-    if red_start == green_start:
-        return 0
+    red_visited = {}
+    green_visited = {}
     
-    red_visited = {red_start: 0}
-    green_visited = {green_start: 0}
+    red_queue = deque([(red_start[0], red_start[1], 0)])
+    green_queue = deque([(green_start[0], green_start[1], 0)])
     
-    red_queue = deque([red_start])
-    green_queue = deque([green_start])
+    red_visited[(red_start[0], red_start[1])] = 0
+    green_visited[(green_start[0], green_start[1])] = 0
     
     while red_queue and green_queue:
-        red_current = red_queue.popleft()
-        green_current = green_queue.popleft()
+        red_x, red_y, red_steps = red_queue.popleft()
+        green_x, green_y, green_steps = green_queue.popleft()
         
-        red_moves = knight_moves(red_current)
-        green_moves = knight_moves(green_current)
+        if (red_x, red_y) in green_visited:
+            if abs(green_visited[(red_x, red_y)] - red_steps) % 2 == 0:
+                total_steps = max(green_visited[(red_x, red_y)], red_steps)
+                with open('OUTPUT.TXT', 'w') as f:
+                    f.write(str(total_steps))
+                return
         
-        for red_next in red_moves:
-            if red_next not in red_visited:
-                red_visited[red_next] = red_visited[red_current] + 1
-                red_queue.append(red_next)
-                
-                if red_next in green_visited:
-                    return max(red_visited[red_next], green_visited[red_next])
+        if (green_x, green_y) in red_visited:
+            if abs(red_visited[(green_x, green_y)] - green_steps) % 2 == 0:
+                total_steps = max(red_visited[(green_x, green_y)], green_steps)
+                with open('OUTPUT.TXT', 'w') as f:
+                    f.write(str(total_steps))
+                return
         
-        for green_next in green_moves:
-            if green_next not in green_visited:
-                green_visited[green_next] = green_visited[green_current] + 1
-                green_queue.append(green_next)
-                
-                if green_next in red_visited:
-                    return max(red_visited[green_next], green_visited[green_next])
+        for nx, ny in knight_moves(chr(red_x + ord('a')) + str(red_y + 1)):
+            if (nx, ny) not in red_visited:
+                red_visited[(nx, ny)] = red_steps + 1
+                red_queue.append((nx, ny, red_steps + 1))
+        
+        for nx, ny in knight_moves(chr(green_x + ord('a')) + str(green_y + 1)):
+            if (nx, ny) not in green_visited:
+                green_visited[(nx, ny)] = green_steps + 1
+                green_queue.append((nx, ny, green_steps + 1))
     
-    return -1
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write('-1')
 
-result = solve()
-with open('output.txt', 'w') as f:
-    f.write(str(result))
+solve()

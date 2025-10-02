@@ -1,28 +1,48 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
+    with open("INPUT.TXT", "r") as f:
         day, month = map(int, f.readline().split())
     
-    # Количество дней в каждом месяце 2008 года (високосный)
     days_in_month = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     
-    # Преобразуем дату в количество дней от начала года
-    total_days = 0
-    for i in range(month - 1):
-        total_days += days_in_month[i]
-    total_days += day
+    def is_valid_date(d, m):
+        return 1 <= m <= 12 and 1 <= d <= days_in_month[m-1]
     
-    # Рассчитываем расстояние до конца года (31 декабря)
-    distance = 365 - total_days
+    memo = {}
     
-    # Используем теорию игр: если расстояние до конца кратно 3, то проигрышная позиция
-    if distance % 3 == 0:
-        result = 2
-    else:
-        result = 1
+    def can_win(d, m):
+        if (d, m) == (31, 12):
+            return False
+        
+        if (d, m) in memo:
+            return memo[(d, m)]
+        
+        moves = []
+        if is_valid_date(d + 1, m):
+            moves.append((d + 1, m))
+        if is_valid_date(d + 2, m):
+            moves.append((d + 2, m))
+        if is_valid_date(d, m + 1):
+            moves.append((d, m + 1))
+        if is_valid_date(d, m + 2):
+            moves.append((d, m + 2))
+        
+        if not moves:
+            memo[(d, m)] = False
+            return False
+        
+        for next_d, next_m in moves:
+            if not can_win(next_d, next_m):
+                memo[(d, m)] = True
+                return True
+        
+        memo[(d, m)] = False
+        return False
     
-    with open('OUTPUT.TXT', 'w') as f:
+    result = 1 if can_win(day, month) else 2
+    
+    with open("OUTPUT.TXT", "w") as f:
         f.write(str(result))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

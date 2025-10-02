@@ -1,37 +1,45 @@
 
-MOD = 10**18
+import sys
 
 def main():
-    import sys
     data = sys.stdin.read().splitlines()
     if not data:
         return
     
-    N, C, K = map(int, data[0].split())
+    n, C, k = map(int, data[0].split())
     s = data[1].strip()
     
-    n = len(s)
+    MOD = 10**k
+    
     dp = [0] * (n + 1)
     dp[0] = 1
     
-    max_len = len(str(C))
-    
     for i in range(1, n + 1):
         total = 0
-        for l in range(1, min(i, max_len) + 1):
-            start = i - l
-            if s[start] == '0' and l > 1:
+        j = i - 1
+        num = 0
+        base = 1
+        
+        while j >= 0:
+            digit = int(s[j])
+            num += digit * base
+            if base > C:
+                break
+            if digit == 0 and j != i - 1:
+                j -= 1
+                base *= 10
                 continue
                 
-            num_str = s[start:i]
-            num = int(num_str)
-            if num <= C:
-                total = (total + dp[start]) % MOD
+            if num > C:
+                break
                 
+            total = (total + dp[j]) % MOD
+            j -= 1
+            base *= 10
+            
         dp[i] = total % MOD
-    
-    result = dp[n] % (10**K)
-    print(str(result).zfill(K))
+        
+    print(str(dp[n] % MOD).zfill(k))
 
 if __name__ == "__main__":
     main()

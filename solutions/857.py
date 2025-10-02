@@ -1,6 +1,12 @@
 
 import sys
 
+class TrieNode:
+    __slots__ = ['children', 'count']
+    def __init__(self):
+        self.children = {}
+        self.count = 0
+
 def main():
     data = sys.stdin.read().splitlines()
     n = int(data[0])
@@ -8,41 +14,32 @@ def main():
     m = int(data[1+n])
     patterns = data[2+n:2+n+m]
     
-    trie = {}
+    root = TrieNode()
     
     for word in words:
-        node = trie
+        node = root
         for char in word:
-            if char not in node:
-                node[char] = {}
-            node = node[char]
-        if 'count' not in node:
-            node['count'] = 0
-        node['count'] += 1
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+            node.count += 1
     
     results = []
     for pattern in patterns:
-        node = trie
+        node = root
         found = True
         for char in pattern:
-            if char not in node:
+            if char not in node.children:
                 found = False
                 break
-            node = node[char]
+            node = node.children[char]
         
-        if not found:
-            results.append('0')
+        if found:
+            results.append(str(node.count))
         else:
-            def count_words(node):
-                total = node.get('count', 0)
-                for key, child in node.items():
-                    if key != 'count':
-                        total += count_words(child)
-                return total
-            
-            results.append(str(count_words(node)))
+            results.append("0")
     
-    sys.stdout.write('\n'.join(results))
+    sys.stdout.write("\n".join(results))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,6 +1,6 @@
 
 def main():
-    with open("INPUT.TXT", "r") as f:
+    with open('INPUT.TXT', 'r') as f:
         data = f.read().split()
         n = int(data[0])
         a_n = int(data[1])
@@ -10,19 +10,20 @@ def main():
         a1 = a_n
         a2 = a_n1
     elif n == 2:
-        a1 = a_n1 - a_n
-        a2 = a_n
+        a1 = a_n
+        a2 = a_n1
     else:
-        f_prev = 1
-        f_curr = 1
-        for i in range(3, n):
-            f_next = f_prev + f_curr
-            f_prev, f_curr = f_curr, f_next
+        fib = [0] * (n + 2)
+        fib[n] = a_n
+        fib[n + 1] = a_n1
         
-        a1 = (a_n1 - a_n * f_prev) // f_curr
-        a2 = (a_n - a1 * f_prev) // f_curr
+        for i in range(n - 1, 0, -1):
+            fib[i] = fib[i + 2] - fib[i + 1]
+        
+        a1 = fib[1]
+        a2 = fib[2]
     
-    with open("OUTPUT.TXT", "w") as f:
+    with open('OUTPUT.TXT', 'w') as f:
         f.write(f"{a1} {a2}")
 
 if __name__ == "__main__":

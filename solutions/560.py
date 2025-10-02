@@ -7,49 +7,76 @@ def main():
         return
         
     try:
-        N = int(data[0]); w = int(data[1]); L = int(data[2])
-        r = int(data[3]); R = int(data[4])
+        N = int(data[0])
+        w = int(data[1])
+        L = int(data[2])
+        r = int(data[3])
+        R = int(data[4])
         costs = list(map(int, data[5:5+L]))
     except:
         print("No solution.")
+        return
+        
+    if N == 0:
+        print(0)
         return
         
     if L < w:
         print("No solution.")
         return
         
-    min_cost = float('inf')
+    min_distance = r
+    max_distance = R
     
-    dp = [[float('inf')] * L for _ in range(N)]
-    
-    for pos in range(L - w + 1):
-        total_cost = sum(costs[pos:pos+w])
-        dp[0][pos] = total_cost
+    total_length_needed = (N - 1) * min_distance + w
+    if total_length_needed > L:
+        print("No solution.")
+        return
         
-    for i in range(1, N):
-        for j in range(L - w + 1):
-            if dp[i-1][j] == float('inf'):
+    dp = [float('inf')] * (L + 1)
+    prefix_sum = [0] * (L + 1)
+    
+    for i in range(1, L + 1):
+        prefix_sum[i] = prefix_sum[i - 1] + costs[i - 1]
+        
+    def get_sum(l, r):
+        if l < 1:
+            l = 1
+        if r > L:
+            r = L
+        return prefix_sum[r] - prefix_sum[l - 1]
+        
+    for pos in range(1, L - w + 2):
+        dp[pos] = get_sum(pos, pos + w - 1)
+        
+    for stop in range(2, N + 1):
+        new_dp = [float('inf')] * (L + 1)
+        
+        for prev_pos in range(1, L + 1):
+            if dp[prev_pos] == float('inf'):
                 continue
                 
-            current_end = j + w - 1
-            next_start_min = current_end + r + 1
-            next_start_max = current_end + R + 1
+            min_next = prev_pos + w + min_distance
+            max_next = prev_pos + w + max_distance
             
-            for k in range(max(0, next_start_min), min(L - w + 1, next_start_max + 1)):
-                if k >= L:
-                    continue
-                total_cost = sum(costs[k:k+w])
-                if dp[i][k] > dp[i-1][j] + total_cost:
-                    dp[i][k] = dp[i-1][j] + total_cost
+            if min_next > L:
+                continue
+                
+            start = min_next
+            end = min(max_next, L - w + 1)
+            
+            for next_pos in range(start, end + 1):
+                cost = dp[prev_pos] + get_sum(next_pos, next_pos + w - 1)
+                if cost < new_dp[next_pos]:
+                    new_dp[next_pos] = cost
                     
-    for pos in range(L - w + 1):
-        if dp[N-1][pos] < min_cost:
-            min_cost = dp[N-1][pos]
-            
-    if min_cost == float('inf'):
+        dp = new_dp
+        
+    result = min(dp)
+    if result == float('inf'):
         print("No solution.")
     else:
-        print(min_cost)
+        print(result)
 
 if __name__ == "__main__":
     main()

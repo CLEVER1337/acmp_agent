@@ -6,16 +6,24 @@ def main():
         return
         
     a, b = 1, 2
-    for i in range(3, n+1):
-        if i % 2 == 1:
-            a = a + 4 * (i - 2) + 1
+    direction = 1
+    current_col = 2
+    current_num = 2
+    
+    while current_col < n:
+        if direction == 1:
+            steps = a + 1
+            a += 1
+            current_num += steps
+            direction = -1
         else:
-            b = b + 4 * (i - 2) + 1
-            
-    if n % 2 == 1:
-        print(a)
-    else:
-        print(b)
+            steps = b + 1
+            b += 1
+            current_num += steps
+            direction = 1
+        current_col += 1
+        
+    print(current_num)
 
 if __name__ == "__main__":
     main()

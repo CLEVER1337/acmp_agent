@@ -10,8 +10,8 @@ def main():
         
     n = int(data[0])
     d = int(data[1])
-    
     graph = [[] for _ in range(n + 1)]
+    
     index = 2
     for i in range(n - 1):
         u = int(data[index])
@@ -22,14 +22,14 @@ def main():
     
     def bfs(start):
         dist = [-1] * (n + 1)
-        queue = deque([start])
+        q = deque([start])
         dist[start] = 0
-        while queue:
-            u = queue.popleft()
+        while q:
+            u = q.popleft()
             for v in graph[u]:
                 if dist[v] == -1:
                     dist[v] = dist[u] + 1
-                    queue.append(v)
+                    q.append(v)
         return dist
     
     dist1 = bfs(1)
@@ -39,23 +39,52 @@ def main():
     dist_v = bfs(v)
     
     diameter = dist_u[v]
-    if diameter < d:
+    if d > diameter:
         print(0)
         return
         
-    cnt_u = [0] * (n + 1)
-    cnt_v = [0] * (n + 1)
-    
+    center = None
     for i in range(1, n + 1):
-        if dist_u[i] >= d and dist_v[i] >= d:
-            cnt_u[dist_u[i]] += 1
-            cnt_v[dist_v[i]] += 1
-    
-    total = 0
-    for dist in range(d, n + 1):
-        total += cnt_u[dist] * cnt_v[d - dist]
+        if dist_u[i] + dist_v[i] == diameter and abs(dist_u[i] - dist_v[i]) <= 1:
+            center = i
+            break
+            
+    if center is None:
+        print(0)
+        return
         
-    print(total)
+    dist_center = bfs(center)
+    
+    count = [0] * (n + 1)
+    for i in range(1, n + 1):
+        if dist_center[i] <= n:
+            count[dist_center[i]] += 1
+            
+    if d % 2 == 0:
+        r = d // 2
+        if r >= len(count):
+            print(0)
+            return
+            
+        total = 0
+        for dist in range(r + 1, min(n + 1, r + d + 1)):
+            if dist < len(count):
+                total += count[dist]
+                
+        result = count[r] * (total * (total - 1) // 2)
+        print(result)
+    else:
+        r1 = d // 2
+        r2 = r1 + 1
+        if r1 >= len(count) or r2 >= len(count):
+            print(0)
+            return
+            
+        total1 = count[r1]
+        total2 = count[r2]
+        
+        result = total1 * total2 * (total1 + total2 - 2) // 2
+        print(result)
 
 if __name__ == "__main__":
     main()

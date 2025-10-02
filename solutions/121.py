@@ -5,7 +5,6 @@ def main():
         coords = list(map(int, f.readline().split()))
     
     coords.sort()
-    
     dp = [0] * n
     dp[1] = coords[1] - coords[0]
     

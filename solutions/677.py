@@ -1,15 +1,16 @@
 
-k, n, m, d = map(int, input().split())
+def main():
+    K, N, M, D = map(int, input().split())
+    total = K * N * M * D
+    for x in range(1, total + 1):
+        if (x % K == 0 and x % N == 0 and x % M == 0):
+            part1 = x // K
+            part2 = x // N
+            part3 = x // M
+            if part1 + part2 + part3 + D == x:
+                print(x)
+                return
+    print(-1)
 
-def solve():
-    for total in range(d + 1, 1000000):
-        first = total // k
-        second = total // n
-        third = total // m
-        rest = total - first - second - third
-        
-        if rest == d:
-            return total
-    return -1
-
-print(solve())
+if __name__ == "__main__":
+    main()

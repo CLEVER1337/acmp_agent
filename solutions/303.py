@@ -8,14 +8,15 @@ def main():
     
     for i in range(n):
         new_num = num_str[:i] + num_str[i+1:]
-        total = 0
+        current_sum = 0
         sign = 1
         
         for j, digit in enumerate(new_num):
-            total += sign * int(digit)
+            current_sum += sign * int(digit)
             sign *= -1
         
-        max_sum = max(max_sum, total)
+        if current_sum > max_sum:
+            max_sum = current_sum
     
     with open('OUTPUT.TXT', 'w') as f:
         f.write(str(max_sum))

@@ -1,72 +1,67 @@
 
-import sys
-from collections import defaultdict
-
 def main():
+    import sys
     data = sys.stdin.read().splitlines()
     n, r = map(int, data[0].split())
     word = data[1].strip()
     q = list(map(float, data[2].split()))
     
-    length = len(word)
+    L = len(word)
     unique_letters = set(word)
-    letter_count = defaultdict(int)
-    for c in word:
-        letter_count[c] += 1
+    k = len(unique_letters)
     
-    total_states = 1 << length
-    dp = [[0.0] * total_states for _ in range(n)]
+    from functools import lru_cache
     
-    for state in range(total_states - 1, -1, -1):
-        open_count = bin(state).count('1')
-        if open_count == length:
-            for i in range(n):
-                dp[i][state] = 1.0 if i == 0 else 0.0
-            continue
-            
-        closed_positions = []
-        closed_letters = set()
-        for pos in range(length):
-            if not (state & (1 << pos)):
-                closed_positions.append(pos)
-                closed_letters.add(word[pos])
-                
-        k = len(closed_positions)
-        j = len(closed_letters)
-        remaining_letters = sorted(closed_letters)
+    @lru_cache(maxsize=None)
+    def dp(mask, turn):
+        closed_count = bin(mask).count('1')
+        if closed_count == 0:
+            return 1.0 if turn == 0 else 0.0
         
-        for player_idx in range(n):
-            total_prob = 0.0
-            current_q = q[player_idx]
+        unknown_letters = set()
+        letter_positions = {}
+        for i in range(L):
+            if mask & (1 << i):
+                letter = word[i]
+                if letter not in letter_positions:
+                    letter_positions[letter] = []
+                letter_positions[letter].append(i)
+                unknown_letters.add(letter)
+        
+        j = len(unknown_letters)
+        current_player = turn % n
+        prob_correct = q[current_player]
+        
+        if j == 0:
+            return 1.0 if turn == 0 else 0.0
+        
+        prob_win = 0.0
+        
+        for letter in unknown_letters:
+            new_mask = mask
+            for pos in letter_positions[letter]:
+                new_mask &= ~(1 << pos)
             
-            prob_correct = current_q * (1.0 / j) if j > 0 else 0.0
-            prob_wrong = (1.0 - current_q) if j > 0 else 1.0
+            p_letter = 1.0 / j
+            p_guess = prob_correct * p_letter
             
-            if j == 0:
-                next_player = (player_idx + 1) % n
-                total_prob += dp[next_player][state]
+            if new_mask == mask:
+                next_turn = (turn + 1) % n
+                result = dp(new_mask, next_turn)
             else:
-                for letter in remaining_letters:
-                    new_state = state
-                    count_found = 0
-                    for pos in closed_positions:
-                        if word[pos] == letter:
-                            new_state |= (1 << pos)
-                            count_found += 1
-                    
-                    if count_found > 0:
-                        total_prob += prob_correct * dp[player_idx][new_state]
-                    else:
-                        next_player = (player_idx + 1) % n
-                        total_prob += prob_correct * dp[next_player][new_state]
-                
-                next_player = (player_idx + 1) % n
-                total_prob += prob_wrong * dp[next_player][state]
-                
-            dp[player_idx][state] = total_prob
+                result = dp(new_mask, turn)
             
-    initial_state = 0
-    result = dp[r - 1][initial_state]
+            prob_win += p_guess * result
+        
+        prob_wrong = 1.0 - prob_correct
+        if prob_wrong > 1e-12:
+            next_turn = (turn + 1) % n
+            prob_win += prob_wrong * dp(mask, next_turn)
+        
+        return prob_win
+    
+    initial_mask = (1 << L) - 1
+    result = dp(initial_mask, 0)
     print("{:.15f}".format(result))
 
 if __name__ == "__main__":

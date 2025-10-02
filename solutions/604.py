@@ -34,19 +34,34 @@ def main():
     order.reverse()
     
     dp = [0] * (n+1)
-    ways = [1] * (n+1)
+    ways = [0] * (n+1)
     
     for u in order:
         dp[u] = 1
         ways[u] = 1
-        for v in children[u]:
-            dp[u] += dp[v]
-            ways[u] = (ways[u] * ways[v]) % MOD
         
+        for v in children[u]:
+            dp[u] = (dp[u] * (dp[v] + 1)) % MOD
+            
         k = len(children[u])
-        if k > 1:
-            ways[u] = (ways[u] * pow(2, k-1, MOD)) % MOD
-    
+        if k == 0:
+            continue
+            
+        pre = [1] * (k+1)
+        suf = [1] * (k+1)
+        
+        for i in range(k):
+            v = children[u][i]
+            pre[i+1] = pre[i] * (dp[v] + 1) % MOD
+            
+        for i in range(k-1, -1, -1):
+            v = children[u][i]
+            suf[i] = suf[i+1] * (dp[v] + 1) % MOD
+            
+        for i in range(k):
+            v = children[u][i]
+            ways[u] = (ways[u] + ways[v] * pre[i] % MOD * suf[i+1] % MOD) % MOD
+            
     print(ways[1] % MOD)
 
 if __name__ == '__main__':

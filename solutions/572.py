@@ -2,8 +2,12 @@
 def main():
     import sys
     data = sys.stdin.read().split()
+    if not data:
+        print(0)
+        return
+        
     n = int(data[0])
-    s = int(data[1])
+    auth = int(data[1])
     friends = []
     index = 2
     for i in range(n):
@@ -11,58 +15,42 @@ def main():
         b = int(data[index+1])
         index += 2
         friends.append((a, b, i+1))
-    
-    pos = []
-    neg = []
+        
+    # Разделяем друзей на тех, у кого bi >= 0 и bi < 0
+    positive = []
+    negative = []
     for a, b, idx in friends:
         if b >= 0:
-            pos.append((a, b, idx))
+            positive.append((a, b, idx))
         else:
-            neg.append((a, b, idx))
+            negative.append((a, b, idx))
+            
+    # Сортируем положительных по ai (по возрастанию)
+    positive.sort(key=lambda x: x[0])
     
-    pos.sort(key=lambda x: x[0])
-    neg.sort(key=lambda x: x[0] + x[1], reverse=True)
+    # Сортируем отрицательных по ai + bi (по убыванию), что эквивалентно (a + b)
+    negative.sort(key=lambda x: x[0] + x[1], reverse=True)
     
-    count = 0
-    order = []
-    current_auth = s
+    selected = []
+    current_auth = auth
     
-    for a, b, idx in pos:
+    # Обрабатываем сначала положительных друзей
+    for a, b, idx in positive:
         if current_auth >= a:
-            count += 1
-            order.append(idx)
             current_auth += b
+            selected.append(idx)
     
-    dp = [[-10**18] * (count+1) for _ in range(len(neg)+1)]
-    dp[0][0] = current_auth
-    
-    for i in range(1, len(neg)+1):
-        a, b, idx = neg[i-1]
-        for j in range(count+1):
-            dp[i][j] = dp[i-1][j]
-            if j > 0 and dp[i-1][j-1] >= a:
-                dp[i][j] = max(dp[i][j], dp[i-1][j-1] + b)
-    
-    max_friends = count
-    for j in range(count, -1, -1):
-        if dp[len(neg)][j] >= 0:
-            max_friends += j
+    # Обрабатываем отрицательных друзей
+    for a, b, idx in negative:
+        if current_auth >= a:
+            current_auth += b
+            selected.append(idx)
+        else:
             break
     
-    result_order = order[:]
-    remaining = count
-    selected = []
-    
-    for i in range(len(neg), 0, -1):
-        a, b, idx = neg[i-1]
-        if remaining > 0 and dp[i-1][remaining-1] >= a and dp[i-1][remaining-1] + b == dp[i][remaining]:
-            selected.append(idx)
-            remaining -= 1
-    
-    result_order.extend(selected[::-1])
-    
-    print(max_friends)
-    print(' '.join(map(str, result_order)))
+    print(len(selected))
+    if selected:
+        print(" ".join(map(str, selected)))
 
 if __name__ == "__main__":
     main()

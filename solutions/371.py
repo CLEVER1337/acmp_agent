@@ -1,20 +1,23 @@
 
-import sys
-
-def sum_divisors(n):
-    total = 1
+def sum_divisors(x):
+    s = 1
     i = 2
-    while i * i <= n:
-        if n % i == 0:
-            total += i
-            if i != n // i:
-                total += n // i
+    while i * i <= x:
+        if x % i == 0:
+            s += i
+            if i != x // i:
+                s += x // i
         i += 1
-    return total
+    return s
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        M, N = map(int, f.readline().split())
+    import sys
+    data = sys.stdin.read().split()
+    if not data:
+        return
+    
+    M = int(data[0])
+    N = int(data[1])
     
     pairs = []
     found_pairs = set()
@@ -32,14 +35,13 @@ def main():
             found_pairs.add(a)
             found_pairs.add(b)
     
+    pairs.sort()
+    
     if not pairs:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write("Absent")
+        print("Absent")
     else:
-        pairs.sort()
-        with open('OUTPUT.TXT', 'w') as f:
-            for a, b in pairs:
-                f.write(f"{a} {b}\n")
+        for a, b in pairs:
+            print(f"{a} {b}")
 
 if __name__ == "__main__":
     main()

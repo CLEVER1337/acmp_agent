@@ -11,94 +11,86 @@ def main():
     edges = []
     index = 3
     for i in range(r):
-        a = int(data[index]); b = int(data[index+1]); c = int(data[index+2])
+        a = int(data[index])
+        b = int(data[index+1])
+        c = int(data[index+2])
         index += 3
         edges.append((a, b, c, i+1))
     
     boys = n
     girls = m
-    size = boys + girls + 2
+    total_nodes = boys + girls + 2
     source = 0
-    sink = size - 1
+    sink = total_nodes - 1
     
-    graph = [[] for _ in range(size)]
-    capacities = [[0] * size for _ in range(size)]
-    costs = [[0] * size for _ in range(size)]
-    edge_indices = [[-1] * size for _ in range(size)]
+    from collections import deque
+    INF = 10**9
     
-    for i in range(1, boys+1):
-        graph[source].append(i)
-        graph[i].append(source)
-        capacities[source][i] = 1
-        costs[source][i] = 0
-        costs[i][source] = 0
-        
-    for j in range(boys+1, boys+girls+1):
-        graph[j].append(sink)
-        graph[sink].append(j)
-        capacities[j][sink] = 1
-        costs[j][sink] = 0
-        costs[sink][j] = 0
-        
+    graph = [[] for _ in range(total_nodes)]
+    
     for idx, (a, b, c, num) in enumerate(edges):
         u = a
         v = boys + b
-        graph[u].append(v)
-        graph[v].append(u)
-        capacities[u][v] = 1
-        costs[u][v] = c
-        costs[v][u] = -c
-        edge_indices[u][v] = num
-        
-    INF = 10**9
-    total_cost = 0
-    total_flow = 0
-    parent = [-1] * size
-    dist = [INF] * size
+        graph[u].append((v, c, idx, len(graph[v])))
+        graph[v].append((u, -c, idx, len(graph[u])-1))
     
-    while True:
-        dist[source] = 0
-        updated = True
-        while updated:
-            updated = False
-            for u in range(size):
-                if dist[u] == INF:
-                    continue
-                for v in graph[u]:
-                    if capacities[u][v] > 0 and dist[v] > dist[u] + costs[u][v]:
-                        dist[v] = dist[u] + costs[u][v]
-                        parent[v] = u
-                        updated = True
-        if dist[sink] == INF:
-            break
-            
-        flow = INF
-        cur = sink
-        while cur != source:
-            prev = parent[cur]
-            flow = min(flow, capacities[prev][cur])
-            cur = prev
-            
-        cur = sink
-        while cur != source:
-            prev = parent[cur]
-            capacities[prev][cur] -= flow
-            capacities[cur][prev] += flow
-            total_cost += flow * costs[prev][cur]
-            cur = prev
-            
-        total_flow += flow
-        dist = [INF] * size
-        
-    result_edges = []
-    for u in range(1, boys+1):
-        for v in range(boys+1, boys+girls+1):
-            if capacities[v][u] > 0 and edge_indices[u][v] != -1:
-                result_edges.append(edge_indices[u][v])
-                
+    for i in range(1, boys+1):
+        graph[source].append((i, 0, -1, len(graph[i])))
+        graph[i].append((source, 0, -1, len(graph[source])-1))
+    
+    for j in range(1, girls+1):
+        node_j = boys + j
+        graph[node_j].append((sink, 0, -1, len(graph[sink])))
+        graph[sink].append((node_j, 0, -1, len(graph[node_j])-1))
+    
+    dist = [INF] * total_nodes
+    parent = [-1] * total_nodes
+    parent_edge = [-1] * total_nodes
+    in_queue = [False] * total_nodes
+    dist[source] = 0
+    q = deque([source])
+    in_queue[source] = True
+    
+    while q:
+        u = q.popleft()
+        in_queue[u] = False
+        for idx, (v, cost, edge_idx, rev_idx) in enumerate(graph[u]):
+            if dist[u] + cost < dist[v]:
+                dist[v] = dist[u] + cost
+                parent[v] = u
+                parent_edge[v] = idx
+                if not in_queue[v]:
+                    in_queue[v] = True
+                    q.append(v)
+    
+    if dist[sink] == INF:
+        print(-1)
+        return
+    
+    total_cost = 0
+    selected_edges = []
+    flow = 0
+    u = sink
+    path_edges = []
+    while u != source:
+        p = parent[u]
+        edge_index = parent_edge[u]
+        edge_info = graph[p][edge_index]
+        v, cost, edge_idx, rev_idx = edge_info
+        if edge_idx != -1:
+            path_edges.append(edge_idx)
+        total_cost += cost
+        u = p
+    
+    selected_edges.extend(path_edges)
+    k = len(selected_edges)
+    
     print(total_cost)
-    print(len(result_edges))
-    print(' '.join(map(str, result_edges)))
+    print(k)
+    if k > 0:
+        print(" ".join(map(str, selected_edges)))
+    else:
+        print()
 
 if __name__ == "__main__":
     main()

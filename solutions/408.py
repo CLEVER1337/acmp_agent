@@ -1,55 +1,45 @@
 
-def main():
-    with open("INPUT.TXT", "r") as f:
-        data = f.read().splitlines()
-    
+with open('INPUT.TXT', 'r') as f:
+    data = f.readlines()
     if not data:
         print("Impossible.")
-        return
-        
-    try:
-        k, n = map(int, data[0].split())
-    except:
-        print("Impossible.")
-        return
-        
-    lines = data[1:1+n]
+        exit()
     
-    result = []
+    first_line = data[0].split()
+    if len(first_line) < 2:
+        print("Impossible.")
+        exit()
+        
+    K = int(first_line[0])
+    N = int(first_line[1])
+    
+    lines = [line.rstrip('\n').rstrip('\r') for line in data[1:1+N]]
+    
+    formatted_lines = []
     for line in lines:
         stripped = line.strip()
-        if not stripped:
-            result.append(" " * k)
-            continue
-            
-        current_len = len(line)
-        if current_len > k:
+        if len(stripped) > K:
             print("Impossible.")
-            return
+            exit()
             
-        total_spaces = k - len(stripped)
+        total_spaces = K - len(stripped)
         left_spaces = total_spaces // 2
-        
-        if total_spaces % 2 == 1:
-            if left_spaces + 1 <= total_spaces - left_spaces:
-                left_spaces += 1
-                
         right_spaces = total_spaces - left_spaces
         
         if left_spaces > right_spaces:
-            print("Impossible.")
-            return
+            left_spaces, right_spaces = right_spaces, left_spaces
             
         if left_spaces + 1 <= right_spaces - 1:
-            print("Impossible.")
-            return
+            left_spaces += 1
+            right_spaces -= 1
             
-        formatted_line = " " * left_spaces + stripped + " " * right_spaces
-        result.append(formatted_line)
-    
-    with open("OUTPUT.TXT", "w") as f:
-        for line in result:
-            f.write(line + "\n")
-
-if __name__ == "__main__":
-    main()
+        if left_spaces > right_spaces:
+            print("Impossible.")
+            exit()
+            
+        formatted_line = ' ' * left_spaces + stripped + ' ' * right_spaces
+        formatted_lines.append(formatted_line)
+        
+    with open('OUTPUT.TXT', 'w') as out:
+        for line in formatted_lines:
+            out.write(line + '\n')

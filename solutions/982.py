@@ -9,68 +9,83 @@ def main():
     white_captures = set()
     black_captures = set()
     
-    directions = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+    directions = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
     
-    def dfs(i, j, color, captured, visited):
-        nonlocal max_captures
-        found = False
-        for dx, dy in directions:
-            ni1, nj1 = i + dx, j + dy
-            ni2, nj2 = i + 2*dx, j + 2*dy
-            
-            if 0 <= ni1 < 8 and 0 <= nj1 < 8 and 0 <= ni2 < 8 and 0 <= nj2 < 8:
-                if color == 'W':
-                    opponent = 'B'
-                else:
-                    opponent = 'W'
-                
-                if (board[ni1][nj1] == opponent and 
-                    board[ni2][nj2] == '.' and 
-                    (ni1, nj1) not in captured):
-                    
-                    new_captured = captured | {(ni1, nj1)}
-                    if (ni2, nj2) not in visited:
-                        visited.add((ni2, nj2))
-                        found = True
-                        dfs(ni2, nj2, color, new_captured, visited.copy())
+    def dfs_captures(x, y, color, captures, path=None):
+        if path is None:
+            path = set()
+        current_captures = set()
+        max_depth_captures = set()
         
-        if not found and captured:
-            for cap in captured:
-                if color == 'W':
-                    white_captures.add(cap)
-                else:
-                    black_captures.add(cap)
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+            jx, jy = x + 2*dx, y + 2*dy
+            
+            if (0 <= jx < 8 and 0 <= jy < 8 and 
+                0 <= nx < 8 and 0 <= ny < 8):
+                
+                opponent = 'B' if color == 'W' else 'W'
+                if (board[nx][ny] == opponent and 
+                    board[jx][jy] == '.' and 
+                    (jx, jy) not in path):
+                    
+                    capture_pos = (nx, ny)
+                    current_captures.add(capture_pos)
+                    
+                    original = board[x][y]
+                    captured = board[nx][ny]
+                    
+                    board[x][y] = '.'
+                    board[nx][ny] = '.'
+                    board[jx][jy] = color
+                    
+                    path.add((jx, jy))
+                    deeper_captures = dfs_captures(jx, jy, color, captures, path)
+                    path.remove((jx, jy))
+                    
+                    board[x][y] = original
+                    board[nx][ny] = captured
+                    board[jx][jy] = '.'
+                    
+                    if deeper_captures:
+                        max_depth_captures.update(deeper_captures)
+        
+        if max_depth_captures:
+            return max_depth_captures
+        return current_captures
     
     for i in range(8):
         for j in range(8):
             if board[i][j] == 'W':
-                visited = set()
-                visited.add((i, j))
-                dfs(i, j, 'W', set(), visited)
+                captures = dfs_captures(i, j, 'W', white_captures)
+                white_captures.update(captures)
             elif board[i][j] == 'B':
-                visited = set()
-                visited.add((i, j))
-                dfs(i, j, 'B', set(), visited)
+                captures = dfs_captures(i, j, 'B', black_captures)
+                black_captures.update(captures)
     
-    white_list = sorted(white_captures)
-    black_list = sorted(black_captures)
+    white_list = sorted(white_captures, key=lambda x: (x[0], x[1]))
+    black_list = sorted(black_captures, key=lambda x: (x[0], x[1]))
     
     with open('OUTPUT.TXT', 'w') as f:
         if white_list:
-            f.write("White captures:")
-            for i, j in white_list:
-                f.write(f" ({i+1},{j+1})")
+            f.write("White takes:")
+            for i, (x, y) in enumerate(white_list):
+                if i % 8 == 0:
+                    f.write("\n")
+                f.write(f"({x+1},{y+1}) ")
             f.write("\n")
         else:
-            f.write("White captures:\n")
+            f.write("White takes: None\n")
             
         if black_list:
-            f.write("Black captures:")
-            for i, j in black_list:
-                f.write(f" ({i+1},{j+1})")
+            f.write("Black takes:")
+            for i, (x, y) in enumerate(black_list):
+                if i % 8 == 0:
+                    f.write("\n")
+                f.write(f"({x+1},{y+1}) ")
             f.write("\n")
         else:
-            f.write("Black captures:\n")
+            f.write("Black takes: None\n")
 
 if __name__ == "__main__":
     main()

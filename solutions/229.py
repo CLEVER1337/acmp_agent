@@ -1,46 +1,42 @@
 
+import sys
+
 def main():
-    import sys
     data = sys.stdin.read().split()
     n = int(data[0])
     participants = []
-    index = 1
     for i in range(n):
-        a = float(data[index])
-        b = float(data[index + 1])
-        index += 2
-        participants.append((a, b, i + 1))
+        a = float(data[1 + 2*i])
+        b = float(data[2 + 2*i])
+        participants.append((a, b))
     
-    possible_winners = []
-    
-    for i in range(n):
-        a_i, b_i, idx_i = participants[i]
-        max_total = a_i + b_i
-        
-        can_win = True
+    can_win = []
+    for idx in range(n):
+        a0, b0 = participants[idx]
+        max_possible_total = a0 + b0
+        possible = True
         
         for j in range(n):
-            if i == j:
+            if j == idx:
                 continue
                 
-            a_j, b_j, idx_j = participants[j]
-            current_total_j = a_j + b_j
+            aj, bj = participants[j]
+            min_needed_total = max_possible_total
             
-            if current_total_j <= max_total:
-                continue
-                
-            max_possible_j = min(100, a_j) + min(100, b_j)
-            if max_possible_j > max_total:
-                can_win = False
+            max_aj = min(100, aj + (100 - aj))
+            max_bj = min(100, bj + (100 - bj))
+            max_total_j = max_aj + max_bj
+            
+            if max_total_j < min_needed_total:
+                possible = False
                 break
                 
-        if can_win:
-            possible_winners.append(idx_i)
-    
-    possible_winners.sort()
-    print(f"{len(possible_winners)}")
-    if possible_winners:
-        print(" ".join(map(str, possible_winners)))
+        if possible:
+            can_win.append(idx + 1)
+            
+    print(f"{len(can_win)}")
+    if can_win:
+        print(" ".join(map(str, can_win)))
     else:
         print()
 

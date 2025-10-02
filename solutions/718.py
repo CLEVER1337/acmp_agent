@@ -10,57 +10,49 @@ def main():
     blocks = []
     for i in range(1, 1 + n):
         blocks.append(data[i].strip())
-    target = data[1 + n].strip()
-    len_target = len(target)
+    s = data[1 + n].strip()
     
-    # DP: dp[i] = (min_blocks, prev_block_index, prev_state)
-    # state: which column we're at in the current block
+    len_s = len(s)
+    INF = 10**9
     
-    INF = float('inf')
-    dp = [INF] * (len_target + 1)
-    prev = [(-1, -1)] * (len_target + 1)
+    dp = [INF] * (len_s + 1)
+    prev = [(-1, -1)] * (len_s + 1)
     dp[0] = 0
     
-    for i in range(len_target + 1):
-        if dp[i] == INF:
+    for pos in range(len_s + 1):
+        if dp[pos] == INF:
             continue
             
-        # Try to add a new block on top
         for block_idx, block in enumerate(blocks):
-            # Check how many characters we can match from this block
             for start_col in range(L):
                 match_len = 0
-                # Check matching from position i in target and column start_col in block
                 for col in range(start_col, L):
-                    pos = i + (col - start_col)
-                    if pos >= len_target:
+                    if pos + match_len >= len_s:
                         break
-                    if target[pos] != block[col]:
+                    if block[col] != s[pos + match_len]:
                         break
                     match_len += 1
                 
                 if match_len > 0:
-                    new_pos = i + match_len
-                    if dp[new_pos] > dp[i] + 1:
-                        dp[new_pos] = dp[i] + 1
-                        prev[new_pos] = (i, block_idx)
+                    new_pos = pos + match_len
+                    if dp[new_pos] > dp[pos] + 1:
+                        dp[new_pos] = dp[pos] + 1
+                        prev[new_pos] = (pos, block_idx)
     
-    if dp[len_target] == INF:
+    if dp[len_s] == INF:
         print(-1)
-        return
-        
-    # Reconstruct the solution
-    k = dp[len_target]
-    result_blocks = []
-    pos = len_target
-    while pos > 0:
-        prev_pos, block_idx = prev[pos]
-        result_blocks.append(block_idx + 1)
-        pos = prev_pos
-        
-    result_blocks.reverse()
-    print(k)
-    print(' '.join(map(str, result_blocks)))
+    else:
+        k = dp[len_s]
+        result_blocks = []
+        pos = len_s
+        while pos > 0:
+            prev_pos, block_idx = prev[pos]
+            result_blocks.append(block_idx + 1)
+            pos = prev_pos
+            
+        result_blocks.reverse()
+        print(k)
+        print(' '.join(map(str, result_blocks)))
 
 if __name__ == "__main__":
     main()

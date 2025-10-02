@@ -4,6 +4,7 @@ def main():
     data = sys.stdin.read().split()
     n = int(data[0])
     m = int(data[1])
+    
     final_config = list(map(int, data[2:2+n]))
     moves = list(map(int, data[2+n:2+n+m]))
     
@@ -11,23 +12,27 @@ def main():
     
     for move_idx in range(m-1, -1, -1):
         last_box = moves[move_idx]
-        idx = last_box - 1
+        total_balls = sum(initial)
+        idx = (last_box - 1) % n
         
-        total_to_remove = 0
-        current = idx
-        while True:
-            if initial[current] > 0:
-                total_to_remove += 1
-                initial[current] -= 1
-                current = (current - 1) % n
-                if current == idx:
-                    break
-            else:
-                break
+        balls_to_distribute = initial[idx]
+        initial[idx] = 0
         
-        initial[idx] += total_to_remove
-    
-    print(" ".join(map(str, initial)))
+        if balls_to_distribute == 0:
+            continue
+            
+        full_cycles = balls_to_distribute // n
+        remainder = balls_to_distribute % n
+        
+        for i in range(n):
+            initial[i] += full_cycles
+            
+        current = (idx) % n
+        for _ in range(remainder):
+            current = (current - 1) % n
+            initial[current] += 1
+            
+    print(' '.join(map(str, initial)))
 
 if __name__ == "__main__":
     main()

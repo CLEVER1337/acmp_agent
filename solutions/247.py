@@ -11,6 +11,7 @@ def main():
         for j in range(n + 1):
             if dp[i][j] == float('inf'):
                 continue
+                
             current_cost = costs[i]
             if current_cost > 100:
                 if j + 1 <= n:
@@ -22,23 +23,21 @@ def main():
                 dp[i + 1][j - 1] = min(dp[i + 1][j - 1], dp[i][j])
     
     min_cost = float('inf')
-    best_j = 0
+    min_j = 0
     for j in range(n + 1):
         if dp[n][j] < min_cost:
             min_cost = dp[n][j]
-            best_j = j
-        elif dp[n][j] == min_cost and j > best_j:
-            best_j = j
+            min_j = j
     
+    coupons_left = min_j
     coupons_used = 0
-    coupons_left = best_j
-    j = best_j
-    for i in range(n - 1, -1, -1):
-        if j < n and dp[i][j + 1] + costs[i] == dp[i + 1][j] and costs[i] > 100:
+    
+    j = coupons_left
+    for i in range(n, 0, -1):
+        if j < n and dp[i][j] == dp[i - 1][j + 1]:
             coupons_used += 1
             j += 1
-        elif j > 0 and dp[i][j - 1] == dp[i + 1][j]:
-            coupons_used += 1
+        elif j > 0 and dp[i][j] == dp[i - 1][j - 1] + costs[i - 1]:
             j -= 1
     
     with open('OUTPUT.TXT', 'w') as f:

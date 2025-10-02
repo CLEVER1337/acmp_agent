@@ -1,71 +1,34 @@
 
-import math
-
-def factorize(n):
-    factors = {}
-    d = 2
-    while d * d <= n:
-        while n % d == 0:
-            factors[d] = factors.get(d, 0) + 1
-            n //= d
-        d += 1
-    if n > 1:
-        factors[n] = factors.get(n, 0) + 1
-    return factors
-
-def get_divisors_count(factors):
-    count = 1
-    for exp in factors.values():
-        count *= (exp + 1)
-    return count
-
-def solve():
-    with open('INPUT.TXT', 'r') as f:
-        D = int(f.read().strip())
-    
+def main():
+    D = int(input().strip())
     if D == 1:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write('1')
+        print(1)
         return
     
-    primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
-    max_primes = len(primes)
+    primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53]
+    exponents = [0] * len(primes)
     
-    def backtrack(idx, current_num, divisors_left, last_exp):
-        if divisors_left == 1:
-            return current_num
-        
-        if idx >= max_primes:
+    def backtrack(pos, divisors, current, limit):
+        if divisors == D:
+            return current
+        if divisors > D or pos >= len(primes):
             return float('inf')
         
         best = float('inf')
-        p = primes[idx]
-        
-        for exp in range(1, last_exp + 1):
-            if divisors_left % (exp + 1) != 0:
-                continue
-                
-            next_num = current_num * (p ** exp)
-            if next_num > 10**15 + 1:
+        for e in range(1, limit + 1):
+            if divisors * (e + 1) > D:
+                break
+            if current * primes[pos] ** e > 10**15 + 1:
                 break
                 
-            next_divisors = divisors_left // (exp + 1)
-            candidate = backtrack(idx + 1, next_num, next_divisors, exp)
-            if candidate < best:
-                best = candidate
-        
-        candidate = backtrack(idx + 1, current_num, divisors_left, last_exp)
-        if candidate < best:
-            best = candidate
-            
+            next_val = backtrack(pos + 1, divisors * (e + 1), current * primes[pos] ** e, e)
+            if next_val < best:
+                best = next_val
+                
         return best
     
-    result = backtrack(0, 1, D, 100)
-    
-    if result > 10**15 + 1:
-        result = 0
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(result))
+    result = backtrack(0, 1, 1, 60)
+    print(result if result <= 10**15 + 1 else 0)
 
-solve()
+if __name__ == "__main__":
+    main()

@@ -16,11 +16,11 @@ def main():
         index += 2
         points.append((x, y))
     
-    count = 0
+    result = 0
     
     for i in range(n):
-        distances = defaultdict(int)
-        same_points = 0
+        dist_count = defaultdict(int)
+        same_point_count = 0
         
         for j in range(n):
             if i == j:
@@ -30,17 +30,13 @@ def main():
             dy = points[i][1] - points[j][1]
             dist_sq = dx * dx + dy * dy
             
-            if dist_sq == 0:
-                same_points += 1
-            else:
-                distances[dist_sq] += 1
+            dist_count[dist_sq] += 1
         
-        for dist, cnt in distances.items():
-            count += cnt * (cnt - 1) // 2
-        
-        count += same_points * (same_points - 1) // 2
+        for count in dist_count.values():
+            if count >= 2:
+                result += count * (count - 1) // 2
     
-    print(count)
+    print(result)
 
 if __name__ == "__main__":
     main()

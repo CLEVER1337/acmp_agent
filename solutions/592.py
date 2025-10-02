@@ -21,30 +21,70 @@ def main():
             segments.append((l, r))
         columns.append(segments)
     
-    n = 0
-    for segs in columns:
-        if segs:
-            max_r = max(r for _, r in segs)
-            n = max(n, max_r)
+    heights = [0] * m
+    stable_segments = []
     
-    fall_height = [0] * (n + 2)
-    result = []
+    for col_idx, segments in enumerate(columns):
+        if not segments:
+            heights[col_idx] = 0
+            continue
+        
+        max_height = 0
+        for l, r in segments:
+            if r > max_height:
+                max_height = r
+        heights[col_idx] = max_height
     
-    for segs in columns:
-        max_top = 0
-        for l, r in segs:
-            max_fall = 0
-            for pos in range(l, r + 1):
-                if fall_height[pos] > max_fall:
-                    max_fall = fall_height[pos]
-            new_height = max_fall + (r - l + 1)
-            for pos in range(l, r + 1):
-                fall_height[pos] = new_height
-            if new_height > max_top:
-                max_top = new_height
-        result.append(str(max_top))
+    for col_idx in range(m):
+        if heights[col_idx] == 0:
+            continue
+            
+        segments = columns[col_idx]
+        max_fall = 0
+        
+        for l, r in segments:
+            fall_distance = l - 1
+            for stable_seg in stable_segments:
+                if stable_seg[0] <= col_idx <= stable_seg[1]:
+                    if stable_seg[2] >= l - 1:
+                        fall_distance = min(fall_distance, l - stable_seg[2] - 1)
+            
+            if fall_distance > 0:
+                new_l = l - fall_distance
+                new_r = r - fall_distance
+                if new_l <= 1:
+                    stable_segments.append((col_idx, col_idx, new_r))
+                else:
+                    for i in range(len(stable_segments)):
+                        seg = stable_segments[i]
+                        if seg[0] <= col_idx <= seg[1] and seg[2] >= new_l - 1:
+                            stable_segments[i] = (min(seg[0], col_idx), max(seg[1], col_idx), max(seg[2], new_r))
+                            break
+                    else:
+                        stable_segments.append((col_idx, col_idx, new_r))
+            
+            heights[col_idx] = min(heights[col_idx], r - fall_distance)
     
-    sys.stdout.write("\n".join(result))
+    for col_idx in range(m):
+        segments = columns[col_idx]
+        if not segments:
+            print(0, end=' ')
+            continue
+            
+        max_r = 0
+        for l, r in segments:
+            if r > max_r:
+                max_r = r
+                
+        fall = max_r
+        for seg in stable_segments:
+            if seg[0] <= col_idx <= seg[1]:
+                if seg[2] < max_r:
+                    fall = min(fall, max_r - (max_r - seg[2]))
+                else:
+                    fall = min(fall, max_r)
+        
+        print(fall, end=' ')
 
 if __name__ == "__main__":
     main()

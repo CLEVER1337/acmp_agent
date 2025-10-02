@@ -11,10 +11,10 @@ for a in range(n):
     for b in adj[a]:
         if b <= a:
             continue
-        for c in adj[b]:
-            if c == a or c <= b:
-                continue
-            if a in adj[c]:
-                count += 1
+        common = 0
+        for neighbor in adj[a]:
+            if neighbor in adj[b]:
+                common += 1
+        count += common * (common - 1) // 2
 
 print(count)

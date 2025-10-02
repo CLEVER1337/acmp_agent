@@ -1,28 +1,22 @@
 
 def main():
     with open('INPUT.TXT', 'r') as f:
-        W, H, x, y, a, b = map(int, f.readline().split())
+        data = f.read().split()
+        W = int(data[0])
+        H = int(data[1])
+        x = int(data[2])
+        y = int(data[3])
+        a = int(data[4])
+        b = int(data[5])
     
-    # Переводим размеры карты из см в метры
-    a_meters = a / 100.0
-    b_meters = b / 100.0
+    scale_x = (W * 100) / a
+    scale_y = (H * 100) / b
     
-    # Коэффициенты сжатия для системы уравнений
-    kx = a_meters / (2 * W)
-    ky = b_meters / (2 * H)
+    fixed_point_x = (x * scale_x) / (scale_x - 1)
+    fixed_point_y = (y * scale_y) / (scale_y - 1)
     
-    # Решаем систему уравнений:
-    # u = kx * (u - x) + x
-    # v = ky * (v - y) + y
-    
-    # Преобразуем к виду:
-    # u * (1 - kx) = x * (1 - kx)
-    # v * (1 - ky) = y * (1 - ky)
-    
-    u = x
-    v = y
-    
-    print("{:.6f} {:.6f}".format(u, v))
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write("{:.6f} {:.6f}".format(fixed_point_x, fixed_point_y))
 
 if __name__ == "__main__":
     main()

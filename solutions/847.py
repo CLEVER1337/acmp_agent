@@ -1,10 +1,12 @@
 
 with open('INPUT.TXT', 'r') as f:
-    word1, word2 = f.readline().split()
+    words = f.readline().split()
+    word1, word2 = words[0], words[1]
 
 if sorted(word1) == sorted(word2):
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write('YES')
+    result = 'YES'
 else:
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write('NO')
+    result = 'NO'
+
+with open('OUTPUT.TXT', 'w') as f:
+    f.write(result)

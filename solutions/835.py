@@ -15,61 +15,49 @@ def main():
         index += 2
         items.append((w, p, i+1))
     
-    best_value = 0
+    max_profit = 0
     best_mask = 0
-    best_count = float('inf')
+    min_items = float('inf')
     
-    total_states = 1 << n
-    for mask in range(total_states):
+    for mask in range(1, 1 << n):
         total_weight = 0
-        total_value = 0
+        total_profit = 0
         count = 0
         for i in range(n):
             if mask & (1 << i):
                 total_weight += items[i][0]
-                total_value += items[i][1]
+                total_profit += items[i][1]
                 count += 1
                 if total_weight > W:
                     break
         
         if total_weight <= W:
-            if total_value > best_value:
-                best_value = total_value
+            if total_profit > max_profit:
+                max_profit = total_profit
                 best_mask = mask
-                best_count = count
-            elif total_value == best_value:
-                if count < best_count:
+                min_items = count
+            elif total_profit == max_profit:
+                if count < min_items:
                     best_mask = mask
-                    best_count = count
-                elif count == best_count:
-                    current_indices = []
-                    new_indices = []
+                    min_items = count
+                elif count == min_items:
                     for i in range(n):
-                        if best_mask & (1 << i):
-                            current_indices.append(items[i][2])
-                        if mask & (1 << i):
-                            new_indices.append(items[i][2])
-                    
-                    current_indices.sort()
-                    new_indices.sort()
-                    
-                    for curr_idx, new_idx in zip(current_indices, new_indices):
-                        if new_idx < curr_idx:
-                            best_mask = mask
-                            break
-                        elif new_idx > curr_idx:
+                        bit1 = (best_mask >> i) & 1
+                        bit2 = (mask >> i) & 1
+                        if bit1 != bit2:
+                            if bit2 < bit1:
+                                best_mask = mask
                             break
     
     selected_indices = []
-    total_val = 0
+    count_selected = 0
     for i in range(n):
         if best_mask & (1 << i):
             selected_indices.append(items[i][2])
-            total_val += items[i][1]
+            count_selected += 1
     
-    selected_indices.sort()
-    print(f"{len(selected_indices)} {total_val}")
-    print(" ".join(map(str, selected_indices)))
+    print(f"{count_selected} {max_profit}")
+    print(" ".join(map(str, sorted(selected_indices))))
 
 if __name__ == "__main__":
     main()

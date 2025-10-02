@@ -5,7 +5,9 @@ def char_to_value(c):
     else:
         return ord(c) - ord('A') + 10
 
-def convert_to_decimal(s, base):
+def convert_number(s, base):
+    if base == 1:
+        return len(s)
     try:
         result = 0
         for char in s:
@@ -24,43 +26,30 @@ def solve():
         A = f.readline().strip()
         B = int(f.readline().strip())
     
-    max_digit = 0
+    min_base = 1
     for char in A:
-        digit = char_to_value(char)
-        if digit > max_digit:
-            max_digit = digit
+        value = char_to_value(char)
+        min_base = max(min_base, value + 1)
     
-    min_base = max_digit + 1
-    if min_base < 2:
-        min_base = 2
+    left, right = min_base, max(min_base, B + 1)
+    found_base = 0
     
-    left, right = min_base, max(10**7 + 1, min_base + 1)
-    solution = 0
+    if convert_number(A, min_base) == B:
+        found_base = min_base
     
-    while left <= right:
-        mid = (left + right) // 2
-        decimal_val = convert_to_decimal(A, mid)
-        if decimal_val == -1 or decimal_val > B:
-            right = mid - 1
-        elif decimal_val < B:
-            left = mid + 1
-        else:
-            solution = mid
-            right = mid - 1
-    
-    if solution != 0:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write(str(solution))
-        return
-    
-    for base in range(min_base, 37):
-        decimal_val = convert_to_decimal(A, base)
-        if decimal_val == B:
-            with open('OUTPUT.TXT', 'w') as f:
-                f.write(str(base))
-            return
+    if found_base == 0:
+        while left <= right:
+            mid = (left + right) // 2
+            converted = convert_number(A, mid)
+            if converted == B:
+                found_base = mid
+                right = mid - 1
+            elif converted == -1 or converted > B:
+                right = mid - 1
+            else:
+                left = mid + 1
     
     with open('OUTPUT.TXT', 'w') as f:
-        f.write('0')
+        f.write(str(found_base))
 
 solve()

@@ -1,80 +1,98 @@
 
 def main():
-    note_list = ['A', 'Bb', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
+    note_order = ['A', 'Bb', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
     note_aliases = {
         'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#',
         'A#': 'Bb', 'D#': 'Eb', 'G#': 'Ab', 'C#': 'Db'
     }
     
     with open('INPUT.TXT', 'r') as f:
-        n = int(f.readline().strip())
-        tuning = f.readline().split()
-        chord_name = f.readline().strip()
+        lines = f.readlines()
     
-    for i in range(len(tuning)):
-        if tuning[i] in note_aliases:
-            tuning[i] = note_aliases[tuning[i]]
+    N = int(lines[0].strip())
+    open_strings = lines[1].strip().split()
+    chord_name = lines[2].strip()
     
-    tonic = chord_name[0]
-    if len(chord_name) > 1 and chord_name[1] in ['#', 'b']:
-        tonic += chord_name[1]
-        chord_type = chord_name[2:]
+    for i in range(len(open_strings)):
+        if open_strings[i] in note_aliases:
+            open_strings[i] = note_aliases[open_strings[i]]
+    
+    tonic = chord_name
+    chord_type = ''
+    if 'maj7' in chord_name:
+        tonic = chord_name[:-4]
+        chord_type = 'maj7'
+    elif 'min7' in chord_name:
+        tonic = chord_name[:-4]
+        chord_type = 'min7'
+    elif 'm' in chord_name:
+        tonic = chord_name[:-1]
+        chord_type = 'm'
     else:
-        chord_type = chord_name[1:]
+        chord_type = ''
     
     if tonic in note_aliases:
         tonic = note_aliases[tonic]
     
-    chord_notes = set()
-    base_index = note_list.index(tonic)
+    tonic_idx = note_order.index(tonic)
     
     if chord_type == '':
-        chord_notes.add(note_list[base_index])
-        chord_notes.add(note_list[(base_index + 4) % 12])
-        chord_notes.add(note_list[(base_index + 7) % 12])
+        chord_notes = [
+            note_order[tonic_idx],
+            note_order[(tonic_idx + 4) % 12],
+            note_order[(tonic_idx + 7) % 12]
+        ]
     elif chord_type == 'm':
-        chord_notes.add(note_list[base_index])
-        chord_notes.add(note_list[(base_index + 3) % 12])
-        chord_notes.add(note_list[(base_index + 7) % 12])
-    elif chord_type == '7':
-        chord_notes.add(note_list[base_index])
-        chord_notes.add(note_list[(base_index + 4) % 12])
-        chord_notes.add(note_list[(base_index + 7) % 12])
-        chord_notes.add(note_list[(base_index + 10) % 12])
-    elif chord_type == 'm7':
-        chord_notes.add(note_list[base_index])
-        chord_notes.add(note_list[(base_index + 3) % 12])
-        chord_notes.add(note_list[(base_index + 7) % 12])
-        chord_notes.add(note_list[(base_index + 10) % 12])
+        chord_notes = [
+            note_order[tonic_idx],
+            note_order[(tonic_idx + 3) % 12],
+            note_order[(tonic_idx + 7) % 12]
+        ]
+    elif chord_type == 'maj7':
+        chord_notes = [
+            note_order[tonic_idx],
+            note_order[(tonic_idx + 4) % 12],
+            note_order[(tonic_idx + 7) % 12],
+            note_order[(tonic_idx + 11) % 12]
+        ]
+    elif chord_type == 'min7':
+        chord_notes = [
+            note_order[tonic_idx],
+            note_order[(tonic_idx + 3) % 12],
+            note_order[(tonic_idx + 7) % 12],
+            note_order[(tonic_idx + 10) % 12]
+        ]
+    
+    chord_notes_set = set(chord_notes)
     
     count = 0
-    for fret1 in range(n + 1):
-        note1 = note_list[(note_list.index(tuning[0]) + fret1) % 12]
-        if note1 not in chord_notes:
+    for s1 in range(N + 1):
+        note1 = note_order[(note_order.index(open_strings[0]) + s1) % 12]
+        if note1 not in chord_notes_set:
             continue
-        for fret2 in range(n + 1):
-            note2 = note_list[(note_list.index(tuning[1]) + fret2) % 12]
-            if note2 not in chord_notes:
+        for s2 in range(N + 1):
+            note2 = note_order[(note_order.index(open_strings[1]) + s2) % 12]
+            if note2 not in chord_notes_set:
                 continue
-            for fret3 in range(n + 1):
-                note3 = note_list[(note_list.index(tuning[2]) + fret3) % 12]
-                if note3 not in chord_notes:
+            for s3 in range(N + 1):
+                note3 = note_order[(note_order.index(open_strings[2]) + s3) % 12]
+                if note3 not in chord_notes_set:
                     continue
-                for fret4 in range(n + 1):
-                    note4 = note_list[(note_list.index(tuning[3]) + fret4) % 12]
-                    if note4 not in chord_notes:
+                for s4 in range(N + 1):
+                    note4 = note_order[(note_order.index(open_strings[3]) + s4) % 12]
+                    if note4 not in chord_notes_set:
                         continue
-                    for fret5 in range(n + 1):
-                        note5 = note_list[(note_list.index(tuning[4]) + fret5) % 12]
-                        if note5 not in chord_notes:
+                    for s5 in range(N + 1):
+                        note5 = note_order[(note_order.index(open_strings[4]) + s5) % 12]
+                        if note5 not in chord_notes_set:
                             continue
-                        for fret6 in range(n + 1):
-                            note6 = note_list[(note_list.index(tuning[5]) + fret6) % 12]
-                            if note6 not in chord_notes:
+                        for s6 in range(N + 1):
+                            note6 = note_order[(note_order.index(open_strings[5]) + s6) % 12]
+                            if note6 not in chord_notes_set:
                                 continue
                             
                             played_notes = {note1, note2, note3, note4, note5, note6}
-                            if played_notes.issubset(chord_notes) and len(played_notes) == len(chord_notes):
+                            if played_notes == chord_notes_set:
                                 count += 1
     
     with open('OUTPUT.TXT', 'w') as f:

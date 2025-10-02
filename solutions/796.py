@@ -24,54 +24,55 @@ def main():
         paragraphs.append(' '.join(current_para))
     
     output_lines = []
-    indent = ' ' * b
     
     for para in paragraphs:
         words = []
         current_word = []
+        in_word = False
         
         for char in para:
-            if char == ' ':
-                if current_word:
+            if char.isalnum():
+                if not in_word and current_word:
                     words.append(''.join(current_word))
                     current_word = []
-            elif char in ',.?!-:\'':
-                if current_word:
-                    current_word.append(char)
-                else:
-                    words.append(char)
-            else:
                 current_word.append(char)
+                in_word = True
+            elif char in [',', '.', '?', '!', '-', ':', "'"]:
+                current_word.append(char)
+                in_word = False
+            elif char == ' ':
+                if in_word or current_word:
+                    words.append(''.join(current_word))
+                    current_word = []
+                in_word = False
         
         if current_word:
             words.append(''.join(current_word))
         
-        if not words:
-            continue
-            
-        current_line = indent
-        first_word = True
+        current_line = ' ' * b
+        first_in_para = True
         
         for word in words:
-            if first_word:
+            if first_in_para:
                 if len(current_line) + len(word) <= w:
                     current_line += word
-                    first_word = False
                 else:
                     output_lines.append(current_line.rstrip())
-                    current_line = indent + word
+                    current_line = ' ' * b + word
+                first_in_para = False
             else:
                 if len(current_line) + 1 + len(word) <= w:
                     current_line += ' ' + word
                 else:
                     output_lines.append(current_line.rstrip())
-                    current_line = indent + word
+                    current_line = word
         
-        if current_line != indent:
+        if current_line.strip():
             output_lines.append(current_line.rstrip())
     
-    for line in output_lines:
-        print(line)
+    with open('OUTPUT.TXT', 'w') as f:
+        for line in output_lines:
+            f.write(line + '\n')
 
 if __name__ == '__main__':
     main()

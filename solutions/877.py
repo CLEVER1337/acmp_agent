@@ -9,31 +9,29 @@ def main():
         return
     
     first_line = lines[0]
-    signed_on_match = re.search(r'(\d{2}:\d{2}:\d{2}): (.+) signed on', first_line)
-    if not signed_on_match:
-        return
-        
-    friend_name = signed_on_match.group(2)
+    last_line = lines[-1]
+    
+    match = re.match(r'\d{2}:\d{2}:\d{2}: (\w+) signed on', first_line)
+    if match:
+        friend_name = match.group(1)
     
     output_lines = []
     
     for i, line in enumerate(lines[1:-1]):
-        time_match = re.match(r'(\d{2}:\d{2}:\d{2}): (.+)', line)
+        time_match = re.match(r'(\d{2}:\d{2}:\d{2}:) (.+)', line)
         if not time_match:
             continue
             
         content = time_match.group(2).strip()
         
-        if not content:
-            continue
-            
-        last_char = content[-1]
-        if last_char == '.':
+        if content.endswith('.'):
             quoted_content = f'«{content[:-1]},»'
-        else:
+        elif content.endswith('!') or content.endswith('?'):
             quoted_content = f'«{content}»'
+        else:
+            quoted_content = f'«{content},»'
         
-        speaker = 'Fedya' if i % 2 == 0 else friend_name
+        speaker = "Fedya" if i % 2 == 0 else friend_name
         
         output_lines.append(f'{quoted_content} --- skazal {speaker}.')
     

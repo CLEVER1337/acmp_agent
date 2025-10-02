@@ -1,39 +1,38 @@
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        data = f.readlines()
+    with open('INPUT.TXT', 'r') as f:
+        data = f.read().split()
     
     rockets = []
     for i in range(4):
-        t, v = map(int, data[i].split())
+        t = int(data[i*2])
+        v = int(data[i*2 + 1])
         rockets.append((t, v))
     
-    Tpov, D = map(int, data[4].split())
+    Tpov = int(data[8])
+    D = int(data[9])
     
     arrival_times = []
-    for i in range(4):
-        arrival_time = rockets[i][0] + D / rockets[i][1]
-        arrival_times.append(arrival_time)
+    for i, (t, v) in enumerate(rockets):
+        arrival_time = t + D / v
+        arrival_times.append((arrival_time, i))
     
-    shield_pos = 0
+    arrival_times.sort()
+    
+    shield_pos = arrival_times[0][1]
     blocked = 0
     
-    events = sorted([(arrival_times[i], i) for i in range(4)])
-    
-    for event_time, rocket_idx in events:
-        required_shield_pos = rocket_idx
-        
-        if shield_pos == required_shield_pos:
+    for arrival_time, rocket_idx in arrival_times:
+        if rocket_idx == shield_pos:
             blocked += 1
             continue
         
-        turns_needed = abs(shield_pos - required_shield_pos)
-        if turns_needed == 3:
-            turns_needed = 1
+        needed_turns = abs(rocket_idx - shield_pos)
+        needed_turns = min(needed_turns, 4 - needed_turns)
         
-        if event_time >= turns_needed * Tpov:
-            shield_pos = required_shield_pos
+        if arrival_time >= arrival_times[shield_pos][0] + needed_turns * Tpov:
             blocked += 1
+            shield_pos = rocket_idx
         else:
             break
     

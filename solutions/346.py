@@ -1,19 +1,17 @@
 
 def main():
     with open("INPUT.TXT", "r") as f:
-        a, b, c = f.readline().split()
+        a, b, c = map(int, f.readline().split())
     
-    def get_permutations(num_str):
-        if len(num_str) == 0:
-            return ['']
-        digits = list(num_str)
-        perms = set()
+    def get_permutations(n):
+        digits = list(str(n))
         from itertools import permutations
+        perms = set()
         for p in permutations(digits):
-            perm_str = ''.join(p)
-            if perm_str[0] != '0' or len(perm_str) == 1:
-                perms.add(perm_str)
-        return sorted([int(x) for x in perms])
+            num_str = ''.join(p)
+            if num_str[0] != '0' or len(num_str) == 1:
+                perms.add(int(num_str))
+        return sorted(perms)
     
     a_perms = get_permutations(a)
     b_perms = get_permutations(b)
@@ -33,9 +31,9 @@ def main():
     with open("OUTPUT.TXT", "w") as f:
         if found:
             f.write("YES\n")
-            f.write(f"{result_x} {result_y}")
+            f.write(f"{result_x} {result_y}\n")
         else:
-            f.write("NO")
+            f.write("NO\n")
 
 if __name__ == "__main__":
     main()

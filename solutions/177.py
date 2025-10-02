@@ -15,117 +15,131 @@ def main():
         goods.append((s, a, d, i))
     
     compartments = [[] for _ in range(n)]
-    free_space = capacities.copy()
+    free_space = capacities[:]
     events = []
     
-    for good in goods:
-        s, a, d, idx = good
+    for s, a, d, idx in goods:
         events.append((a, 'arrive', idx))
         events.append((d, 'depart', idx))
     
-    events.sort(key=lambda x: x[0])
+    events.sort(key=lambda x: (x[0], 0 if x[1] == 'arrive' else 1))
     
-    good_info = {}
-    for idx, (s, a, d, orig_idx) in enumerate(goods):
-        good_info[idx] = {'size': s, 'compartment': -1}
+    current_goods_in_compartment = {}
     
-    def find_compartment_for_good(good_size):
-        candidates = []
-        for comp_id in range(n):
-            if free_space[comp_id] >= good_size:
-                candidates.append((free_space[comp_id], comp_id))
-        if not candidates:
-            return -1
-        candidates.sort(key=lambda x: (x[0], x[1]))
-        return candidates[0][1]
-    
-    def find_good_to_move(target_comp, required_space):
-        best_option = None
-        for comp_from in range(n):
-            if comp_from == target_comp:
-                continue
-            for good_idx_in_comp in compartments[comp_from]:
-                good_size = good_info[good_idx_in_comp]['size']
-                if free_space[target_comp] + good_size >= required_space:
-                    new_free_from = free_space[comp_from] + good_size
-                    new_free_to = free_space[target_comp] - good_size
-                    option = (good_size, new_free_from, new_free_to, good_idx_in_comp, comp_from, target_comp)
-                    if best_option is None:
-                        best_option = option
-                    else:
-                        if good_size < best_option[0]:
-                            best_option = option
-                        elif good_size == best_option[0]:
-                            if new_free_from < best_option[1]:
-                                best_option = option
-                            elif new_free_from == best_option[1]:
-                                if new_free_to < best_option[2]:
-                                    best_option = option
-                                elif new_free_to == best_option[2]:
-                                    if good_idx_in_comp < best_option[3]:
-                                        best_option = option
-                                    elif good_idx_in_comp == best_option[3]:
-                                        if target_comp < best_option[5]:
-                                            best_option = option
-        return best_option
-    
-    for time, event_type, good_idx in events:
+    for time, event_type, idx in events:
         if event_type == 'arrive':
-            s = goods[good_idx][0]
-            comp_id = find_compartment_for_good(s)
-            if comp_id != -1:
-                free_space[comp_id] -= s
-                compartments[comp_id].append(good_idx)
-                good_info[good_idx]['compartment'] = comp_id
-                print(f"груз {good_idx+1} размещен в отсеке {comp_id+1}")
+            s, a, d, _ = goods[idx]
+            best_comp = -1
+            min_free = float('inf')
+            for i in range(n):
+                if free_space[i] >= s:
+                    if free_space[i] < min_free:
+                        min_free = free_space[i]
+                        best_comp = i
+            if best_comp != -1:
+                compartments[best_comp].append((s, idx))
+                free_space[best_comp] -= s
+                current_goods_in_compartment[idx] = best_comp
+                print(f"put cargo {idx+1} to compartment {best_comp+1}")
             else:
                 found = False
-                best_move_option = None
-                for target_comp in range(n):
-                    move_option = find_good_to_move(target_comp, s)
-                    if move_option:
-                        if best_move_option is None:
-                            best_move_option = move_option
-                        else:
-                            g_size, new_f_from, new_f_to, g_idx, comp_from, comp_to = move_option
-                            b_g_size, b_new_f_from, b_new_f_to, b_g_idx, b_comp_from, b_comp_to = best_move_option
-                            if g_size < b_g_size:
-                                best_move_option = move_option
-                            elif g_size == b_g_size:
-                                if new_f_from < b_new_f_from:
-                                    best_move_option = move_option
-                                elif new_f_from == b_new_f_from:
-                                    if new_f_to < b_new_f_to:
-                                        best_move_option = move_option
-                                    elif new_f_to == b_new_f_to:
-                                        if g_idx < b_g_idx:
-                                            best_move_option = move_option
-                                        elif g_idx == b_g_idx:
-                                            if comp_to < b_comp_to:
-                                                best_move_option = move_option
-                if best_move_option:
-                    g_size, new_f_from, new_f_to, move_good_idx, comp_from, comp_to = best_move_option
-                    compartments[comp_from].remove(move_good_idx)
-                    free_space[comp_from] += g_size
-                    compartments[comp_to].append(move_good_idx)
-                    free_space[comp_to] -= g_size
-                    good_info[move_good_idx]['compartment'] = comp_to
-                    print(f"груз {move_good_idx+1} перемещен из отсека {comp_from+1} в отсек {comp_to+1}")
+                best_move = None
+                best_move_size = float('inf')
+                best_source_free_after = -1
+                best_target_free_after = float('inf')
+                best_cargo_idx = float('inf')
+                best_target_comp = float('inf')
+                
+                for source_comp in range(n):
+                    if not compartments[source_comp]:
+                        continue
+                    for cargo_idx_in_source in range(len(compartments[source_comp])):
+                        cargo_size, cargo_id = compartments[source_comp][cargo_idx_in_source]
+                        for target_comp in range(n):
+                            if target_comp == source_comp:
+                                continue
+                            if free_space[target_comp] >= cargo_size:
+                                if free_space[source_comp] + cargo_size >= s:
+                                    source_free_after = free_space[source_comp] + cargo_size - s
+                                    target_free_after = free_space[target_comp] - cargo_size
+                                    if best_move is None:
+                                        best_move = (source_comp, cargo_idx_in_source, target_comp, cargo_id)
+                                        best_move_size = cargo_size
+                                        best_source_free_after = source_free_after
+                                        best_target_free_after = target_free_after
+                                        best_cargo_idx = cargo_id
+                                        best_target_comp = target_comp
+                                    else:
+                                        if cargo_size < best_move_size:
+                                            best_move = (source_comp, cargo_idx_in_source, target_comp, cargo_id)
+                                            best_move_size = cargo_size
+                                            best_source_free_after = source_free_after
+                                            best_target_free_after = target_free_after
+                                            best_cargo_idx = cargo_id
+                                            best_target_comp = target_comp
+                                        elif cargo_size == best_move_size:
+                                            if source_free_after < best_source_free_after:
+                                                best_move = (source_comp, cargo_idx_in_source, target_comp, cargo_id)
+                                                best_move_size = cargo_size
+                                                best_source_free_after = source_free_after
+                                                best_target_free_after = target_free_after
+                                                best_cargo_idx = cargo_id
+                                                best_target_comp = target_comp
+                                            elif source_free_after == best_source_free_after:
+                                                if target_free_after < best_target_free_after:
+                                                    best_move = (source_comp, cargo_idx_in_source, target_comp, cargo_id)
+                                                    best_move_size = cargo_size
+                                                    best_source_free_after = source_free_after
+                                                    best_target_free_after = target_free_after
+                                                    best_cargo_idx = cargo_id
+                                                    best_target_comp = target_comp
+                                                elif target_free_after == best_target_free_after:
+                                                    if cargo_id < best_cargo_idx:
+                                                        best_move = (source_comp, cargo_idx_in_source, target_comp, cargo_id)
+                                                        best_move_size = cargo_size
+                                                        best_source_free_after = source_free_after
+                                                        best_target_free_after = target_free_after
+                                                        best_cargo_idx = cargo_id
+                                                        best_target_comp = target_comp
+                                                    elif cargo_id == best_cargo_idx and target_comp < best_target_comp:
+                                                        best_move = (source_comp, cargo_idx_in_source, target_comp, cargo_id)
+                                                        best_move_size = cargo_size
+                                                        best_source_free_after = source_free_after
+                                                        best_target_free_after = target_free_after
+                                                        best_cargo_idx = cargo_id
+                                                        best_target_comp = target_comp
+                
+                if best_move is not None:
+                    source_comp, cargo_idx_in_source, target_comp, cargo_id = best_move
+                    cargo_size = compartments[source_comp][cargo_idx_in_source][0]
                     
-                    free_space[comp_to] -= s
-                    compartments[comp_to].append(good_idx)
-                    good_info[good_idx]['compartment'] = comp_to
-                    print(f"груз {good_idx+1} размещен в отсеке {comp_to+1}")
+                    compartments[target_comp].append(compartments[source_comp][cargo_idx_in_source])
+                    free_space[target_comp] -= cargo_size
+                    del compartments[source_comp][cargo_idx_in_source]
+                    free_space[source_comp] += cargo_size
+                    
+                    compartments[source_comp].append((s, idx))
+                    free_space[source_comp] -= s
+                    current_goods_in_compartment[idx] = source_comp
+                    current_goods_in_compartment[cargo_id] = target_comp
+                    
+                    print(f"move cargo {cargo_id+1} from compartment {source_comp+1} to compartment {target_comp+1}")
+                    print(f"put cargo {idx+1} to compartment {source_comp+1}")
                     found = True
+                
                 if not found:
-                    print(f"груз {good_idx+1} не принят")
+                    print(f"reject cargo {idx+1}")
         else:
-            comp_id = good_info[good_idx]['compartment']
-            if comp_id != -1:
-                s = good_info[good_idx]['size']
-                compartments[comp_id].remove(good_idx)
-                free_space[comp_id] += s
-                print(f"груз {good_idx+1} забран из отсека {comp_id+1}")
+            if idx in current_goods_in_compartment:
+                comp = current_goods_in_compartment[idx]
+                s = goods[idx][0]
+                for i in range(len(compartments[comp])):
+                    if compartments[comp][i][1] == idx:
+                        del compartments[comp][i]
+                        free_space[comp] += s
+                        break
+                del current_goods_in_compartment[idx]
+                print(f"remove cargo {idx+1} from compartment {comp+1}")
 
 if __name__ == "__main__":
     main()

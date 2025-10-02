@@ -8,12 +8,12 @@ def main():
         return
     
     n = int(data[0])
-    index = 1
-    graph = [[] for _ in range(n+1)]
-    dependencies = [[] for _ in range(n+1)]
-    in_degree = [0] * (n+1)
+    graph = [[] for _ in range(n + 1)]
+    dependencies = [[] for _ in range(n + 1)]
+    in_degree = [0] * (n + 1)
     
-    for i in range(1, n+1):
+    index = 1
+    for i in range(1, n + 1):
         line = []
         while index < len(data) and data[index] != '0':
             line.append(int(data[index]))
@@ -25,44 +25,44 @@ def main():
             dependencies[i].append(dep)
             in_degree[i] += 1
     
-    required = [False] * (n+1)
+    required = [False] * (n + 1)
     required[1] = True
-    q = deque([1])
+    queue = deque([1])
     
-    while q:
-        node = q.popleft()
+    while queue:
+        node = queue.popleft()
         for dep in dependencies[node]:
             if not required[dep]:
                 required[dep] = True
-                q.append(dep)
+                queue.append(dep)
     
-    new_graph = [[] for _ in range(n+1)]
-    new_in_degree = [0] * (n+1)
+    new_graph = [[] for _ in range(n + 1)]
+    new_in_degree = [0] * (n + 1)
     
-    for i in range(1, n+1):
+    for i in range(1, n + 1):
         if required[i]:
             for dep in dependencies[i]:
                 if required[dep]:
                     new_graph[dep].append(i)
                     new_in_degree[i] += 1
     
-    q = deque()
-    for i in range(1, n+1):
+    queue = deque()
+    for i in range(1, n + 1):
         if required[i] and new_in_degree[i] == 0:
-            q.append(i)
+            queue.append(i)
     
     result = []
-    while q:
-        node = q.popleft()
+    while queue:
+        node = queue.popleft()
         result.append(node)
         for neighbor in new_graph[node]:
             new_in_degree[neighbor] -= 1
             if new_in_degree[neighbor] == 0:
-                q.append(neighbor)
+                queue.append(neighbor)
     
     print(len(result))
-    for node in result:
-        print(node)
+    for theorem in result:
+        print(theorem)
 
 if __name__ == "__main__":
     main()

@@ -2,6 +2,10 @@
 def main():
     import sys
     data = sys.stdin.read().split()
+    if not data:
+        print(0)
+        return
+        
     n = int(data[0])
     m = int(data[1])
     p = int(data[2])
@@ -15,13 +19,13 @@ def main():
         performances.append((athlete, exercise))
     
     count = 0
-    for i in range(len(performances)):
-        current_athlete, current_exercise = performances[i]
+    for i in range(p):
+        a1, e1 = performances[i]
         for j in range(i):
-            prev_athlete, prev_exercise = performances[j]
-            if current_athlete > prev_athlete and current_exercise < prev_exercise:
+            a2, e2 = performances[j]
+            if a1 > a2 and e1 < e2:
                 count += 1
-            elif current_athlete < prev_athlete and current_exercise > prev_exercise:
+            elif a1 < a2 and e1 > e2:
                 count += 1
                 
     print(count)

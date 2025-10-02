@@ -7,30 +7,29 @@ def main():
     m = int(data[1])
     grid = []
     index = 2
+    
     for i in range(n):
         row = list(map(int, data[index:index+m]))
-        index += m
         grid.append(row)
+        index += m
     
-    total_length = 0
+    total_length = 0.0
+    
+    # Проверяем соседей по горизонтали
     for i in range(n):
-        for j in range(m):
-            current_room = grid[i][j]
-            
-            if i > 0 and grid[i-1][j] != current_room:
-                total_length += 1
-            
-            if i < n-1 and grid[i+1][j] != current_room:
-                total_length += 1
-            
-            if j > 0 and grid[i][j-1] != current_room:
-                total_length += 1
-            
-            if j < m-1 and grid[i][j+1] != current_room:
+        for j in range(m - 1):
+            if grid[i][j] != grid[i][j + 1]:
                 total_length += 1
     
-    wall_thickness = 0.2
-    wall_height = 3.0
+    # Проверяем соседей по вертикали
+    for i in range(n - 1):
+        for j in range(m):
+            if grid[i][j] != grid[i + 1][j]:
+                total_length += 1
+    
+    wall_thickness = 0.2  # 20 см
+    wall_height = 3.0     # 3 метра
+    
     volume = total_length * wall_thickness * wall_height
     
     with open('OUTPUT.TXT', 'w') as f:

@@ -1,33 +1,39 @@
 
-n, m = map(int, input().split())
-ad = [input().strip() for _ in range(n)]
-board = []
-for _ in range(n):
-    row = list(map(int, input().split()))
-    board.append(row)
-
-color_map = {
-    'R': 1,
-    'G': 2,
-    'B': 4,
-    '.': 0
-}
-
-possible = True
-for i in range(n):
-    for j in range(m):
-        ad_color = ad[i][j]
-        board_capability = board[i][j]
-        required_color = color_map[ad_color]
-        
-        if required_color == 0:
-            continue
-            
-        if (board_capability & required_color) == 0:
-            possible = False
-            break
+def main():
+    import sys
+    data = sys.stdin.read().splitlines()
+    n, m = map(int, data[0].split())
     
-    if not possible:
-        break
+    ad = []
+    for i in range(1, 1 + n):
+        ad.append(data[i].strip())
+    
+    screen = []
+    for i in range(1 + n, 1 + n + n):
+        row = list(map(int, data[i].split()))
+        screen.append(row)
+    
+    color_map = {
+        '.': 0,
+        'R': 1,
+        'G': 2,
+        'B': 4
+    }
+    
+    for i in range(n):
+        for j in range(m):
+            ad_color = ad[i][j]
+            screen_capabilities = screen[i][j]
+            
+            if ad_color == '.':
+                continue
+                
+            required_color = color_map[ad_color]
+            if (screen_capabilities & required_color) == 0:
+                print("NO")
+                return
+                
+    print("YES")
 
-print('YES' if possible else 'NO')
+if __name__ == "__main__":
+    main()

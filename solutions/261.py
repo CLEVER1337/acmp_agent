@@ -8,15 +8,16 @@ def main():
     
     n, m, k = map(int, data[0].split())
     A = list(map(int, data[1].split()))
+    
     bets = []
     for i in range(2, 2 + n):
         line = data[i].strip()
         if line:
             bets.append(line)
     
-    prefix_tree = {}
+    trie = {}
     for bet in bets:
-        node = prefix_tree
+        node = trie
         for char in bet:
             digit = int(char)
             if digit not in node:
@@ -37,15 +38,15 @@ def main():
         for digit in range(k):
             if digit in node:
                 count = node[digit]['count']
-                win_amount = A[depth] if depth < len(A) else 0
-                new_sum = current_sum + count * win_amount
+                win = A[depth] * count
+                new_sum = current_sum + win
                 dfs(node[digit], depth + 1, new_sum)
             else:
                 total = current_sum
                 if total < min_total:
                     min_total = total
     
-    dfs(prefix_tree, 0, 0)
+    dfs(trie, 0, 0)
     print(min_total)
 
 if __name__ == "__main__":

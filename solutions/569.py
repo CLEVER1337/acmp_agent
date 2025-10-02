@@ -8,8 +8,8 @@ def main():
     di = list(map(int, data[2:2+n]))
     
     employees = []
-    for i in range(n):
-        employees.append((di[i], i))
+    for i, salary in enumerate(di):
+        employees.append((salary, i))
     
     employees.sort()
     
@@ -19,28 +19,28 @@ def main():
     right = n - 1
     
     while left < right:
-        if employees[left][0] == d and employees[right][0] == d:
+        low_salary, low_idx = employees[left]
+        high_salary, high_idx = employees[right]
+        
+        if low_salary == d and high_salary == d:
             break
             
-        if employees[left][0] < d:
-            needed = d - employees[left][0]
-            available = employees[right][0] - d
+        if low_salary < d:
+            needed = d - low_salary
+            available = high_salary - d
             
             transfer = min(needed, available)
             
             if transfer > 0:
-                from_idx = employees[right][1]
-                to_idx = employees[left][1]
+                result[high_idx][0] = low_idx + 1
+                result[high_idx][1] = transfer
                 
-                result[from_idx] = [to_idx + 1, transfer]
-                result[to_idx] = [0, 0]
+                employees[left] = (low_salary + transfer, low_idx)
+                employees[right] = (high_salary - transfer, high_idx)
                 
-                employees[left] = (employees[left][0] + transfer, employees[left][1])
-                employees[right] = (employees[right][0] - transfer, employees[right][1])
-                
-                if employees[left][0] == d:
+                if low_salary + transfer == d:
                     left += 1
-                if employees[right][0] == d:
+                if high_salary - transfer == d:
                     right -= 1
             else:
                 right -= 1
@@ -48,7 +48,10 @@ def main():
             left += 1
     
     for i in range(n):
-        print(result[i][0], result[i][1])
+        if result[i][0] == 0:
+            print("0 0")
+        else:
+            print(f"{result[i][0]} {result[i][1]}")
 
 if __name__ == "__main__":
     main()

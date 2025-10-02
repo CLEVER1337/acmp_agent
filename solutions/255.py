@@ -1,23 +1,23 @@
 
+import math
+
 def main():
-    with open("INPUT.TXT", "r") as f:
-        N = int(f.readline().strip())
+    with open('INPUT.TXT', 'r') as f:
+        n = int(f.readline().strip())
     
-    if N % 2 == 0:
-        A = N // 2
-        B = N // 2
+    if n % 2 == 0:
+        a = n // 2
+        b = n // 2
     else:
-        for d in range(3, int(N**0.5) + 1, 2):
-            if N % d == 0:
-                A = d
-                B = N - d
-                break
+        if n % 3 == 0:
+            a = n // 3
+            b = 2 * n // 3
         else:
-            A = 1
-            B = N - 1
+            a = 1
+            b = n - 1
     
-    with open("OUTPUT.TXT", "w") as f:
-        f.write(f"{A} {B}")
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write(f"{a} {b}")
 
 if __name__ == "__main__":
     main()

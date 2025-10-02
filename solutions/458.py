@@ -1,13 +1,9 @@
 
-import sys
-
 def main():
     with open('INPUT.TXT', 'r', encoding='cp866') as f:
-        lines = f.readlines()
-    
-    H = int(lines[0].strip())
-    order = list(map(int, lines[1].strip().split()))
-    encoded = lines[2].strip()
+        H = int(f.readline().strip())
+        order = list(map(int, f.readline().split()))
+        encoded = f.readline().strip()
     
     n = len(encoded)
     cols = n // H
@@ -17,18 +13,20 @@ def main():
     matrix = [[''] * cols for _ in range(H)]
     
     idx = 0
-    for row_num in order:
-        row_idx = row_num - 1
-        for col in range(cols):
+    for col in range(cols):
+        for row in range(H):
             if idx < n:
-                matrix[row_idx][col] = encoded[idx]
+                matrix[row][col] = encoded[idx]
                 idx += 1
+    
+    original_order = sorted(range(1, H+1), key=lambda x: order.index(x))
     
     result = []
     for col in range(cols):
-        for row in range(H):
-            if matrix[row][col]:
-                result.append(matrix[row][col])
+        for row_idx in original_order:
+            char = matrix[row_idx-1][col]
+            if char:
+                result.append(char)
     
     with open('OUTPUT.TXT', 'w', encoding='cp866') as f:
         f.write(''.join(result))

@@ -2,23 +2,23 @@
 import math
 
 def main():
-    with open("input.txt", "r") as f:
+    with open("INPUT.TXT", "r") as f:
         data = f.read().split()
         N = int(data[0])
         K = int(data[1])
     
     if N == K:
-        print("10 1")
+        print("2 1")
         return
-        
+    
     if K == 0:
         if N == 0:
-            print("10 1")
+            print("2 1")
         else:
             D = N + 1
             print(f"{D} 1")
         return
-        
+    
     best_D = 2
     best_L = 0
     
@@ -32,24 +32,37 @@ def main():
                 divisors.add(M // i)
         
         for d in divisors:
-            if d > max(K, 1) and d <= 10**12:
+            if d > 1 and d > K and (d > best_L or (d > K and best_L == 0)):
                 temp_N = N
                 count = 0
                 while temp_N % d == K:
                     count += 1
                     temp_N //= d
-                    if temp_N == 0:
-                        break
-                if count > best_L or (count == best_L and d < best_D):
+                if count > best_L:
                     best_L = count
                     best_D = d
     
     if best_L == 0:
-        best_D = (N - K) // K + 1
-        if best_D <= max(K, 1):
-            best_D = N + 1
+        for d in range(2, min(1000000, N + 2)):
+            if d <= K:
+                continue
+            temp_N = N
+            count = 0
+            while temp_N % d == K:
+                count += 1
+                temp_N //= d
+                if temp_N == 0:
+                    break
+            if count > best_L:
+                best_L = count
+                best_D = d
+            if count == best_L and d < best_D:
+                best_D = d
+    
+    if best_L == 0:
+        best_D = N + 1
         best_L = 1
-        
+    
     print(f"{best_D} {best_L}")
 
 if __name__ == "__main__":

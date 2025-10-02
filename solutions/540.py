@@ -16,13 +16,15 @@ def main():
     dp_curr = [0] * m
     
     for i in range(1, n):
-        prefix_sum = 0
+        prefix = [0] * (m + 1)
         for j in range(m):
-            prefix_sum = (prefix_sum + dp_prev[j]) % r
-            dp_curr[j] = prefix_sum
-        
+            prefix[j + 1] = (prefix[j] + dp_prev[j]) % r
+            
+        for j in range(m):
+            dp_curr[j] = prefix[j + 1] % r
+            
         dp_prev, dp_curr = dp_curr, dp_prev
-    
+        
     print(" ".join(map(str, dp_prev)))
 
 if __name__ == "__main__":

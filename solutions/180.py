@@ -10,18 +10,18 @@ def main():
             f.write('YES')
         return
     
-    def product_of_digits(n):
+    def digit_product(n):
         product = 1
-        for digit in str(n):
-            if digit == '0':
+        while n > 0:
+            digit = n % 10
+            if digit == 0:
                 return 0
-            product *= int(digit)
+            product *= digit
+            n //= 10
         return product
     
-    max_pages_to_check = min(N, 1000000)
-    
-    for page in range(1, max_pages_to_check + 1):
-        if product_of_digits(page) == K:
+    for num in range(1, min(N + 1, 1000000)):
+        if digit_product(num) == K:
             with open('OUTPUT.TXT', 'w') as f:
                 f.write('YES')
             return

@@ -15,12 +15,13 @@ def main():
         for j in range(n):
             if graph[i][j] != 0:
                 dist[i][j] = graph[i][j]
-        dist[i][i] = 0
+            if i == j:
+                dist[i][j] = 0
     
     for k in range(n):
         for i in range(n):
             for j in range(n):
-                if dist[i][k] < float('inf') and dist[k][j] < float('inf'):
+                if dist[i][k] != float('inf') and dist[k][j] != float('inf'):
                     if dist[i][j] > dist[i][k] + dist[k][j]:
                         dist[i][j] = dist[i][k] + dist[k][j]
     
@@ -28,16 +29,16 @@ def main():
     for k in range(n):
         for i in range(n):
             for j in range(n):
-                if dist[i][k] < float('inf') and dist[k][j] < float('inf'):
+                if dist[i][k] != float('inf') and dist[k][j] != float('inf'):
                     if dist[i][j] > dist[i][k] + dist[k][j]:
                         negative_cycle[i][j] = True
     
     for k in range(n):
         for i in range(n):
             for j in range(n):
-                if negative_cycle[i][k] and dist[k][j] < float('inf'):
+                if negative_cycle[i][k] and dist[k][j] != float('inf'):
                     negative_cycle[i][j] = True
-                if negative_cycle[k][j] and dist[i][k] < float('inf'):
+                if dist[i][k] != float('inf') and negative_cycle[k][j]:
                     negative_cycle[i][j] = True
     
     result = [[0] * n for _ in range(n)]

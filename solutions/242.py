@@ -15,120 +15,90 @@ def main():
         index += n
         grid.append(row)
     
-    from collections import defaultdict
-    
-    row_colors = [defaultdict(int) for _ in range(n)]
-    col_colors = [defaultdict(int) for _ in range(n)]
-    
+    colors_count = [0] * (k + 1)
     for i in range(n):
         for j in range(n):
             color = grid[i][j]
-            row_colors[i][color] += 1
-            col_colors[j][color] += 1
+            if color <= k:
+                colors_count[color] += 1
     
-    def is_valid_row(i, color):
-        return row_colors[i][color] >= 2
+    min_ops = float('inf')
+    best_color = 0
     
-    def is_valid_col(j, color):
-        return col_colors[j][color] >= 2
-    
-    def paint_row(i, new_color):
-        for j in range(n):
-            old_color = grid[i][j]
-            if old_color != new_color:
-                row_colors[i][old_color] -= 1
-                col_colors[j][old_color] -= 1
-                row_colors[i][new_color] += 1
-                col_colors[j][new_color] += 1
-                grid[i][j] = new_color
-    
-    def paint_col(j, new_color):
-        for i in range(n):
-            old_color = grid[i][j]
-            if old_color != new_color:
-                row_colors[i][old_color] -= 1
-                col_colors[j][old_color] -= 1
-                row_colors[i][new_color] += 1
-                col_colors[j][new_color] += 1
-                grid[i][j] = new_color
-    
-    def all_same_color():
-        target = grid[0][0]
-        for i in range(n):
-            for j in range(n):
-                if grid[i][j] != target:
-                    return False
-        return True
-    
-    min_operations = float('inf')
-    best_color = None
-    
-    for candidate_color in range(1, k+1):
-        operations = 0
-        temp_grid = [row[:] for row in grid]
-        temp_row_colors = [d.copy() for d in row_colors]
-        temp_col_colors = [d.copy() for d in col_colors]
-        
-        def temp_paint_row(i, new_color):
-            nonlocal operations
-            for j in range(n):
-                old_color = temp_grid[i][j]
-                if old_color != new_color:
-                    temp_row_colors[i][old_color] -= 1
-                    temp_col_colors[j][old_color] -= 1
-                    temp_row_colors[i][new_color] += 1
-                    temp_col_colors[j][new_color] += 1
-                    temp_grid[i][j] = new_color
-            operations += 1
-        
-        def temp_paint_col(j, new_color):
-            nonlocal operations
-            for i in range(n):
-                old_color = temp_grid[i][j]
-                if old_color != new_color:
-                    temp_row_colors[i][old_color] -= 1
-                    temp_col_colors[j][old_color] -= 1
-                    temp_row_colors[i][new_color] += 1
-                    temp_col_colors[j][new_color] += 1
-                    temp_grid[i][j] = new_color
-            operations += 1
-        
-        changed = True
-        while changed:
-            changed = False
-            for i in range(n):
-                if temp_is_valid_row(i, candidate_color) and any(temp_grid[i][j] != candidate_color for j in range(n)):
-                    temp_paint_row(i, candidate_color)
-                    changed = True
+    for candidate in range(1, k + 1):
+        if colors_count[candidate] < 2:
+            continue
             
-            for j in range(n):
-                if temp_is_valid_col(j, candidate_color) and any(temp_grid[i][j] != candidate_color for i in range(n)):
-                    temp_paint_col(j, candidate_color)
-                    changed = True
+        ops = 0
+        temp_grid = [row[:] for row in grid]
         
+        for i in range(n):
+            row_colors = {}
+            for j in range(n):
+                color = temp_grid[i][j]
+                row_colors[color] = row_colors.get(color, 0) + 1
+                
+            if candidate in row_colors and row_colors[candidate] >= 2:
+                for j in range(n):
+                    temp_grid[i][j] = candidate
+                ops += 1
+            else:
+                found_valid = False
+                for color, count in row_colors.items():
+                    if count >= 2:
+                        for j in range(n):
+                            temp_grid[i][j] = color
+                        ops += 1
+                        found_valid = True
+                        break
+                if not found_valid:
+                    break
+        
+        if not found_valid:
+            continue
+            
+        for j in range(n):
+            col_colors = {}
+            for i in range(n):
+                color = temp_grid[i][j]
+                col_colors[color] = col_colors.get(color, 0) + 1
+                
+            if candidate in col_colors and col_colors[candidate] >= 2:
+                for i in range(n):
+                    temp_grid[i][j] = candidate
+                ops += 1
+            else:
+                found_valid = False
+                for color, count in col_colors.items():
+                    if count >= 2:
+                        for i in range(n):
+                            temp_grid[i][j] = color
+                        ops += 1
+                        found_valid = True
+                        break
+                if not found_valid:
+                    break
+        
+        if not found_valid:
+            continue
+            
         all_same = True
         for i in range(n):
             for j in range(n):
-                if temp_grid[i][j] != candidate_color:
+                if temp_grid[i][j] != candidate:
                     all_same = False
                     break
             if not all_same:
                 break
-        
-        if all_same and operations < min_operations:
-            min_operations = operations
-            best_color = candidate_color
+                
+        if all_same and ops < min_ops:
+            min_ops = ops
+            best_color = candidate
     
-    if min_operations == float('inf'):
-        print("0 0")
+    if min_ops != float('inf'):
+        print(f"{min_ops} {best_color}")
     else:
-        print(f"{min_operations} {best_color}")
-
-def temp_is_valid_row(i, color):
-    return True
-
-def temp_is_valid_col(j, color):
-    return True
+        print("0 0")
 
 if __name__ == "__main__":
     main()

@@ -16,52 +16,47 @@ def main():
                 cities.append((i, j))
     
     total_cities = len(cities)
-    cities_per_state = total_cities // 2
+    required = total_cities // 2
     
     result = [[0] * n for _ in range(n)]
     
-    for i in range(n):
-        for j in range(n):
-            if grid[i][j] == 'C':
+    def dfs(i, j, state):
+        if i < 0 or i >= n or j < 0 or j >= n:
+            return 0
+        if result[i][j] != 0:
+            return 0
+        if grid[i][j] == 'C':
+            if state == 1 and required > 0:
                 result[i][j] = 1
+                required -= 1
+                return 1
             else:
-                result[i][j] = 1
+                result[i][j] = 2
+                return 0
+        else:
+            result[i][j] = state
+            return 0
     
-    count_state1 = total_cities
-    
-    def dfs(x, y, target_state):
-        stack = [(x, y)]
-        visited = set()
-        visited.add((x, y))
-        changed = []
-        
-        while stack:
-            cx, cy = stack.pop()
-            changed.append((cx, cy))
-            
-            for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-                nx, ny = cx + dx, cy + dy
-                if 0 <= nx < n and 0 <= ny < n:
-                    if (nx, ny) not in visited and result[nx][ny] != target_state:
-                        visited.add((nx, ny))
-                        stack.append((nx, ny))
-        
-        return changed
-    
+    count1 = 0
     for i in range(n):
         for j in range(n):
-            if count_state1 == cities_per_state:
-                break
-            if result[i][j] == 1 and grid[i][j] != 'C':
-                changed_cells = dfs(i, j, 2)
-                count_state1 -= sum(1 for x, y in changed_cells if grid[x][y] == 'C')
-                for x, y in changed_cells:
-                    result[x][y] = 2
-        if count_state1 == cities_per_state:
+            if result[i][j] == 0:
+                count1 += dfs(i, j, 1)
+                if count1 >= required:
+                    break
+        if count1 >= required:
             break
     
     for i in range(n):
-        print(''.join(str(result[i][j]) for j in range(n)))
+        for j in range(n):
+            if result[i][j] == 0:
+                dfs(i, j, 2)
+    
+    output_lines = []
+    for i in range(n):
+        output_lines.append(''.join(str(x) for x in result[i]))
+    
+    sys.stdout.write('\n'.join(output_lines))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

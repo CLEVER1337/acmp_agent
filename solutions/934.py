@@ -18,17 +18,18 @@ def main():
         unique_words = sorted(set(word_list))
         unique_groups.append((len(unique_words), unique_words))
     
-    unique_groups.sort(key=lambda x: (-x[0], x[1][0] if x[1] else ''))
+    unique_groups.sort(key=lambda x: (-x[0], x[1][0]))
     
     output_lines = []
     for i in range(min(5, len(unique_groups))):
-        count, words_list = unique_groups[i]
+        count, word_list = unique_groups[i]
         output_lines.append(f"Группа {i+1}. Длина {count}")
-        for word in sorted(words_list):
+        for word in word_list:
             output_lines.append(word)
+        output_lines.append("")
     
-    with open('OUTPUT.TXT', 'w', encoding='utf-8') as f:
-        f.write('\n'.join(output_lines))
+    with open("OUTPUT.TXT", "w", encoding="utf-8") as f:
+        f.write("\n".join(output_lines))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -11,44 +11,48 @@ def main():
     n, m = map(int, data[0].split())
     grid = []
     for i in range(1, 1 + n):
-        grid.append(list(data[i].strip()))
+        grid.append(list(data[i]))
     
     visited = [[False] * m for _ in range(n)]
     directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
     
-    def dfs(i, j, ship_cells):
-        if i < 0 or i >= n or j < 0 or j >= m or visited[i][j]:
-            return
-        if grid[i][j] not in ['X', 'S']:
-            return
-            
-        visited[i][j] = True
-        ship_cells.append((i, j))
-        
-        for dx, dy in directions:
-            dfs(i + dx, j + dy, ship_cells)
+    whole_ships = 0
+    damaged_ships = 0
+    destroyed_ships = 0
     
-    destroyed = 0
-    damaged = 0
-    intact = 0
+    def dfs(i, j):
+        stack = [(i, j)]
+        visited[i][j] = True
+        has_damaged = False
+        has_whole = False
+        
+        while stack:
+            x, y = stack.pop()
+            if grid[x][y] == 'X':
+                has_damaged = True
+            elif grid[x][y] == 'S':
+                has_whole = True
+                
+            for dx, dy in directions:
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < n and 0 <= ny < m and not visited[nx][ny] and grid[nx][ny] in ['X', 'S']:
+                    visited[nx][ny] = True
+                    stack.append((nx, ny))
+        
+        return has_whole, has_damaged
     
     for i in range(n):
         for j in range(m):
-            if grid[i][j] in ['X', 'S'] and not visited[i][j]:
-                ship_cells = []
-                dfs(i, j, ship_cells)
-                
-                has_intact = any(grid[x][y] == 'S' for x, y in ship_cells)
-                has_damaged = any(grid[x][y] == 'X' for x, y in ship_cells)
-                
-                if has_intact and has_damaged:
-                    damaged += 1
-                elif has_intact:
-                    intact += 1
-                elif has_damaged:
-                    destroyed += 1
-    
-    print(f"{intact} {damaged} {destroyed}")
+            if not visited[i][j] and grid[i][j] in ['X', 'S']:
+                has_whole, has_damaged = dfs(i, j)
+                if has_whole and not has_damaged:
+                    whole_ships += 1
+                elif has_damaged and not has_whole:
+                    destroyed_ships += 1
+                else:
+                    damaged_ships += 1
+                    
+    print(f"{whole_ships} {damaged_ships} {destroyed_ships}")
 
 if __name__ == "__main__":
     main()

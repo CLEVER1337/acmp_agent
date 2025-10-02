@@ -6,39 +6,31 @@ def main():
     m = int(data[1])
     g = list(map(int, data[2:2+n]))
     
-    indices = sorted(range(n), key=lambda i: g[i])
+    indices = sorted(range(n), key=lambda i: g[i], reverse=True)
     sorted_g = [g[i] for i in indices]
     
-    dp = [[10**18] * (m + 1) for _ in range(n + 1)]
+    dp = [[float('inf')] * (m + 1) for _ in range(n + 1)]
     prev = [[-1] * (m + 1) for _ in range(n + 1)]
     
     dp[0][0] = 0
     
-    for i in range(n):
-        for j in range(m + 1):
-            if dp[i][j] == 10**18:
-                continue
-            for k in range(1, m - j + 1):
-                if j + k > m:
-                    break
-                cost = dp[i][j] + (n - i - 1) * sorted_g[i] * k
-                if cost < dp[i + 1][j + k]:
-                    dp[i + 1][j + k] = cost
-                    prev[i + 1][j + k] = k
+    for i in range(1, n + 1):
+        for j in range(i, m + 1):
+            for k in range(1, j - i + 2):
+                cost = sorted_g[i - 1] * (i - 1)
+                if dp[i - 1][j - k] + cost < dp[i][j]:
+                    dp[i][j] = dp[i - 1][j - k] + cost
+                    prev[i][j] = k
     
     result = [0] * n
     j = m
-    for i in range(n - 1, -1, -1):
-        k = prev[i + 1][j]
-        result[i] = k
+    for i in range(n, 0, -1):
+        k = prev[i][j]
+        result[indices[i - 1]] = k
         j -= k
     
-    original_result = [0] * n
-    for idx, pos in enumerate(indices):
-        original_result[pos] = result[idx]
-    
     print(dp[n][m])
-    print(' '.join(map(str, original_result)))
+    print(' '.join(map(str, result)))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

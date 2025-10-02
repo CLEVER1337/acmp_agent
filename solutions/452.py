@@ -1,50 +1,50 @@
 
-def main():
-    with open('INPUT.TXT', 'r') as f:
-        a_str = f.readline().strip()
-        b_str = f.readline().strip()
+def fib_to_dec(s):
+    fibs = [1, 2]
+    while len(fibs) < len(s):
+        fibs.append(fibs[-1] + fibs[-2])
+    fibs.reverse()
+    total = 0
+    for i, char in enumerate(s):
+        if char == '1':
+            total += fibs[i]
+    return total
+
+def dec_to_fib(n):
+    if n == 0:
+        return '0'
     
-    max_len = max(len(a_str), len(b_str))
-    a_str = a_str.zfill(max_len)
-    b_str = b_str.zfill(max_len)
-    
-    fib_weights = []
-    f1, f2 = 1, 2
-    for _ in range(max_len):
-        fib_weights.append(f1)
-        f1, f2 = f2, f1 + f2
-    
-    a_num = 0
-    for i, digit in enumerate(a_str[::-1]):
-        if digit == '1':
-            a_num += fib_weights[i]
-    
-    b_num = 0
-    for i, digit in enumerate(b_str[::-1]):
-        if digit == '1':
-            b_num += fib_weights[i]
-    
-    sum_num = a_num + b_num
-    
-    max_fib = fib_weights[-1] + fib_weights[-2]
-    while max_fib <= sum_num:
-        fib_weights.append(max_fib)
-        max_fib = fib_weights[-1] + fib_weights[-2]
+    fibs = [1, 2]
+    while fibs[-1] <= n:
+        fibs.append(fibs[-1] + fibs[-2])
+    fibs.pop()
+    fibs.reverse()
     
     result = []
-    for weight in reversed(fib_weights):
-        if sum_num >= weight:
+    for fib in fibs:
+        if n >= fib:
             result.append('1')
-            sum_num -= weight
+            n -= fib
         else:
             result.append('0')
     
-    result_str = ''.join(result).lstrip('0')
-    if not result_str:
-        result_str = '0'
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(result_str)
+    return ''.join(result).lstrip('0')
 
-if __name__ == "__main__":
-    main()
+def normalize_fib(s):
+    n = fib_to_dec(s)
+    return dec_to_fib(n)
+
+def add_fib_numbers(a, b):
+    num_a = fib_to_dec(a)
+    num_b = fib_to_dec(b)
+    total = num_a + num_b
+    return dec_to_fib(total)
+
+with open('INPUT.TXT', 'r') as f:
+    a_str = f.readline().strip()
+    b_str = f.readline().strip()
+
+result = add_fib_numbers(a_str, b_str)
+
+with open('OUTPUT.TXT', 'w') as f:
+    f.write(result)

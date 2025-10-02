@@ -1,51 +1,79 @@
 
 import math
 
-def readints():
-    return list(map(int, input().split()))
+def read_input():
+    with open('INPUT.TXT', 'r') as f:
+        n = int(f.readline().strip())
+        line = list(map(int, f.readline().split()))
+        xp1, yp1, xp2, yp2 = line
+        plates = []
+        for i in range(n):
+            data = list(map(int, f.readline().split()))
+            plates.append((data[0], data[1], data[2], i + 1))
+        return n, (xp1, yp1), (xp2, yp2), plates
 
-n = int(input())
-xp1, yp1, xp2, yp2 = readints()
-plates = []
-
-for i in range(n):
-    data = readints()
-    plates.append((data[0], data[1], data[2], i + 1))
-
-def distance_from_point_to_line(x0, y0, x1, y1, x2, y2):
-    numerator = abs((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1)
-    denominator = math.sqrt((y2 - y1) ** 2 + (x2 - x1) ** 2)
+def distance_point_to_line(px, py, x1, y1, x2, y2):
+    A = y2 - y1
+    B = x1 - x2
+    C = x2 * y1 - x1 * y2
+    
+    numerator = abs(A * px + B * py + C)
+    denominator = math.sqrt(A * A + B * B)
+    
+    if denominator == 0:
+        return math.sqrt((px - x1)**2 + (py - y1)**2)
+    
     return numerator / denominator
 
-def point_in_segment(x0, y0, x1, y1, x2, y2):
-    cross = (x2 - x1) * (y0 - y1) - (y2 - y1) * (x0 - x1)
+def point_on_segment(px, py, x1, y1, x2, y2):
+    cross = (px - x1) * (y2 - y1) - (py - y1) * (x2 - x1)
     if abs(cross) > 1e-10:
         return False
-    dot1 = (x0 - x1) * (x2 - x1) + (y0 - y1) * (y2 - y1)
-    dot2 = (x0 - x2) * (x1 - x2) + (y0 - y2) * (y1 - y2)
+    
+    dot1 = (px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)
+    dot2 = (px - x2) * (x1 - x2) + (py - y2) * (y1 - y2)
+    
     return dot1 >= 0 and dot2 >= 0
 
-destroyed = []
-for x, y, r, idx in plates:
-    dist = distance_from_point_to_line(x, y, xp1, yp1, xp2, yp2)
+def main():
+    n, p1, p2, plates = read_input()
+    x1, y1 = p1
+    x2, y2 = p2
     
-    if dist <= r + 1e-10:
-        if point_in_segment(x, y, xp1, yp1, xp2, yp2):
+    destroyed = []
+    
+    for x, y, r, idx in plates:
+        dist = distance_point_to_line(x, y, x1, y1, x2, y2)
+        
+        if dist <= r:
             destroyed.append(idx)
         else:
-            d1 = math.sqrt((x - xp1) ** 2 + (y - yp1) ** 2)
-            d2 = math.sqrt((x - xp2) ** 2 + (y - yp2) ** 2)
+            d1 = math.sqrt((x - x1)**2 + (y - y1)**2)
+            d2 = math.sqrt((x - x2)**2 + (y - y2)**2)
+            
             if d1 <= r or d2 <= r:
                 destroyed.append(idx)
             else:
-                dot1 = (x - xp1) * (xp2 - xp1) + (y - yp1) * (yp2 - yp1)
-                dot2 = (x - xp2) * (xp1 - xp2) + (y - yp2) * (yp1 - yp2)
-                if dot1 > 0 and dot2 > 0:
-                    destroyed.append(idx)
+                dx = x2 - x1
+                dy = y2 - y1
+                
+                t = ((x - x1) * dx + (y - y1) * dy) / (dx*dx + dy*dy)
+                
+                if 0 <= t <= 1:
+                    proj_x = x1 + t * dx
+                    proj_y = y1 + t * dy
+                    dist_to_proj = math.sqrt((x - proj_x)**2 + (y - proj_y)**2)
+                    if dist_to_proj <= r:
+                        destroyed.append(idx)
+    
+    destroyed.sort()
+    
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write(f"{len(destroyed)}\n")
+        if destroyed:
+            f.write(" ".join(map(str, destroyed)))
+        else:
+            f.write("")
 
-destroyed.sort()
-print(len(destroyed))
-if destroyed:
-    print(' '.join(map(str, destroyed)))
-else:
-    print()
+if __name__ == "__main__":
+    main()

@@ -1,5 +1,5 @@
 
-def main():
+def solve():
     import sys
     data = sys.stdin.read().split()
     if not data:
@@ -14,34 +14,55 @@ def main():
         return
         
     if Y == 0:
-        if X == 0:
-            print(0)
-        else:
+        print(1)
+        return
+        
+    if X == 0:
+        if Y != 0:
             print(-1)
+            return
+            
+    if Y < X:
+        print(-1)
         return
         
     if X == 0:
         print(-1)
         return
         
-    if Y % X != 0:
+    def gcd(a, b):
+        while b:
+            a, b = b, a % b
+        return a
+        
+    if Y % gcd(X, Y - X) != 0:
         print(-1)
         return
         
-    k = Y // X
-    if k <= 0:
+    steps = 0
+    current = X
+    buffer = 0
+    
+    while current < Y:
+        if buffer == 0:
+            buffer = current
+            steps += 1
+        else:
+            if current + buffer <= Y:
+                current += buffer
+                steps += 1
+            else:
+                if (Y - current) % buffer == 0:
+                    steps += (Y - current) // buffer
+                    current = Y
+                else:
+                    steps += 1
+                    buffer = current
+                    
+    if current == Y:
+        print(steps)
+    else:
         print(-1)
-        return
-        
-    count = 0
-    while k > 1:
-        if k % 2 == 1:
-            print(-1)
-            return
-        k //= 2
-        count += 1
-        
-    print(count + 1)
 
 if __name__ == "__main__":
-    main()
+    solve()

@@ -6,18 +6,21 @@ def main():
     A = list(map(int, data[1:1+n]))
     
     total_moves = 0
+    boxes = A.copy()
+    
     for i in range(n):
-        if A[i] > 1:
-            excess = A[i] - 1
-            A[i] = 1
-            j = (i + 1) % n
-            while excess > 0:
-                if A[j] == 0:
-                    moves = min((j - i) % n, (i - j) % n)
-                    total_moves += moves * excess
-                    A[j] = 1
-                    excess -= 1
-                j = (j + 1) % n
+        if boxes[i] > 1:
+            excess = boxes[i] - 1
+            boxes[i] = 1
+            boxes[(i + 1) % n] += excess
+            total_moves += excess
+    
+    for i in range(n):
+        if boxes[i] > 1:
+            excess = boxes[i] - 1
+            boxes[i] = 1
+            boxes[(i + 1) % n] += excess
+            total_moves += excess
     
     print(total_moves)
 

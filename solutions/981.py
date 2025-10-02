@@ -1,169 +1,197 @@
 
 import sys
 
-def median_expr(a, b, c):
-    return f"<{a}{b}{c}>"
-
-def parse_expression(s, variables):
-    stack = []
+def parse_expr(s):
+    tokens = []
     i = 0
     n = len(s)
-    
     while i < n:
         if s[i] == ' ':
             i += 1
             continue
-            
-        if s[i] == '(':
-            stack.append('(')
-            i += 1
-        elif s[i] == ')':
-            expr = []
-            while stack and stack[-1] != '(':
-                expr.append(stack.pop())
-            if stack and stack[-1] == '(':
-                stack.pop()
-            if expr:
-                if len(expr) == 1:
-                    stack.append(expr[0])
-                else:
-                    op = expr.pop()
-                    if op == '!':
-                        operand = expr.pop()
-                        stack.append(f"!{operand}")
-                    else:
-                        right = expr.pop()
-                        left = expr.pop()
-                        if op == '&':
-                            stack.append(f"({left}&{right})")
-                        elif op == '|':
-                            stack.append(f"({left}|{right})")
-            i += 1
-        elif s[i] in variables:
-            var = s[i]
-            stack.append(var)
-            i += 1
-        elif s[i] == '!':
-            stack.append('!')
-            i += 1
-        elif s[i] == '&':
-            stack.append('&')
-            i += 1
-        elif s[i] == '|':
-            stack.append('|')
+        if s[i] in '()&|!':
+            tokens.append(s[i])
             i += 1
         else:
-            i += 1
+            j = i
+            while j < n and s[j].isalpha():
+                j += 1
+            tokens.append(s[i:j])
+            i = j
+    return tokens
 
-    while len(stack) > 1:
-        expr = []
-        while stack and stack[-1] != '(':
-            expr.append(stack.pop())
-        if expr:
-            if len(expr) == 1:
-                stack.append(expr[0])
-            else:
-                op = expr.pop()
-                if op == '!':
-                    operand = expr.pop()
-                    stack.append(f"!{operand}")
-                else:
-                    right = expr.pop()
-                    left = expr.pop()
-                    if op == '&':
-                        stack.append(f"({left}&{right})")
-                    elif op == '|':
-                        stack.append(f"({left}|{right})")
-    
-    return stack[0] if stack else ""
+def shunting_yard(tokens):
+    output = []
+    stack = []
+    precedence = {'!': 3, '&': 2, '|': 1}
+    for token in tokens:
+        if token == '(':
+            stack.append(token)
+        elif token == ')':
+            while stack and stack[-1] != '(':
+                output.append(stack.pop())
+            stack.pop()
+        elif token in precedence:
+            while stack and stack[-1] != '(' and precedence.get(stack[-1], 0) >= precedence[token]:
+                output.append(stack.pop())
+            stack.append(token)
+        else:
+            output.append(token)
+    while stack:
+        output.append(stack.pop())
+    return output
 
-def to_median(expr):
-    if len(expr) == 0:
-        return ""
+def build_ast(rpn):
+    stack = []
+    for token in rpn:
+        if token == '!':
+            operand = stack.pop()
+            stack.append(('NOT', operand))
+        elif token == '&':
+            right = stack.pop()
+            left = stack.pop()
+            stack.append(('AND', left, right))
+        elif token == '|':
+            right = stack.pop()
+            left = stack.pop()
+            stack.append(('OR', left, right))
+        else:
+            stack.append(('VAR', token))
+    return stack[0]
+
+def eval_ast(ast, values):
+    if ast[0] == 'VAR':
+        return values.get(ast[1], 0)
+    elif ast[0] == 'NOT':
+        return 1 - eval_ast(ast[1], values)
+    elif ast[0] == 'AND':
+        return eval_ast(ast[1], values) & eval_ast(ast[2], values)
+    elif ast[0] == 'OR':
+        return eval_ast(ast[1], values) | eval_ast(ast[2], values)
+
+def get_variables(ast):
+    vars_set = set()
+    def traverse(node):
+        if node[0] == 'VAR':
+            vars_set.add(node[1])
+        elif node[0] == 'NOT':
+            traverse(node[1])
+        else:
+            traverse(node[1])
+            traverse(node[2])
+    traverse(ast)
+    return sorted(vars_set)
+
+def is_self_dual(ast, vars_list):
+    n = len(vars_list)
+    for i in range(1 << n):
+        values = {}
+        for j, var in enumerate(vars_list):
+            values[var] = (i >> j) & 1
+        dual_values = {var: 1 - values[var] for var in vars_list}
+        if eval_ast(ast, values) != eval_ast(ast, dual_values):
+            return False
+    return True
+
+def is_monotonic(ast, vars_list):
+    n = len(vars_list)
+    for i in range(1 << n):
+        for j in range(n):
+            if not (i & (1 << j)):
+                continue
+            smaller = i & ~(1 << j)
+            values_i = {}
+            values_smaller = {}
+            for k, var in enumerate(vars_list):
+                values_i[var] = (i >> k) & 1
+                values_smaller[var] = (smaller >> k) & 1
+            if eval_ast(ast, values_smaller) > eval_ast(ast, values_i):
+                return False
+    return True
+
+def median_repr(ast, vars_list):
+    n = len(vars_list)
+    if n == 0:
+        return "0" if eval_ast(ast, {}) == 0 else "1"
     
-    if expr[0] == '!':
-        inner = to_median(expr[1:])
-        return median_expr(inner, inner, inner)
+    truth_table = []
+    for i in range(1 << n):
+        values = {}
+        for j, var in enumerate(vars_list):
+            values[var] = (i >> j) & 1
+        truth_table.append(eval_ast(ast, values))
     
-    if expr[0] == '(' and expr[-1] == ')':
-        inner = expr[1:-1]
-        if '&' in inner or '|' in inner:
-            parts = []
-            current = ""
-            level = 0
-            op = None
-            for char in inner:
-                if char == '(':
-                    level += 1
-                    current += char
-                elif char == ')':
-                    level -= 1
-                    current += char
-                elif level == 0 and (char == '&' or char == '|'):
-                    if op is None:
-                        op = char
-                    parts.append(current)
-                    current = ""
-                else:
-                    current += char
-            if current:
-                parts.append(current)
-            
-            if len(parts) == 2 and op:
-                left = to_median(parts[0])
-                right = to_median(parts[1])
-                if op == '&':
-                    return median_expr(left, right, "0")
-                elif op == '|':
-                    return median_expr(left, right, "1")
-        return to_median(inner)
-    
-    if '&' in expr or '|' in expr:
-        parts = []
-        current = ""
-        level = 0
-        op = None
-        for char in expr:
-            if char == '(':
-                level += 1
-                current += char
-            elif char == ')':
-                level -= 1
-                current += char
-            elif level == 0 and (char == '&' or char == '|'):
-                if op is None:
-                    op = char
-                parts.append(current)
-                current = ""
-            else:
-                current += char
-        if current:
-            parts.append(current)
+    def build_median_expr(mask):
+        if all(truth_table[i] == 0 for i in mask):
+            return "0"
+        if all(truth_table[i] == 1 for i in mask):
+            return "1"
         
-        if len(parts) == 2 and op:
-            left = to_median(parts[0])
-            right = to_median(parts[1])
-            if op == '&':
-                return median_expr(left, right, "0")
-            elif op == '|':
-                return median_expr(left, right, "1")
+        min_terms = []
+        max_terms = []
+        for i in mask:
+            if truth_table[i] == 1:
+                min_terms.append(i)
+            else:
+                max_terms.append(i)
+        
+        if len(min_terms) >= len(max_terms):
+            if len(min_terms) == 1:
+                i = min_terms[0]
+                terms = []
+                for j, var in enumerate(vars_list):
+                    if (i >> j) & 1:
+                        terms.append(var)
+                    else:
+                        terms.append(f"!{var}")
+                if len(terms) == 1:
+                    return terms[0]
+                return f"<{'<'.join(terms)}>"
+            else:
+                parts = []
+                for i in min_terms:
+                    sub_mask = [idx for idx in mask if idx != i]
+                    parts.append(build_median_expr(sub_mask))
+                return f"<{'<'.join(parts)}>"
+        else:
+            if len(max_terms) == 1:
+                i = max_terms[0]
+                terms = []
+                for j, var in enumerate(vars_list):
+                    if (i >> j) & 1:
+                        terms.append(f"!{var}")
+                    else:
+                        terms.append(var)
+                if len(terms) == 1:
+                    return terms[0]
+                return f"<{'<'.join(terms)}>"
+            else:
+                parts = []
+                for i in max_terms:
+                    sub_mask = [idx for idx in mask if idx != i]
+                    parts.append(build_median_expr(sub_mask))
+                return f"<{'<'.join(parts)}>"
     
-    return expr
+    full_mask = list(range(1 << n))
+    return build_median_expr(full_mask)
 
 def main():
-    with open('input.txt', 'r') as f:
-        formula = f.readline().strip()
+    with open('INPUT.TXT', 'r') as f:
+        formula = f.read().strip()
     
-    variables = set()
-    for char in formula:
-        if 'a' <= char <= 'z':
-            variables.add(char)
+    tokens = parse_expr(formula)
+    rpn = shunting_yard(tokens)
+    ast = build_ast(rpn)
+    vars_list = get_variables(ast)
     
-    parsed = parse_expression(formula, variables)
-    result = to_median(parsed)
+    if not is_self_dual(ast, vars_list) or not is_monotonic(ast, vars_list):
+        with open('OUTPUT.TXT', 'w') as f:
+            f.write("0")
+        return
     
-    with open('output.txt', 'w') as f:
-        f.write(result)
+    median_expr = median_repr(ast, vars_list)
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write(median_expr)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

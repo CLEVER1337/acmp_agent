@@ -5,7 +5,8 @@ def cross(o, a, b):
     return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
 
 def convex_hull(points):
-    points = sorted(points)
+    if len(points) <= 1:
+        return points
     lower = []
     for p in points:
         while len(lower) >= 2 and cross(lower[-2], lower[-1], p) <= 0:
@@ -36,16 +37,17 @@ def main():
     index = 1
     max_area = 0.0
     
-    for _ in range(n):
+    for i in range(n):
         k = int(data[index]); index += 1
         points = []
-        for i in range(k):
+        for j in range(k):
             x = float(data[index]); y = float(data[index+1]); index += 2
             points.append((x, y))
         
         hull = convex_hull(points)
         area = polygon_area(hull)
-        max_area = max(max_area, area)
+        if area > max_area:
+            max_area = area
     
     print("{:.2f}".format(max_area))
 

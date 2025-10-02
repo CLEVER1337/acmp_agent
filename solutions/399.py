@@ -1,8 +1,6 @@
 
 def main():
     import sys
-    sys.setrecursionlimit(1000000)
-    
     data = sys.stdin.read().splitlines()
     if not data:
         print(-1)
@@ -11,7 +9,7 @@ def main():
     n, m = map(int, data[0].split())
     grid = []
     for i in range(1, 1 + n):
-        grid.append(data[i].rstrip('\n'))
+        grid.append(list(data[i]))
     
     start = (1, 1)
     end = (m - 2, n - 2)
@@ -20,56 +18,58 @@ def main():
         print(-1)
         return
         
-    visited_count = [[0] * m for _ in range(n)]
+    visit_count = [[0] * m for _ in range(n)]
     directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-    dir_names = ['down', 'right', 'up', 'left']
-    priority_order = [0, 1, 2, 3]
+    dir_names = ['right', 'down', 'left', 'up']
     
     x, y = start
-    current_dir = 0
+    visit_count[y][x] = 1
     steps = 0
-    max_steps = 10000000
+    current_dir = 0
     
-    visited_count[y][x] = 1
-    
-    while (x, y) != end and steps < max_steps:
-        counts = []
-        for dx, dy in directions:
-            nx, ny = x + dx, y + dy
-            if 0 <= nx < m and 0 <= ny < n and grid[ny][nx] != '@':
-                counts.append(visited_count[ny][nx])
-            else:
-                counts.append(float('inf'))
-                
-        min_count = min(counts)
-        candidates = [i for i in range(4) if counts[i] == min_count]
-        
-        if current_dir in candidates:
-            new_dir = current_dir
-        else:
-            for candidate in priority_order:
-                if candidate in candidates:
-                    new_dir = candidate
-                    break
-            else:
-                new_dir = current_dir
-                
-        dx, dy = directions[new_dir]
-        nx, ny = x + dx, y + dy
-        
-        if grid[ny][nx] == '@':
+    while (x, y) != end:
+        if steps > 10000000:
             print(-1)
             return
             
-        x, y = nx, ny
-        current_dir = new_dir
-        visited_count[y][x] += 1
-        steps += 1
+        dx, dy = directions[current_dir]
+        nx, ny = x + dx, y + dy
         
-    if (x, y) == end:
-        print(steps)
-    else:
-        print(-1)
+        if grid[ny][nx] != '@':
+            x, y = nx, ny
+            visit_count[y][x] += 1
+            steps += 1
+            continue
+            
+        possible_dirs = []
+        min_visits = float('inf')
+        
+        for i, (dx, dy) in enumerate(directions):
+            nx, ny = x + dx, y + dy
+            if grid[ny][nx] != '@':
+                if visit_count[ny][nx] < min_visits:
+                    min_visits = visit_count[ny][nx]
+                    possible_dirs = [i]
+                elif visit_count[ny][nx] == min_visits:
+                    possible_dirs.append(i)
+        
+        if not possible_dirs:
+            print(-1)
+            return
+            
+        if current_dir in possible_dirs:
+            new_dir = current_dir
+        else:
+            new_dir = min(possible_dirs)
+        
+        dx, dy = directions[new_dir]
+        x += dx
+        y += dy
+        visit_count[y][x] += 1
+        steps += 1
+        current_dir = new_dir
+    
+    print(steps)
 
 if __name__ == "__main__":
     main()

@@ -14,54 +14,70 @@ def main():
         if 'X' in line:
             start = (i-1, line.index('X'))
     
-    directions = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
-    visited = set()
+    directions = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+    visited = [[set() for _ in range(m)] for _ in range(n)]
     
     def trace(r, c, dr, dc):
-        while 0 <= r < n and 0 <= c < m:
-            if (r, c, dr, dc) in visited:
+        while True:
+            if not (0 <= r < n and 0 <= c < m):
                 break
-            visited.add((r, c, dr, dc))
+                
+            if (dr, dc) in visited[r][c]:
+                break
+            visited[r][c].add((dr, dc))
             
             if grid[r][c] == '*':
                 break
                 
             if grid[r][c] == '.':
-                if dr == dc:
+                if dr == -1 and dc == -1:
+                    grid[r][c] = '/'
+                elif dr == -1 and dc == 1:
                     grid[r][c] = '\\'
-                else:
+                elif dr == 1 and dc == -1:
+                    grid[r][c] = '\\'
+                elif dr == 1 and dc == 1:
                     grid[r][c] = '/'
             elif grid[r][c] == '/':
-                if dr == dc:
-                    grid[r][c] = 'X'
-                else:
-                    pass
+                if (dr, dc) == (-1, -1):
+                    dr, dc = 1, 1
+                elif (dr, dc) == (-1, 1):
+                    dr, dc = 1, -1
+                elif (dr, dc) == (1, -1):
+                    dr, dc = -1, 1
+                elif (dr, dc) == (1, 1):
+                    dr, dc = -1, -1
             elif grid[r][c] == '\\':
-                if dr != dc:
-                    grid[r][c] = 'X'
-                else:
-                    pass
+                if (dr, dc) == (-1, -1):
+                    dr, dc = -1, -1
+                elif (dr, dc) == (-1, 1):
+                    dr, dc = 1, 1
+                elif (dr, dc) == (1, -1):
+                    dr, dc = -1, -1
+                elif (dr, dc) == (1, 1):
+                    dr, dc = 1, 1
             elif grid[r][c] == 'X':
                 pass
             
-            if grid[r][c] == '*':
-                break
-                
-            next_r = r + dr
-            next_c = c + dc
-            
-            if not (0 <= next_r < n and 0 <= next_c < m):
-                break
-                
-            if grid[next_r][next_c] == '*':
-                dr, dc = -dr, -dc
-            else:
-                r, c = next_r, next_c
+            r += dr
+            c += dc
     
     for dr, dc in directions:
         trace(start[0], start[1], dr, dc)
     
-    grid[start[0]][start[1]] = 'X'
+    for i in range(n):
+        for j in range(m):
+            if grid[i][j] == 'X':
+                if len(visited[i][j]) > 1:
+                    grid[i][j] = 'X'
+                elif visited[i][j]:
+                    if (-1, -1) in visited[i][j] or (1, 1) in visited[i][j]:
+                        grid[i][j] = '/'
+                    else:
+                        grid[i][j] = '\\'
+            elif grid[i][j] != '*' and grid[i][j] != '.':
+                if len(visited[i][j]) > 1:
+                    grid[i][j] = 'X'
     
     for i in range(n):
         print(''.join(grid[i]))

@@ -3,35 +3,22 @@ def main():
     import sys
     data = sys.stdin.read().splitlines()
     n = int(data[0])
-    containers = []
+    matrix = []
     for i in range(1, n+1):
         row = list(map(int, data[i].split()))
-        containers.append(row)
+        matrix.append(row)
     
-    total_bottles = [0] * n
+    total_moves = 0
     for i in range(n):
         for j in range(n):
-            total_bottles[j] += containers[i][j]
+            if i != j:
+                total_moves += matrix[i][j]
     
-    from itertools import permutations
-    best_cost = float('inf')
-    best_perm = None
+    letters = [chr(ord('a') + i) for i in range(n)]
+    permutation = ''.join(letters).upper()
     
-    for perm in permutations(range(n)):
-        cost = 0
-        for i in range(n):
-            for j in range(n):
-                if j != perm[i]:
-                    cost += containers[i][j]
-        if cost < best_cost:
-            best_cost = cost
-            best_perm = perm
-    
-    letters = [chr(ord('A') + i) for i in range(n)]
-    result_letters = [letters[i] for i in best_perm]
-    
-    print(' '.join(result_letters))
-    print(best_cost)
+    print(permutation)
+    print(total_moves)
 
 if __name__ == "__main__":
     main()

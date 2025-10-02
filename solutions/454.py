@@ -4,18 +4,23 @@ def main():
         M = int(f.readline().strip())
         N = int(f.readline().strip())
     
-    n = N - M + 1
-    result = M - 1
+    length = N - M + 1
+    step = 1
+    left = M
+    right = N
     
-    while n > 1:
-        if n % 2 == 1:
-            result += (n + 1) // 2
-        n //= 2
-    
-    result += 1
+    while length > 1:
+        if step % 2 == 1:
+            left += (1 << (step - 1))
+            length = (length + 1) // 2
+        else:
+            if length % 2 == 1:
+                left += (1 << (step - 1))
+            length = length // 2
+        step += 1
     
     with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(result))
+        f.write(str(left))
 
 if __name__ == '__main__':
     main()

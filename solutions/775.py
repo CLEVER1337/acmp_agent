@@ -20,21 +20,20 @@ def main():
             f.write('NO')
         return
     
-    min_steps = collatz_steps(N)
-    best_K = None
+    n_steps = collatz_steps(N)
+    best_k = None
     best_steps = float('inf')
     
-    for K in range(N + 1, N + M + 1):
-        steps = collatz_steps(K)
-        if steps < best_steps:
-            best_steps = steps
-            best_K = K
-        elif steps == best_steps and K < best_K:
-            best_K = K
+    for k in range(N + 1, N + M + 1):
+        steps = collatz_steps(k)
+        if steps < n_steps:
+            if steps < best_steps or (steps == best_steps and k < best_k):
+                best_k = k
+                best_steps = steps
     
-    if best_steps < min_steps:
+    if best_k is not None:
         with open('OUTPUT.TXT', 'w') as f:
-            f.write(str(best_K))
+            f.write(str(best_k))
     else:
         with open('OUTPUT.TXT', 'w') as f:
             f.write('NO')

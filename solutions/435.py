@@ -4,32 +4,34 @@ def main():
     data = sys.stdin.read().split()
     N = int(data[0])
     K = int(data[1])
-    max_sum = N * K
-    total_numbers = (K + 1) ** N
+    
+    total_sum = N * K
+    max_sum = total_sum // 2
     
     dp = [0] * (max_sum + 1)
     dp[0] = 1
     
     for _ in range(N):
         new_dp = [0] * (max_sum + 1)
-        for s in range(len(dp)):
+        for s in range(max_sum + 1):
             if dp[s] == 0:
                 continue
             for d in range(K + 1):
-                new_sum = s + d
-                if new_sum <= max_sum:
-                    new_dp[new_sum] += dp[s]
+                new_s = s + d
+                if new_s <= max_sum:
+                    new_dp[new_s] += dp[s]
         dp = new_dp
     
-    happy_count = 0
+    total_numbers = (K + 1) ** N
+    lucky_count = 0
     for s in range(max_sum + 1):
-        if s % 2 == 0:
-            half = s // 2
-            if half <= max_sum:
-                happy_count += dp[half] * dp[half]
+        if 2 * s == total_sum:
+            lucky_count += dp[s] * dp[s]
+        else:
+            lucky_count += 2 * dp[s] * dp[s]
     
-    result = total_numbers - happy_count
-    print(result)
+    unlucky_count = total_numbers - lucky_count
+    print(unlucky_count)
 
 if __name__ == "__main__":
     main()

@@ -5,50 +5,39 @@ def main():
     n = int(data[0])
     k = int(data[1])
     objects = []
+    index = 2
     for i in range(n):
-        x = int(data[2 + i*2])
-        y = int(data[3 + i*2])
+        x = int(data[index])
+        y = int(data[index+1])
+        index += 2
         objects.append((x, y))
     
     if k == 0:
         print(0)
         return
         
-    cols_needed = set()
-    rows_needed = set()
+    objects.sort(key=lambda obj: (obj[1], obj[0]))
     
-    for x, y in objects:
-        col = (x - 1) // k
-        row = (y - 1) // k
-        cols_needed.add(col)
-        rows_needed.add(row)
+    min_days = 0
+    current_y = 0
+    current_x = 1
     
-    if not cols_needed or not rows_needed:
-        print(0)
-        return
+    for obj in objects:
+        x, y = obj
         
-    min_col = min(cols_needed)
-    max_col = max(cols_needed)
-    min_row = min(rows_needed)
-    max_row = max(rows_needed)
+        if y > current_y:
+            min_days += y - current_y
+            current_y = y
+            current_x = 1
+        
+        if x < current_x:
+            min_days += (current_x - x) * 2
+            current_x = x
+        elif x >= current_x + k:
+            min_days += (x - (current_x + k - 1)) * 2
+            current_x = x - k + 1
     
-    total_cols = max_col - min_col + 1
-    total_rows = max_row - min_row + 1
-    
-    days = 0
-    
-    if total_rows > 0:
-        days += (total_rows - 1) * 2
-    
-    if total_cols > 0:
-        days += max_col - min_col
-    
-    if total_rows % 2 == 1:
-        days += max_col - min_col
-    else:
-        days += min_col - max_col
-    
-    print(days)
+    print(min_days)
 
 if __name__ == "__main__":
     main()

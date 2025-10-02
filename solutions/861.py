@@ -1,16 +1,17 @@
 
-def phi(n):
-    result = n
-    p = 2
-    while p * p <= n:
-        if n % p == 0:
-            while n % p == 0:
-                n //= p
-            result -= result // p
-        p += 1
-    if n > 1:
-        result -= result // n
-    return result
+def main():
+    N = int(input().strip())
+    result = 0
+    i = 1
+    while i * i <= N:
+        if N % i == 0:
+            d1 = i
+            d2 = N // i
+            result += d1 * (N // d1 - 1)
+            if d1 != d2:
+                result += d2 * (N // d2 - 1)
+        i += 1
+    print(result)
 
-n = int(input())
-print(n - phi(n))
+if __name__ == '__main__':
+    main()

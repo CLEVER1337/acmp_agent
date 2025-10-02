@@ -19,33 +19,35 @@ def main():
     INF = float('inf')
     dist = [INF] * (n+1)
     dist[1] = 0
-    prev_edge = [0] * (n+1)
-    prev_node = [0] * (n+1)
+    parent_edge = [0] * (n+1)
     
     for i in range(n-1):
         updated = False
         for u, v, c, idx in edges:
             if dist[u] < INF and dist[v] > dist[u] + c:
                 dist[v] = dist[u] + c
-                prev_edge[v] = idx
-                prev_node[v] = u
+                parent_edge[v] = idx
                 updated = True
         if not updated:
             break
     
     total_cost = 0
     used_edges = set()
-    for city in range(2, n+1):
-        if dist[city] < INF:
-            total_cost += dist[city]
-            cur = city
-            while cur != 1:
-                used_edges.add(prev_edge[cur])
-                cur = prev_node[cur]
+    for i in range(2, n+1):
+        if dist[i] < INF:
+            total_cost += dist[i]
+            v = i
+            while v != 1:
+                edge_id = parent_edge[v]
+                used_edges.add(edge_id)
+                for u, v_target, c, idx in edges:
+                    if idx == edge_id:
+                        v = u
+                        break
     
     k = len(used_edges)
-    print(f"{total_cost} {k}")
-    print(" ".join(map(str, sorted(used_edges))))
+    print(total_cost, k)
+    print(' '.join(map(str, sorted(used_edges))))
 
 if __name__ == "__main__":
     main()

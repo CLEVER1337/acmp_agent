@@ -1,41 +1,54 @@
 
-def main():
-    with open('INPUT.TXT', 'r') as f:
-        data = f.read().split()
-        C = data[0]
-        N = int(data[1])
+def solve():
+    data = input().split()
+    C = data[0]
+    N = int(data[1])
     
     weights = []
     while N > 0:
         remainder = N % 3
         weights.append(remainder)
         N = N // 3
-        if remainder == 2:
-            N += 1
+        
+    weights.append(0)
     
-    left_weights = []
-    right_weights = []
-    power = 0
+    left = []
+    right = []
+    power = 1
     
-    for digit in weights:
-        if digit == 1:
+    for i in range(len(weights)):
+        if weights[i] == 0:
+            pass
+        elif weights[i] == 1:
             if C == 'L':
-                right_weights.append(3**power)
+                right.append(power)
             else:
-                left_weights.append(3**power)
-        elif digit == 2:
+                left.append(power)
+        elif weights[i] == 2:
             if C == 'L':
-                left_weights.append(3**power)
+                left.append(power)
+                weights[i+1] += 1
             else:
-                right_weights.append(3**power)
-        power += 1
+                right.append(power)
+                weights[i+1] += 1
+        elif weights[i] == 3:
+            weights[i+1] += 1
+        
+        power *= 3
     
-    left_weights.sort()
-    right_weights.sort()
+    left.sort()
+    right.sort()
     
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write("L: " + " ".join(map(str, left_weights)) + "\n")
-        f.write("R: " + " ".join(map(str, right_weights)) + "\n")
+    print("L:", end="")
+    if left:
+        print(" " + " ".join(map(str, left)))
+    else:
+        print()
+    
+    print("R:", end="")
+    if right:
+        print(" " + " ".join(map(str, right)))
+    else:
+        print()
 
-if __name__ == "__main__":
-    main()
+solve()

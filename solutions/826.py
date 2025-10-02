@@ -18,65 +18,56 @@ def main():
     
     constraints = [""] * (n+1)
     for i in range(n):
-        constraints[i+1] = data[n-1+i+1].strip()
+        constraints[i+1] = data[n + i].strip()
     
-    if any(len(constraints[i]) == 0 for i in range(1, n+1)):
-        print(-1)
-        return
+    dp = [[-1] * 3 for _ in range(n+1)]
     
-    dp = [[0]*3 for _ in range(n+1)]
-    possible = [False] * (n+1)
-    
-    def dfs(u, parent):
-        colors = []
-        for char in constraints[u]:
-            if char == 'I':
-                colors.append(0)
-            elif char == 'B':
-                colors.append(1)
-            elif char == 'V':
-                colors.append(2)
-        
-        if not colors:
-            possible[u] = False
-            return
-        
-        for color in colors:
-            dp[u][color] = 1 if color == 0 else 0
-        
+    def dfs(u, parent, color):
+        if dp[u][color] != -1:
+            return dp[u][color]
+            
+        allowed_colors = []
+        if 'I' in constraints[u]:
+            allowed_colors.append(0)
+        if 'B' in constraints[u]:
+            allowed_colors.append(1)
+        if 'V' in constraints[u]:
+            allowed_colors.append(2)
+            
+        if color not in allowed_colors:
+            dp[u][color] = -10**9
+            return -10**9
+            
+        total = 1 if color == 0 else 0
         for v in graph[u]:
             if v == parent:
                 continue
-            dfs(v, u)
-            if not possible[v]:
-                possible[u] = False
-                return
                 
-            for u_color in range(3):
-                if dp[u][u_color] == -1:
-                    continue
-                    
-                best = -1
-                for v_color in range(3):
-                    if u_color != v_color and dp[v][v_color] != -1:
-                        total = dp[u][u_color] + dp[v][v_color]
-                        if total > best:
-                            best = total
+            best = -10**9
+            for next_color in range(3):
+                if next_color != color:
+                    res = dfs(v, u, next_color)
+                    if res > best:
+                        best = res
+                        
+            if best == -10**9:
+                dp[u][color] = -10**9
+                return -10**9
                 
-                if best == -1:
-                    dp[u][u_color] = -1
-                else:
-                    dp[u][u_color] = best
+            total += best
+            
+        dp[u][color] = total
+        return total
         
-        possible[u] = any(dp[u][color] != -1 for color in range(3))
-    
-    root = 1
-    dfs(root, -1)
-    
-    if not possible[root]:
+    result = -1
+    for color in range(3):
+        res = dfs(1, -1, color)
+        if res > result:
+            result = res
+            
+    if result < 0:
         print(-1)
     else:
-        result = max(dp[root])
         print(result)
 
 if __name__ == "__main__":

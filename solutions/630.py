@@ -9,52 +9,50 @@ def main():
     
     for _ in range(k):
         n = int(data[index]); index += 1
-        guards = []
+        intervals = []
         for i in range(n):
             a = int(data[index]); b = int(data[index+1]); index += 2
-            guards.append((a, b))
+            intervals.append((a, b))
         
         max_time = 10000
-        timeline = [0] * (max_time + 2)
+        covered = [0] * (max_time + 2)
         
-        for a, b in guards:
-            timeline[a] += 1
-            timeline[b] -= 1
+        for a, b in intervals:
+            covered[a] += 1
+            if b + 1 <= max_time:
+                covered[b + 1] -= 1
         
-        current = 0
+        for i in range(1, max_time + 1):
+            covered[i] += covered[i - 1]
+        
+        fully_covered = True
         for i in range(max_time + 1):
-            current += timeline[i]
-            timeline[i] = current
-        
-        critical_guards = 0
-        valid = True
-        
-        for i in range(max_time):
-            if timeline[i] == 0:
-                valid = False
+            if covered[i] <= 0:
+                fully_covered = False
                 break
         
-        if not valid:
+        if not fully_covered:
             results.append("Wrong Answer")
             continue
         
+        critical_all = True
         for i in range(n):
-            a, b = guards[i]
-            temp_timeline = timeline.copy()
+            temp_covered = covered.copy()
+            a, b = intervals[i]
+            for t in range(a, b + 1):
+                temp_covered[t] -= 1
             
-            for t in range(a, b):
-                temp_timeline[t] -= 1
-            
-            uncovered = False
-            for t in range(max_time):
-                if temp_timeline[t] == 0:
-                    uncovered = True
+            has_gap = False
+            for t in range(max_time + 1):
+                if temp_covered[t] <= 0:
+                    has_gap = True
                     break
             
-            if not uncovered:
-                critical_guards += 1
+            if not has_gap:
+                critical_all = False
+                break
         
-        if critical_guards == n:
+        if critical_all:
             results.append("Accepted")
         else:
             results.append("Wrong Answer")

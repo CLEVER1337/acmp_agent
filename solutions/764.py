@@ -6,37 +6,29 @@ def gcd(a, b):
         a, b = b, a % b
     return abs(a)
 
-def main():
-    with open('INPUT.TXT', 'r') as f:
-        n = int(f.readline().strip())
-        points = []
-        for _ in range(n):
-            x, y = map(int, f.readline().split())
-            points.append((x, y))
-    
-    if n == 0:
-        print(0)
-        return
-        
-    max_count = 0
-    
-    for i in range(n):
-        x1, y1 = points[i]
-        g = gcd(x1, y1)
-        if g == 0:
-            continue
-        dx = x1 // g
-        dy = y1 // g
-        
-        count = 0
-        for j in range(n):
-            x2, y2 = points[j]
-            if x2 * dy == y2 * dx:
-                count += 1
-                
-        max_count = max(max_count, count)
-    
-    print(max_count)
+def get_direction(x, y):
+    g = gcd(x, y)
+    dx, dy = x // g, y // g
+    if dx == 0:
+        return (0, 1 if dy > 0 else -1)
+    if dy == 0:
+        return (1 if dx > 0 else -1, 0)
+    return (dx, dy)
 
-if __name__ == "__main__":
-    main()
+n = int(input())
+targets = []
+
+for _ in range(n):
+    x, y = map(int, input().split())
+    targets.append((x, y))
+
+max_count = 0
+directions = {}
+
+for x, y in targets:
+    direction = get_direction(x, y)
+    directions[direction] = directions.get(direction, 0) + 1
+
+max_count = max(directions.values()) if directions else 0
+
+print(max_count)

@@ -1,6 +1,13 @@
 
 def main():
-    s = input().strip()
+    with open("INPUT.TXT", "r") as f:
+        s = f.readline().strip()
+    
+    n = len(s)
+    if n % 2 != 0:
+        print(-1)
+        return
+        
     stack = []
     changes = 0
     
@@ -9,47 +16,27 @@ def main():
             stack.append(char)
         else:
             if not stack:
-                changes += 1
-                stack.append('(' if char == ')' else '[')
-            else:
-                top = stack.pop()
-                if char == ')':
-                    if top == '[':
-                        changes += 1
-                    elif top == '(':
-                        pass
-                    else:
-                        stack.append(top)
-                        changes += 1
-                        stack.append('(')
-                else:  # char == ']'
-                    if top == '(':
-                        changes += 1
-                    elif top == '[':
-                        pass
-                    else:
-                        stack.append(top)
-                        changes += 1
-                        stack.append('[')
-    
+                print(-1)
+                return
+                
+            top = stack.pop()
+            if char == ')':
+                if top != '(' and top != '[':
+                    print(-1)
+                    return
+                if top == '[':
+                    changes += 1
+            else:  # char == ']'
+                if top != '[' and top != '(':
+                    print(-1)
+                    return
+                if top == '(':
+                    changes += 1
+                    
     if stack:
-        if len(stack) % 2 != 0:
-            print(-1)
-            return
-        
-        for i in range(0, len(stack), 2):
-            if stack[i] == '(' and stack[i+1] == ')':
-                pass
-            elif stack[i] == '[' and stack[i+1] == ']':
-                pass
-            elif stack[i] == '(' and stack[i+1] == ']':
-                changes += 1
-            elif stack[i] == '[' and stack[i+1] == ')':
-                changes += 1
-            else:
-                changes += 2
-    
-    print(changes)
+        print(-1)
+    else:
+        print(changes)
 
 if __name__ == "__main__":
     main()

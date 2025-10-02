@@ -14,100 +14,129 @@ def find_palindrome(s):
     normalized = normalize(s)
     n = len(normalized)
     
+    if n == 0:
+        return "a"
+    
     if is_palindrome(normalized):
         return s
     
-    for i in range(len(normalized)):
-        # Попробовать удалить символ
-        candidate = normalized[:i] + normalized[i+1:]
-        if is_palindrome(candidate):
-            return reconstruct_original(s, candidate, i, 'delete')
-        
-        # Попробовать заменить символ
-        for j in range(i + 1, len(normalized)):
-            if normalized[i] != normalized[j]:
-                candidate = list(normalized)
-                candidate[i] = candidate[j]
-                candidate = ''.join(candidate)
-                if is_palindrome(candidate):
-                    return reconstruct_original(s, candidate, i, 'replace')
+    for i in range(n // 2 + 1):
+        j = n - 1 - i
+        if normalized[i] != normalized[j]:
+            # Попробуем удалить символ слева
+            if is_palindrome(normalized[i+1:j+1]):
+                return reconstruct_with_deletion(s, i)
+            
+            # Попробуем удалить символ справа
+            if is_palindrome(normalized[i:j]):
+                return reconstruct_with_deletion(s, j)
+            
+            # Попробуем заменить символ
+            if i != j:
+                return reconstruct_with_replacement(s, i, j, normalized[j])
+            
+            # Попробуем добавить символ
+            return reconstruct_with_addition(s, i, normalized[i])
     
-    # Попробовать добавить символ
-    for i in range(len(normalized) + 1):
-        for char in 'abcdefghijklmnopqrstuvwxyz':
-            candidate = normalized[:i] + char + normalized[i:]
-            if is_palindrome(candidate):
-                return reconstruct_original(s, candidate, i, 'add', char)
-    
-    return None
+    return s
 
-def reconstruct_original(original, palindrome, pos, operation, added_char=None):
-    letters_only = [c for c in original if is_letter(c)]
-    non_letters = [c for c in original if not is_letter(c)]
+def reconstruct_with_deletion(s, pos):
+    letters = [c for c in s if is_letter(c)]
+    result = []
+    letter_count = 0
     
-    if operation == 'delete':
-        # Восстановить оригинал, вставив удаленный символ обратно
-        result = []
-        letter_idx = 0
-        for c in original:
-            if is_letter(c):
-                if letter_idx == pos:
-                    result.append(c)
+    for c in s:
+        if is_letter(c):
+            if letter_count != pos:
                 result.append(c)
-                letter_idx += 1
+            letter_count += 1
+        else:
+            result.append(c)
+    
+    return ''.join(result)
+
+def reconstruct_with_replacement(s, left_pos, right_pos, correct_char):
+    letters = [c for c in s if is_letter(c)]
+    result = []
+    letter_count = 0
+    
+    for c in s:
+        if is_letter(c):
+            if letter_count == left_pos:
+                result.append(correct_char.upper() if c.isupper() else correct_char)
             else:
                 result.append(c)
-        return ''.join(result)
+            letter_count += 1
+        else:
+            result.append(c)
     
-    elif operation == 'replace':
-        # Восстановить оригинал, заменив символ обратно
-        result = []
-        letter_idx = 0
-        for c in original:
-            if is_letter(c):
-                if letter_idx == pos:
-                    result.append(c)
-                else:
-                    result.append(c)
-                letter_idx += 1
+    return ''.join(result)
+
+def reconstruct_with_addition(s, pos, correct_char):
+    letters = [c for c in s if is_letter(c)]
+    result = []
+    letter_count = 0
+    
+    for c in s:
+        if is_letter(c):
+            if letter_count == pos:
+                result.append(correct_char.upper() if c.isupper() else correct_char)
+                result.append(c)
             else:
                 result.append(c)
-        return ''.join(result)
+            letter_count += 1
+        else:
+            result.append(c)
     
-    elif operation == 'add':
-        # Восстановить оригинал, удалив добавленный символ
-        result = []
-        letter_idx = 0
-        for c in original:
-            if is_letter(c):
-                result.append(c)
-                letter_idx += 1
-            else:
-                result.append(c)
-        return ''.join(result)
+    return ''.join(result)
 
 def main():
-    data = sys.stdin.read().strip()
-    if not data:
-        print("NO")
-        return
+    with open('INPUT.TXT', 'r', encoding='utf-8') as f:
+        s = f.readline().strip()
     
-    normalized = normalize(data)
+    normalized = normalize(s)
     
-    # Проверить, является ли строка палиндромом
     if is_palindrome(normalized):
-        print("YES")
-        print(data)
+        with open('OUTPUT.TXT', 'w', encoding='utf-8') as f:
+            f.write("YES\n")
+            f.write(s + "\n")
         return
     
-    # Проверить возможность исправления одним изменением
-    result = find_palindrome(data)
+    n = len(normalized)
+    found = False
     
-    if result:
-        print("YES")
-        print(result)
+    for i in range(n // 2 + 1):
+        j = n - 1 - i
+        if normalized[i] != normalized[j]:
+            # Проверяем возможность удаления одного символа
+            if is_palindrome(normalized[i+1:j+1]) or is_palindrome(normalized[i:j]):
+                found = True
+                break
+            
+            # Проверяем возможность замены одного символа
+            if i != j and (normalized[:i] + normalized[j] + normalized[i+1:]) == (normalized[:i] + normalized[j] + normalized[i+1:])[::-1]:
+                found = True
+                break
+            
+            # Проверяем возможность добавления одного символа
+            test_str = normalized[:i] + normalized[j] + normalized[i:]
+            if is_palindrome(test_str):
+                found = True
+                break
+            
+            test_str = normalized[:j+1] + normalized[i] + normalized[j+1:]
+            if is_palindrome(test_str):
+                found = True
+                break
+    
+    if found:
+        palindrome = find_palindrome(s)
+        with open('OUTPUT.TXT', 'w', encoding='utf-8') as f:
+            f.write("YES\n")
+            f.write(palindrome + "\n")
     else:
-        print("NO")
+        with open('OUTPUT.TXT', 'w', encoding='utf-8') as f:
+            f.write("NO\n")
 
 if __name__ == "__main__":
     main()

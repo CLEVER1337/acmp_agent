@@ -1,38 +1,25 @@
 
 def main():
     with open('INPUT.TXT', 'r') as f:
-        grid = [list(line.strip()) for line in f.readlines()]
+        grid = [line.strip() for line in f.readlines()]
     
-    correct_pattern1 = []
-    correct_pattern2 = []
-    
+    correct_colors = []
     for i in range(8):
-        row1 = []
-        row2 = []
+        row = []
         for j in range(8):
             if (i + j) % 2 == 0:
-                row1.append('W')
-                row2.append('B')
+                row.append('W')
             else:
-                row1.append('B')
-                row2.append('W')
-        correct_pattern1.append(row1)
-        correct_pattern2.append(row2)
+                row.append('B')
+        correct_colors.append(row)
     
-    errors1 = 0
-    errors2 = 0
-    
+    errors = 0
     for i in range(8):
         for j in range(8):
-            if grid[i][j] != correct_pattern1[i][j]:
-                errors1 += 1
-            if grid[i][j] != correct_pattern2[i][j]:
-                errors2 += 1
+            if grid[i][j] != correct_colors[i][j]:
+                errors += 1
     
-    min_errors = min(errors1, errors2)
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(min_errors))
+    print(min(errors, 64 - errors))
 
 if __name__ == '__main__':
     main()

@@ -1,85 +1,80 @@
 
-import math
-
-def find_roots(a, b, c, d):
-    if a == 0:
-        if b == 0:
-            if c == 0:
-                if d == 0:
-                    return -1, []  # Бесконечно много корней
-                else:
-                    return 0, []   # Нет корней
-            else:
-                # Линейное уравнение: c*x + d = 0
-                if d % c == 0:
-                    root = -d // c
-                    return 1, [root]
-                else:
-                    return 0, []
-        else:
-            # Квадратное уравнение: b*x^2 + c*x + d = 0
-            discriminant = c*c - 4*b*d
-            if discriminant < 0:
-                return 0, []
-            elif discriminant == 0:
-                if c % (2*b) == 0:
-                    root = -c // (2*b)
-                    return 1, [root]
-                else:
-                    return 0, []
-            else:
-                sqrt_disc = math.isqrt(discriminant)
-                if sqrt_disc * sqrt_disc != discriminant:
-                    return 0, []
-                
-                roots = set()
-                numerator1 = -c + sqrt_disc
-                numerator2 = -c - sqrt_disc
-                denominator = 2 * b
-                
-                if numerator1 % denominator == 0:
-                    roots.add(numerator1 // denominator)
-                if numerator2 % denominator == 0:
-                    roots.add(numerator2 // denominator)
-                
-                return len(roots), sorted(roots)
-    else:
-        # Кубическое уравнение
-        roots = set()
-        
-        # Ищем целые корни среди делителей свободного члена
-        divisors = set()
-        d_abs = abs(d)
-        for i in range(1, int(math.sqrt(d_abs)) + 1):
-            if d_abs % i == 0:
-                divisors.add(i)
-                divisors.add(d_abs // i)
-                divisors.add(-i)
-                divisors.add(-d_abs // i)
-        divisors.add(0) if d == 0 else None
-        
-        for x in divisors:
-            if a*x*x*x + b*x*x + c*x + d == 0:
-                roots.add(x)
-        
-        return len(roots), sorted(roots)
-
 def main():
-    with open('INPUT.TXT', 'r') as f:
+    with open("INPUT.TXT", "r") as f:
         data = f.read().split()
-        if not data:
+        A, B, C, D = map(int, data)
+    
+    if A == 0 and B == 0 and C == 0:
+        if D == 0:
+            with open("OUTPUT.TXT", "w") as f:
+                f.write("-1")
             return
-        a, b, c, d = map(int, data)
-    
-    count, roots = find_roots(a, b, c, d)
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        if count == -1:
-            f.write('-1')
         else:
-            f.write(f"{count}\n")
-            if roots:
-                f.write(' '.join(map(str, roots)))
+            roots = []
+    elif A == 0 and B == 0:
+        if C != 0 and D % C == 0:
+            roots = [-D // C]
+        else:
+            roots = []
+    elif A == 0:
+        discriminant = C * C - 4 * B * D
+        if discriminant < 0:
+            roots = []
+        elif discriminant == 0:
+            if C % (2 * B) == 0:
+                roots = [-C // (2 * B)]
+            else:
+                roots = []
+        else:
+            root1 = (-C + discriminant**0.5) / (2 * B)
+            root2 = (-C - discriminant**0.5) / (2 * B)
+            roots = []
+            if abs(root1 - round(root1)) < 1e-10:
+                roots.append(int(round(root1)))
+            if abs(root2 - round(root2)) < 1e-10:
+                roots.append(int(round(root2)))
+            roots = sorted(list(set(roots)))
+    else:
+        roots = []
+        divisors_D = set()
+        divisors_A = set()
+        
+        for i in range(1, int(abs(D))**0.5 + 1):
+            if D != 0 and abs(D) % i == 0:
+                divisors_D.add(i)
+                divisors_D.add(-i)
+                divisors_D.add(D // i)
+                divisors_D.add(-D // i)
+        
+        for i in range(1, int(abs(A))**0.5 + 1):
+            if A != 0 and abs(A) % i == 0:
+                divisors_A.add(i)
+                divisors_A.add(-i)
+                divisors_A.add(A // i)
+                divisors_A.add(-A // i)
+        
+        candidates = set()
+        if D == 0:
+            candidates.add(0)
+        
+        for p in divisors_D:
+            for q in divisors_A:
+                if q != 0 and p % q == 0:
+                    candidate = p // q
+                    candidates.add(candidate)
+                    candidates.add(-candidate)
+        
+        for x in candidates:
+            if A*x*x*x + B*x*x + C*x + D == 0:
+                roots.append(x)
+        
+        roots = sorted(list(set(roots)))
+    
+    with open("OUTPUT.TXT", "w") as f:
+        if len(roots) == 0:
+            f.write("0")
+        else:
+            f.write(f"{len(roots)} " + " ".join(map(str, roots)))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

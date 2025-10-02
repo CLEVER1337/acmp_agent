@@ -1,63 +1,88 @@
 
 import math
 
-def read_input(filename):
-    with open(filename, 'r') as f:
-        lines = f.readlines()
+def read_input():
+    with open('INPUT.TXT', 'r') as f:
+        data = f.readlines()
     
-    # Читаем исходный шар
-    x, y, z, r = map(float, lines[0].split())
-    original_ball = (x, y, z, r)
-    
-    # Читаем количество добавляемых шаров
-    n = int(lines[1].strip())
-    
-    # Читаем добавляемые шары
+    center_x, center_y, center_z, radius = map(float, data[0].split())
+    n = int(data[1])
     balls = []
-    for i in range(2, 2 + n):
-        xi, yi, zi, ri = map(float, lines[i].split())
-        balls.append((xi, yi, zi, ri))
     
-    return original_ball, balls
+    for i in range(2, 2 + n):
+        x, y, z, r = map(float, data[i].split())
+        balls.append((x, y, z, r))
+    
+    return (center_x, center_y, center_z, radius), n, balls
 
-def distance_between_centers(x1, y1, z1, x2, y2, z2):
+def distance(x1, y1, z1, x2, y2, z2):
     return math.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
 
-def balls_intersect(ball1, ball2):
-    x1, y1, z1, r1 = ball1
-    x2, y2, z2, r2 = ball2
-    distance = distance_between_centers(x1, y1, z1, x2, y2, z2)
-    return distance <= (r1 + r2)
+def balls_intersect(x1, y1, z1, r1, x2, y2, z2, r2):
+    dist = distance(x1, y1, z1, x2, y2, z2)
+    return dist <= r1 + r2
 
 def main():
-    original_ball, balls = read_input('INPUT.TXT')
+    original_ball, n, balls = read_input()
+    ox, oy, oz, orad = original_ball
+    
+    # Создаем список всех шаров (оригинальный + добавляемые)
     all_balls = [original_ball]
+    ball_indices = [0]  # индекс 0 для оригинального шара
     
-    for i, ball in enumerate(balls, 1):
-        all_balls.append(ball)
-        
-        # Проверяем, есть ли хотя бы один шар, не пересекающийся с другими
-        has_isolated = False
-        for j, current_ball in enumerate(all_balls):
-            intersects_with_any = False
-            for k, other_ball in enumerate(all_balls):
-                if j != k and balls_intersect(current_ball, other_ball):
-                    intersects_with_any = True
-                    break
+    for i in range(n):
+        x, y, z, r = balls[i]
+        all_balls.append((x, y, z, r))
+        ball_indices.append(i + 1)
+    
+    # Проверяем, пересекается ли каждый шар хотя бы с одним другим
+    isolated_balls = set(range(len(all_balls)))
+    
+    for i in range(len(all_balls)):
+        for j in range(i + 1, len(all_balls)):
+            x1, y1, z1, r1 = all_balls[i]
+            x2, y2, z2, r2 = all_balls[j]
             
-            if not intersects_with_any:
-                has_isolated = True
-                break
-        
-        # Если нет изолированных шаров, можно остановиться
-        if not has_isolated:
-            with open('OUTPUT.TXT', 'w') as f:
-                f.write(str(i))
-            return
+            if balls_intersect(x1, y1, z1, r1, x2, y2, z2, r2):
+                if i in isolated_balls:
+                    isolated_balls.remove(i)
+                if j in isolated_balls:
+                    isolated_balls.remove(j)
     
-    # Если после всех добавлений все еще есть изолированные шары
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write('0')
+    # Если есть изолированные шары после добавления всех
+    if isolated_balls:
+        return 0
+    
+    # Постепенно добавляем шары и проверяем наличие изолированных
+    current_balls = [original_ball]
+    current_indices = [0]
+    
+    for i in range(n):
+        x, y, z, r = balls[i]
+        current_balls.append((x, y, z, r))
+        current_indices.append(i + 1)
+        
+        # Проверяем наличие изолированных шаров
+        isolated = set(range(len(current_balls)))
+        
+        for j in range(len(current_balls)):
+            for k in range(j + 1, len(current_balls)):
+                x1, y1, z1, r1 = current_balls[j]
+                x2, y2, z2, r2 = current_balls[k]
+                
+                if balls_intersect(x1, y1, z1, r1, x2, y2, z2, r2):
+                    if j in isolated:
+                        isolated.remove(j)
+                    if k in isolated:
+                        isolated.remove(k)
+        
+        # Если нет изолированных шаров
+        if not isolated:
+            return i + 1
+    
+    return 0
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    result = main()
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write(str(result))

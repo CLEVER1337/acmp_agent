@@ -6,114 +6,78 @@ def main():
     k = int(data[0])
     m = list(map(int, data[1:1+k]))
     
-    if k == 0:
-        print("0")
+    n = sum(m)
+    if n == 0:
+        print(0)
         return
         
     result = []
-    n = sum(m)
-    
-    if n == 0:
-        print("1")
-        print("0")
-        return
+    stack = []
+    i = 0
+    while i < k:
+        count = 1
+        while i + 1 < k and m[i] == m[i+1]:
+            count += 1
+            i += 1
+        stack.append((m[i], count))
+        i += 1
         
-    if k == 1:
-        if m[0] % 2 == 0:
-            print("1")
-            print("0")
-        else:
-            print("1")
-            print("1 1")
-        return
-        
-    rows = []
-    for i in range(k):
-        rows.append((m[i], i))
-        
-    def get_irreducible_diagrams():
-        diagrams = set()
-        diagrams.add(tuple(m))
-        
-        queue = [tuple(m)]
-        visited = set()
-        visited.add(tuple(m))
-        
-        while queue:
-            current = queue.pop(0)
-            current_list = list(current)
-            len_current = len(current_list)
+    def dfs(pos, current_len, current_count, path):
+        if pos == len(stack):
+            if current_count > 0:
+                path.append((current_len, current_count))
+            if path:
+                res = []
+                for l, cnt in path:
+                    res.extend([l] * cnt)
+                result.append(res)
+            else:
+                result.append([])
+            return
             
-            for i in range(len_current):
-                if i < len_current - 1 and current_list[i] > current_list[i + 1]:
-                    if current_list[i] >= 2 and current_list[i + 1] >= 1:
-                        new_list = current_list[:]
-                        new_list[i] -= 2
-                        new_list[i + 1] -= 1
-                        while new_list and new_list[-1] == 0:
-                            new_list.pop()
-                        new_tuple = tuple(new_list)
-                        if new_tuple not in visited:
-                            visited.add(new_tuple)
-                            queue.append(new_tuple)
-                            diagrams.add(new_tuple)
-                            
-                if i > 0 and current_list[i - 1] > current_list[i]:
-                    if current_list[i] >= 2:
-                        new_list = current_list[:]
-                        new_list[i] -= 2
-                        while new_list and new_list[-1] == 0:
-                            new_list.pop()
-                        new_tuple = tuple(new_list)
-                        if new_tuple not in visited:
-                            visited.add(new_tuple)
-                            queue.append(new_tuple)
-                            diagrams.add(new_tuple)
-                            
-            for i in range(len_current):
-                if current_list[i] >= 2:
-                    new_list = current_list[:]
-                    new_list[i] -= 2
-                    while new_list and new_list[-1] == 0:
-                        new_list.pop()
-                    new_tuple = tuple(new_list)
-                    if new_tuple not in visited:
-                        visited.add(new_tuple)
-                        queue.append(new_tuple)
-                        diagrams.add(new_tuple)
+        l, cnt = stack[pos]
+        if current_count == 0:
+            for take in range(cnt + 1):
+                rem = cnt - take
+                if rem == 0:
+                    dfs(pos + 1, 0, 0, path + [(l, take)])
+                else:
+                    if take > 0:
+                        dfs(pos + 1, l, rem, path + [(l, take - 1)])
+                    else:
+                        dfs(pos + 1, l, rem, path)
+        else:
+            if l < current_len:
+                return
+            min_take = max(0, cnt - (current_len - l if current_len > l else 0))
+            for take in range(min_take, cnt + 1):
+                rem = cnt - take
+                if rem == 0:
+                    if l == current_len:
+                        dfs(pos + 1, 0, 0, path + [(current_len, current_count + take)])
+                    else:
+                        dfs(pos + 1, 0, 0, path + [(current_len, current_count), (l, take)])
+                else:
+                    if l == current_len:
+                        dfs(pos + 1, l, current_count + rem, path + [(current_len, take)])
+                    else:
+                        dfs(pos + 1, l, rem, path + [(current_len, current_count), (l, take)])
                         
-        irreducible = set()
-        for diagram in diagrams:
-            is_irreducible = True
-            diagram_list = list(diagram)
-            len_diagram = len(diagram_list)
-            
-            for i in range(len_diagram):
-                if i < len_diagram - 1 and diagram_list[i] > diagram_list[i + 1]:
-                    if diagram_list[i] >= 2 and diagram_list[i + 1] >= 1:
-                        is_irreducible = False
-                        break
-                if i > 0 and diagram_list[i - 1] > diagram_list[i]:
-                    if diagram_list[i] >= 2:
-                        is_irreducible = False
-                        break
-                if diagram_list[i] >= 2:
-                    is_irreducible = False
-                    break
-                    
-            if is_irreducible:
-                irreducible.add(diagram)
-                
-        return list(irreducible)
-        
-    irreducible_diagrams = get_irreducible_diagrams()
+    dfs(0, 0, 0, [])
     
-    print(len(irreducible_diagrams))
-    for diagram in irreducible_diagrams:
-        if len(diagram) == 0:
-            print("0")
-        else:
-            print(f"{len(diagram)} {' '.join(map(str, diagram))}")
+    result = sorted(result, key=lambda x: (-len(x), x))
+    unique_result = []
+    for i, res in enumerate(result):
+        if i == 0 or res != result[i-1]:
+            unique_result.append(res)
             
-if __name__ == "__main__":
+    print(len(unique_result))
+    for res in unique_result:
+        if not res:
+            print(0)
+        else:
+            print(len(res), end=' ')
+            print(' '.join(map(str, res)))
+            
+if __name__ == '__main__':
     main()

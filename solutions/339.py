@@ -25,7 +25,7 @@ def date_to_days(d, m, y):
     return days
 
 def main():
-    with open("INPUT.TXT", "r") as f:
+    with open('INPUT.TXT', 'r') as f:
         start_date = f.readline().strip()
         end_date = f.readline().strip()
     
@@ -37,8 +37,8 @@ def main():
     
     result = end_days - start_days
     
-    with open("OUTPUT.TXT", "w") as f:
+    with open('OUTPUT.TXT', 'w') as f:
         f.write(str(result))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

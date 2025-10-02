@@ -9,20 +9,23 @@ def main():
         print(0)
         return
         
-    prefix = [0] * (n + 1)
-    for i in range(n):
-        prefix[i+1] = prefix[i] + (1 if directions[i] % 2 == 1 else -1)
-        
+    sides = []
+    current_side = 0
+    for d in directions:
+        if d == 1:
+            current_side += 1
+        else:
+            if current_side > 0:
+                sides.append(current_side)
+                current_side = 0
+    if current_side > 0:
+        sides.append(current_side)
+    
     total = 0
-    for i in range(n):
-        for j in range(i+2, n+1):
-            if j - i > n - 2:
-                continue
-            if prefix[i] == prefix[j] and (j - i) % 3 == 0:
-                k = (j - i) // 3
-                if prefix[i+k] == prefix[i] + k and prefix[i+2*k] == prefix[i] + 2*k:
-                    total += 1
-                    
+    for side_length in sides:
+        if side_length >= 2:
+            total += (side_length - 1) * (side_length) // 2
+            
     print(total)
 
 if __name__ == "__main__":

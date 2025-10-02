@@ -7,26 +7,32 @@ def main():
     if not data:
         return
     
-    idx = 0
-    n = int(data[idx]); m = int(data[idx+1]); idx += 2
+    n = int(data[0])
+    m = int(data[1])
+    index = 2
     
     graph = defaultdict(dict)
     
-    for _ in range(m):
-        u = int(data[idx]); v = int(data[idx+1]); c = int(data[idx+2]); idx += 3
+    for i in range(m):
+        u = int(data[index])
+        v = int(data[index+1])
+        c = int(data[index+2])
+        index += 3
+        
         if c not in graph[u]:
             graph[u][c] = []
-        graph[u][c].append(v)
-        
         if c not in graph[v]:
             graph[v][c] = []
+            
+        graph[u][c].append(v)
         graph[v][c].append(u)
     
-    k = int(data[idx]); idx += 1
+    k = int(data[index])
+    index += 1
     
     colors = []
     if k > 0:
-        colors = list(map(int, data[idx:idx+k]))
+        colors = list(map(int, data[index:index+k]))
     
     current_room = 1
     
@@ -39,7 +45,7 @@ def main():
         if len(next_rooms) > 1:
             print("INCORRECT")
             return
-            
+        
         current_room = next_rooms[0]
     
     print(current_room)

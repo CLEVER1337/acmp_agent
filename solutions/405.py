@@ -1,6 +1,7 @@
 
 import sys
-from sys import stdin
+from collections import defaultdict
+
 sys.setrecursionlimit(300000)
 
 def main():
@@ -10,8 +11,8 @@ def main():
     
     n = int(data[0])
     m = int(data[1])
-    graph = [[] for _ in range(n + 1)]
     
+    graph = [[] for _ in range(n + 1)]
     index = 2
     for i in range(m):
         u = int(data[index])
@@ -24,61 +25,56 @@ def main():
     low = [0] * (n + 1)
     parent = [0] * (n + 1)
     time = 0
-    is_articulation = [False] * (n + 1)
-    size = [0] * (n + 1)
+    articulation_points = [False] * (n + 1)
+    sizes = [0] * (n + 1)
     
     def dfs(u, p):
         nonlocal time
-        disc[u] = time + 1
-        low[u] = time + 1
         time += 1
-        parent[u] = p
-        size[u] = 1
+        disc[u] = time
+        low[u] = time
+        sizes[u] = 1
         children = 0
+        total = 0
         
         for v in graph[u]:
             if v == p:
                 continue
             if disc[v] == 0:
                 children += 1
+                parent[v] = u
                 dfs(v, u)
-                size[u] += size[v]
+                sizes[u] += sizes[v]
                 low[u] = min(low[u], low[v])
                 
-                if p != 0 and low[v] >= disc[u]:
-                    is_articulation[u] = True
+                if (p == -1 and children > 1) or (p != -1 and low[v] >= disc[u]):
+                    articulation_points[u] = True
+                    total += sizes[v]
             else:
                 low[u] = min(low[u], disc[v])
-                
-        if p == 0 and children > 1:
-            is_articulation[u] = True
+        
+        return total
     
-    dfs(1, 0)
+    dfs(1, -1)
     
-    total = n
     result = [0] * (n + 1)
+    total_nodes = n
     
     for u in range(1, n + 1):
-        if not is_articulation[u]:
-            continue
-            
-        sum_sizes = 0
-        count = 0
-        for v in graph[u]:
-            if parent[v] == u:
-                sum_sizes += size[v]
-                count += 1
-        
-        if parent[u] != 0:
-            remaining = total - sum_sizes - 1
-            result[u] += remaining * sum_sizes
-        
-        for v in graph[u]:
-            if parent[v] == u:
-                remaining = total - size[v] - 1
-                result[u] += size[v] * remaining
-        
-        result[u] //= 2
+        if articulation_points[u]:
+            sum_sizes = 0
+            product_sum = 0
+            for v in graph[u]:
+                if parent[v] == u:
+                    sum_sizes += sizes[v]
+                    product_sum += sizes[v] * sizes[v]
+            remaining = total_nodes - 1 - sum_sizes
+            pairs = (sum_sizes * sum_sizes - product_sum) // 2
+            pairs += sum_sizes * remaining
+            pairs += remaining * (remaining - 1) // 2
+            result[u] = pairs
+        else:
+            result[u] = (total_nodes - 1) * (total_nodes - 2) // 2
     
     output = []
     for i in range(1, n + 1):

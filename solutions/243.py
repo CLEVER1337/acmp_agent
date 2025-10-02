@@ -10,42 +10,42 @@ def main():
     L = int(data[1])
     shops = []
     index = 2
-    
     for i in range(n):
-        p = int(data[index])
-        r = int(data[index+1])
-        q = int(data[index+2])
-        f = int(data[index+3])
+        P = int(data[index])
+        R = int(data[index+1])
+        Q = int(data[index+2])
+        F = int(data[index+3])
         index += 4
-        shops.append((p, r, q, f))
+        shops.append((P, R, Q, F))
     
     INF = float('inf')
     dp = [INF] * (L + 101)
     dp[0] = 0
     
-    for p, r, q, f in shops:
+    for P, R, Q, F in shops:
         new_dp = dp[:]
         for meters in range(len(dp)):
             if dp[meters] == INF:
                 continue
-            for buy in range(1, f + 1 if f > 0 else [1]):
+            max_buy = min(F, len(dp) - meters - 1)
+            for buy in range(1, max_buy + 1):
                 total_meters = meters + buy
                 if total_meters >= len(dp):
                     continue
-                cost = buy * p
-                if buy >= r:
-                    cost = buy * q
+                cost = buy * P
+                if buy >= R:
+                    cost = buy * Q
                 new_dp[total_meters] = min(new_dp[total_meters], dp[meters] + cost)
         dp = new_dp
     
-    min_cost = INF
+    result = INF
     for meters in range(L, len(dp)):
-        min_cost = min(min_cost, dp[meters])
+        result = min(result, dp[meters])
     
-    if min_cost == INF:
+    if result == INF:
         print(-1)
     else:
-        print(min_cost)
+        print(result)
 
 if __name__ == "__main__":
     main()

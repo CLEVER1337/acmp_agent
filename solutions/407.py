@@ -10,9 +10,9 @@ def main():
     dp[0] = 0
     
     for coin in coins:
-        for amount in range(coin, k + 1):
-            if dp[amount - coin] != float('inf'):
-                dp[amount] = min(dp[amount], dp[amount - coin] + 1)
+        for j in range(coin, k + 1):
+            if dp[j - coin] != float('inf'):
+                dp[j] = min(dp[j], dp[j - coin] + 1)
                 
     result = dp[k] if dp[k] != float('inf') else -1
     print(result)

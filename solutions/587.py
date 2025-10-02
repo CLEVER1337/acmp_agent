@@ -8,32 +8,31 @@ def main():
     engines = []
     for i in range(1, n + 1):
         parts = data[i].split()
-        mag = float(parts[0])
+        if len(parts) < 2:
+            continue
+        magnitude = float(parts[0])
         angle_deg = float(parts[1])
         angle_rad = math.radians(angle_deg)
-        engines.append((mag, angle_rad, i))
-    
-    engines_sorted = sorted(engines, key=lambda x: x[1])
+        x = magnitude * math.cos(angle_rad)
+        y = magnitude * math.sin(angle_rad)
+        engines.append((x, y, i))
     
     total_x = 0.0
     total_y = 0.0
-    selected_indices = []
+    selected = []
     
-    for i in range(n):
-        mag, angle, idx = engines_sorted[i]
-        test_x = total_x + mag * math.cos(angle)
-        test_y = total_y + mag * math.sin(angle)
-        new_mag = math.sqrt(test_x**2 + test_y**2)
-        current_mag = math.sqrt(total_x**2 + total_y**2)
-        
-        if new_mag >= current_mag:
-            total_x = test_x
-            total_y = test_y
-            selected_indices.append(idx)
+    for x, y, idx in engines:
+        dot_product = total_x * x + total_y * y
+        if dot_product > 0:
+            total_x += x
+            total_y += y
+            selected.append(idx)
     
-    selected_indices.sort()
-    print(len(selected_indices))
-    print(" ".join(map(str, selected_indices)))
+    print(len(selected))
+    if selected:
+        print(" ".join(map(str, selected)))
+    else:
+        print()
 
 if __name__ == "__main__":
     main()

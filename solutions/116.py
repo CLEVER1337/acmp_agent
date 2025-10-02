@@ -8,8 +8,8 @@ def main():
         
     n, m = map(int, data[0].split())
     grid = []
-    for i in range(1, 1 + n):
-        row = list(map(int, list(data[i].strip())))
+    for i in range(1, n+1):
+        row = list(map(int, data[i].strip()))
         grid.append(row)
     
     if n == 0 or m == 0:
@@ -23,28 +23,23 @@ def main():
     max_area = 0
     
     for i in range(n):
-        cur_left = 0
-        cur_right = m
-        
+        current_left = 0
         for j in range(m):
             if grid[i][j] == 1:
                 height[j] += 1
+                left[j] = max(left[j], current_left)
             else:
                 height[j] = 0
-                
-        for j in range(m):
-            if grid[i][j] == 1:
-                left[j] = max(left[j], cur_left)
-            else:
                 left[j] = 0
-                cur_left = j + 1
+                current_left = j + 1
                 
+        current_right = m
         for j in range(m-1, -1, -1):
             if grid[i][j] == 1:
-                right[j] = min(right[j], cur_right)
+                right[j] = min(right[j], current_right)
             else:
                 right[j] = m
-                cur_right = j
+                current_right = j
                 
         for j in range(m):
             area = height[j] * (right[j] - left[j])

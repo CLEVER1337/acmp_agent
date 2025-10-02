@@ -3,42 +3,32 @@ import math
 
 def main():
     with open('INPUT.TXT', 'r') as f:
-        n_str = f.readline().strip()
-        if not n_str:
+        N = f.readline().strip()
+        if not N:
             print(-1)
             return
             
-        n = int(n_str)
-        if n <= 0:
-            print(-1)
-            return
-            
+        n = int(N)
         log10_2 = math.log10(2)
         log10_n = math.log10(n)
-        log10_n_plus_1 = math.log10(n + 1)
+        log10_n1 = math.log10(n + 1)
         
         k = 1
-        found = False
-        
         while True:
             log10_2k = k * log10_2
             fractional = log10_2k - math.floor(log10_2k)
+            lower_bound = 10 ** fractional
             
-            start_num = 10 ** fractional
-            
-            if n <= start_num < n + 1:
-                found = True
+            if lower_bound >= n and lower_bound < n + 1:
                 break
                 
             k += 1
-            
-            if k > 10000000:
+            if k > 10**7:
+                k = -1
                 break
                 
-        if found:
-            print(k)
-        else:
-            print(-1)
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write(str(k))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

@@ -1,8 +1,7 @@
 
-import sys
-sys.setrecursionlimit(300000)
-
 def main():
+    import sys
+    sys.setrecursionlimit(300000)
     data = sys.stdin.read().split()
     if not data:
         print(-1)
@@ -12,7 +11,6 @@ def main():
     m = int(data[1])
     edges = []
     index = 2
-    
     for i in range(m):
         u = int(data[index])
         v = int(data[index+1])
@@ -51,134 +49,103 @@ def main():
         else:
             bad_edges.append((u, v, idx))
     
+    selected_edges = []
     mst_edges = []
+    
     parent_mst = list(range(n))
     rank_mst = [0] * n
     
-    def find_mst(x):
-        if parent_mst[x] != x:
-            parent_mst[x] = find_mst(parent_mst[x])
-        return parent_mst[x]
-    
-    def union_mst(x, y):
-        rx = find_mst(x)
-        ry = find_mst(y)
-        if rx == ry:
-            return False
-        if rank_mst[rx] < rank_mst[ry]:
-            parent_mst[rx] = ry
-        elif rank_mst[rx] > rank_mst[ry]:
-            parent_mst[ry] = rx
-        else:
-            parent_mst[ry] = rx
-            rank_mst[rx] += 1
-        return True
-    
     for u, v, idx in good_edges:
-        if union_mst(u, v):
-            mst_edges.append(idx)
+        if union(u, v):
+            mst_edges.append((u, v, idx, 1))
     
-    bad_count = 0
+    bad_count_in_mst = 0
     for u, v, idx in bad_edges:
-        if union_mst(u, v):
-            mst_edges.append(idx)
-            bad_count += 1
+        if union(u, v):
+            mst_edges.append((u, v, idx, 2))
+            bad_count_in_mst += 1
     
     if len(mst_edges) != n - 1:
         print(-1)
         return
     
-    if bad_count % 2 == 0:
-        for edge in sorted(mst_edges):
-            print(edge)
+    if bad_count_in_mst % 2 == 0:
+        result = [edge[2] for edge in mst_edges]
+        for idx in sorted(result):
+            print(idx)
         return
     
-    parent_dsu = list(range(n))
-    rank_dsu = [0] * n
+    parent_copy = parent_mst[:]
+    rank_copy = rank_mst[:]
     
-    def find_dsu(x):
-        if parent_dsu[x] != x:
-            parent_dsu[x] = find_dsu(parent_dsu[x])
-        return parent_dsu[x]
+    def find_copy(x):
+        if parent_copy[x] != x:
+            parent_copy[x] = find_copy(parent_copy[x])
+        return parent_copy[x]
     
-    def union_dsu(x, y):
-        rx = find_dsu(x)
-        ry = find_dsu(y)
+    def union_copy(x, y):
+        rx = find_copy(x)
+        ry = find_copy(y)
         if rx == ry:
             return False
-        if rank_dsu[rx] < rank_dsu[ry]:
-            parent_dsu[rx] = ry
-        elif rank_dsu[rx] > rank_dsu[ry]:
-            parent_dsu[ry] = rx
+        if rank_copy[rx] < rank_copy[ry]:
+            parent_copy[rx] = ry
+        elif rank_copy[rx] > rank_copy[ry]:
+            parent_copy[ry] = rx
         else:
-            parent_dsu[ry] = rx
-            rank_dsu[rx] += 1
+            parent_copy[ry] = rx
+            rank_copy[rx] += 1
         return True
     
-    for idx in mst_edges:
-        for u, v, t, edge_idx in edges:
-            if edge_idx == idx:
-                if t == 1:
-                    union_dsu(u, v)
-                break
+    for u, v, idx, t in mst_edges:
+        if t == 1:
+            union_copy(u, v)
     
-    candidate = -1
-    candidate_idx = -1
-    
-    for u, v, t, idx in edges:
-        if t == 2 and find_dsu(u) != find_dsu(v):
-            candidate = idx
-            candidate_idx = idx
-            break
-    
-    if candidate == -1:
-        print(-1)
-        return
-    
-    new_mst = []
-    parent_new = list(range(n))
-    rank_new = [0] * n
-    
-    def find_new(x):
-        if parent_new[x] != x:
-            parent_new[x] = find_new(parent_new[x])
-        return parent_new[x]
-    
-    def union_new(x, y):
-        rx = find_new(x)
-        ry = find_new(y)
-        if rx == ry:
-            return False
-        if rank_new[rx] < rank_new[ry]:
-            parent_new[rx] = ry
-        elif rank_new[rx] > rank_new[ry]:
-            parent_new[ry] = rx
-        else:
-            parent_new[ry] = rx
-            rank_new[rx] += 1
-        return True
-    
-    union_new(edges[candidate_idx-1][0], edges[candidate_idx-1][1])
-    new_mst.append(candidate_idx)
-    new_bad_count = 1
-    
-    for u, v, idx in good_edges:
-        if union_new(u, v):
-            new_mst.append(idx)
+    found_replacement = False
+    replacement_edge = None
+    removed_edge = None
     
     for u, v, idx in bad_edges:
-        if idx == candidate_idx:
-            continue
-        if union_new(u, v):
-            new_mst.append(idx)
-            new_bad_count += 1
+        if find_copy(u) != find_copy(v):
+            replacement_edge = idx
+            break
     
-    if len(new_mst) != n - 1 or new_bad_count % 2 != 0:
+    if replacement_edge is None:
         print(-1)
         return
     
-    for edge in sorted(new_mst):
-        print(edge)
+    for u, v, idx, t in mst_edges:
+        if t == 2:
+            removed_edge = idx
+            break
+    
+    if removed_edge is None:
+        print(-1)
+        return
+    
+    result_set = set()
+    for u, v, idx, t in mst_edges:
+        if idx != removed_edge:
+            result_set.add(idx)
+    result_set.add(replacement_edge)
+    
+    if len(result_set) != n - 1:
+        print(-1)
+        return
+    
+    bad_count = 0
+    for edge in result_set:
+        for u, v, t, idx in edges:
+            if idx == edge and t == 2:
+                bad_count += 1
+                break
+    
+    if bad_count % 2 != 0:
+        print(-1)
+        return
+    
+    for idx in sorted(result_set):
+        print(idx)
 
 if __name__ == "__main__":
     main()

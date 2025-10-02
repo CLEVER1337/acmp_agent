@@ -7,34 +7,37 @@ def count_combinations(n, k):
         res = res * (n - k + i) // i
     return res
 
-def find_nth_smooth_number(n):
+def find_nth_smooth_number(N):
     length = 1
+    total = 0
+    
     while True:
         count = count_combinations(9 + length, length)
-        if n <= count:
+        if total + count >= N:
             break
-        n -= count
+        total += count
         length += 1
     
+    pos = N - total
     result = []
-    prev_digit = 1
+    prev_digit = 0
     
-    for pos in range(length):
+    for i in range(length):
         for digit in range(prev_digit, 10):
-            remaining_positions = length - pos - 1
-            combinations = count_combinations(10 - digit, remaining_positions)
-            if n <= combinations:
+            remaining_length = length - len(result) - 1
+            count = count_combinations(9 - digit + remaining_length, remaining_length)
+            if pos <= count:
                 result.append(str(digit))
                 prev_digit = digit
                 break
-            n -= combinations
+            pos -= count
     
     return ''.join(result)
 
 def main():
     with open('INPUT.TXT', 'r') as f:
-        n = int(f.read().strip())
-    result = find_nth_smooth_number(n)
+        N = int(f.read().strip())
+    result = find_nth_smooth_number(N)
     with open('OUTPUT.TXT', 'w') as f:
         f.write(result)
 

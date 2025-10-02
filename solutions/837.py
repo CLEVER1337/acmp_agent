@@ -6,7 +6,6 @@ def main():
     k = int(data[0])
     index = 1
     results = []
-    
     for _ in range(k):
         n = int(data[index])
         m = int(data[index + 1])
@@ -14,19 +13,28 @@ def main():
         
         if m > n * (n - 1) // 2:
             results.append("No")
-        elif m < n - 1:
+            continue
+            
+        if n == 1:
+            if m == 0:
+                results.append("Yes")
+            else:
+                results.append("No")
+            continue
+            
+        min_edges = n - 1
+        if m < min_edges:
             results.append("No")
-        elif m == n * (n - 1) // 2:
+            continue
+            
+        max_edges_planar = 3 * n - 6
+        if m <= max_edges_planar:
             results.append("Yes")
         else:
-            max_edges = n * (n - 1) // 2
-            if m > max_edges - (n - 1):
-                results.append("No")
-            else:
-                results.append("Yes")
-                
-    for result in results:
-        print(result)
+            results.append("No")
+            
+    for res in results:
+        print(res)
 
 if __name__ == "__main__":
     main()

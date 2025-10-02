@@ -1,50 +1,38 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        T1, T2, S1, S2, S = map(int, f.readline().split())
-    
-    if S1 <= S2:
-        if S > 0:
-            print("NO")
-            return
-        else:
-            print("0.00")
-            return
+    import sys
+    data = sys.stdin.read().split()
+    T1 = int(data[0])
+    T2 = int(data[1])
+    S1 = int(data[2])
+    S2 = int(data[3])
+    S = int(data[4])
     
     v1 = S1 / T1
     v2 = S2 / T2
     
     if v1 <= v2:
-        if S > 0:
+        if S <= S1:
+            time = S / v1
+            print("{:.2f}".format(time))
+        else:
+            print("NO")
+    else:
+        cycle_distance = S1 - S2
+        if cycle_distance <= 0:
             print("NO")
             return
-        else:
-            print("0.00")
-            return
-    
-    cycle_distance = S1 - S2
-    cycle_time = T1 + T2
-    
-    if S <= 0:
-        print("0.00")
-        return
-    
-    full_cycles = S // cycle_distance
-    remaining_distance = S % cycle_distance
-    
-    if remaining_distance == 0:
-        total_time = full_cycles * cycle_time - T2
-    else:
+            
+        full_cycles = (S - S1) // cycle_distance
+        remaining_distance = S - full_cycles * cycle_distance
+        
         if remaining_distance <= S1:
-            time_in_cycle = remaining_distance / v1
-            total_time = full_cycles * cycle_time + time_in_cycle
+            time = full_cycles * (T1 + T2) + remaining_distance / v1
+            print("{:.2f}".format(time))
         else:
-            forward_time = T1
-            backward_distance = remaining_distance - S1
-            backward_time = backward_distance / v2
-            total_time = full_cycles * cycle_time + T1 + backward_time
-    
-    print("{:.2f}".format(total_time))
+            remaining_distance -= cycle_distance
+            time = (full_cycles + 1) * (T1 + T2) + remaining_distance / v1
+            print("{:.2f}".format(time))
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,7 @@
 
 def main():
     with open('INPUT.TXT', 'r') as f:
-        data = f.read().strip().split()
+        data = f.read().split()
     
     n_ternary, m_ternary = data[0], data[1]
     

@@ -1,33 +1,27 @@
 
 def main():
     import sys
-    data = sys.stdin.read().split()
+    data = sys.stdin.read().splitlines()
     n = int(data[0])
-    index = 1
     results = []
     current_flow = 0
     
-    for i in range(n):
-        type_cross = data[index]; index += 1
-        left_exit = int(data[index]); index += 1
-        right_exit = int(data[index]); index += 1
-        left_enter = int(data[index]); index += 1
-        right_enter = int(data[index]); index += 1
+    for i in range(1, n + 1):
+        parts = data[i].split()
+        cross_type = parts[0]
+        left_exit = int(parts[1])
+        right_exit = int(parts[2])
+        left_enter = int(parts[3])
+        right_enter = int(parts[4])
         
-        if type_cross == 'L':
+        if cross_type == 'L':
             results.append(-1)
-            continue
-            
-        total_exit = left_exit + right_exit
-        total_enter = left_enter + right_enter
-        net_change = total_enter - total_exit
-        
-        if type_cross == 'B':
-            bridge_flow = current_flow + left_exit + left_enter
+            current_flow += (left_enter + right_enter) - (left_exit + right_exit)
+        else:
+            bridge_flow = current_flow + left_enter - right_exit
             results.append(bridge_flow)
-        
-        current_flow += net_change
-    
+            current_flow += (left_enter + right_enter) - (left_exit + right_exit)
+            
     print(' '.join(map(str, results)))
 
 if __name__ == "__main__":

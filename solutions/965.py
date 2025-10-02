@@ -9,42 +9,53 @@ def main():
     
     n = int(data[0])
     m = int(data[1])
+    
     edges = []
     index = 2
+    graph = [[] for _ in range(n+1)]
     for i in range(m):
-        u = int(data[index]); v = int(data[index+1]); index += 2
-        edges.append((u-1, v-1))
+        u = int(data[index])
+        v = int(data[index+1])
+        index += 2
+        edges.append((u, v))
+        graph[u].append(v)
+        graph[v].append(u)
     
-    min_vertex_cover = n
-    count_ways = 0
-    best_solution = []
+    min_k = n
+    count = 0
+    best_set = None
     
     for k in range(1, n+1):
         found = False
-        for combo in combinations(range(n), k):
-            covers_all = True
-            for u, v in edges:
-                if u not in combo and v not in combo:
-                    covers_all = False
-                    break
+        for combo in combinations(range(1, n+1), k):
+            covered_edges = set()
+            for station in combo:
+                for neighbor in graph[station]:
+                    edge = tuple(sorted((station, neighbor)))
+                    covered_edges.add(edge)
             
-            if covers_all:
-                if k < min_vertex_cover:
-                    min_vertex_cover = k
-                    count_ways = 1
-                    best_solution = list(combo)
+            if len(covered_edges) == m:
+                if k < min_k:
+                    min_k = k
+                    count = 1
+                    best_set = combo
                     found = True
-                elif k == min_vertex_cover:
-                    count_ways += 1
-                    if not best_solution:
-                        best_solution = list(combo)
+                elif k == min_k:
+                    count += 1
+                    if best_set is None:
+                        best_set = combo
         
         if found:
             break
     
-    best_solution = [x+1 for x in best_solution]
-    print(f"{min_vertex_cover} {count_ways}")
-    print(" ".join(map(str, best_solution)))
+    if min_k == n and count == 0:
+        min_k = n
+        count = 1
+        best_set = tuple(range(1, n+1))
+    
+    print(f"{min_k} {count}")
+    if best_set:
+        print(" ".join(map(str, best_set)))
 
 if __name__ == "__main__":
     main()

@@ -1,59 +1,69 @@
 
-def main():
+def read_input():
     import sys
     data = sys.stdin.read().split()
-    if not data:
-        return
-    
-    L = int(data[0])
-    M = int(data[1])
-    N = int(data[2])
+    idx = 0
+    L = int(data[idx]); idx += 1
+    M = int(data[idx]); idx += 1
+    N = int(data[idx]); idx += 1
     
     templates = {}
-    index = 3
-    
     for _ in range(M):
-        template_id = int(data[index])
-        heights = list(map(int, data[index+1:index+1+L]))
+        template_id = int(data[idx]); idx += 1
+        heights = list(map(int, data[idx:idx+L]))
+        idx += L
         templates[template_id] = heights
-        index += 1 + L
     
     sections = []
     for _ in range(N):
-        heights = list(map(int, data[index:index+L]))
+        heights = list(map(int, data[idx:idx+L]))
+        idx += L
         sections.append(heights)
-        index += L
+    
+    return L, M, N, templates, sections
+
+def normalize_section(section):
+    min_val = min(section)
+    normalized = [h - min_val for h in section]
+    return normalized
+
+def match_section(section, templates):
+    normalized_section = normalize_section(section)
+    
+    best_match_id = None
+    best_diff = float('inf')
+    
+    for template_id, template_heights in templates.items():
+        normalized_template = normalize_section(template_heights)
+        
+        diff = sum(abs(a - b) for a, b in zip(normalized_section, normalized_template))
+        
+        if diff < best_diff:
+            best_diff = diff
+            best_match_id = template_id
+    
+    return best_match_id if best_diff == 0 else '-'
+
+def main():
+    L, M, N, templates, sections = read_input()
     
     results = []
     matched_count = 0
+    bad_count = 0
     
     for section in sections:
-        found = False
-        for template_id, template_heights in templates.items():
-            if len(section) != len(template_heights):
-                continue
-                
-            match = True
-            for i in range(L):
-                if section[i] != template_heights[i]:
-                    match = False
-                    break
-            
-            if match:
-                results.append(str(template_id))
-                matched_count += 1
-                found = True
-                break
+        result = match_section(section, templates)
+        results.append(str(result))
         
-        if not found:
-            results.append('-')
+        if result == '-':
+            bad_count += 1
+        else:
+            matched_count += 1
     
-    bad_count = N - matched_count
-    
-    for res in results:
-        print(res)
-    
-    print(f"OK= {matched_count} BAD= {bad_count}")
+    with open('OUTPUT.TXT', 'w') as f:
+        for result in results:
+            f.write(result + '\n')
+        f.write(f'OK= {matched_count} BAD= {bad_count}\n')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

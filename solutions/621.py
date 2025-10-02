@@ -3,57 +3,50 @@ import sys
 from collections import deque
 
 def main():
-    data = sys.stdin.read().split()
+    data = sys.stdin.read().splitlines()
     if not data:
         return
     
-    n = int(data[0])
+    n = int(data[0].strip())
     matrix = []
-    index = 1
-    for i in range(n):
-        row = list(map(int, data[index:index+n]))
-        index += n
+    for i in range(1, n + 1):
+        row = list(map(int, data[i].strip().split()))
         matrix.append(row)
     
     result = [row[:] for row in matrix]
-    
-    directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+    zeros = []
+    non_zeros = []
     
     for i in range(n):
         for j in range(n):
             if matrix[i][j] == 0:
-                visited = [[False] * n for _ in range(n)]
-                queue = deque()
-                queue.append((i, j, 0))
-                visited[i][j] = True
-                candidates = []
-                min_dist = float('inf')
-                
-                while queue:
-                    x, y, dist = queue.popleft()
-                    
-                    if dist > min_dist:
-                        break
-                        
-                    if matrix[x][y] != 0:
-                        if dist < min_dist:
-                            min_dist = dist
-                            candidates = [matrix[x][y]]
-                        elif dist == min_dist:
-                            candidates.append(matrix[x][y])
-                        continue
-                    
-                    for dx, dy in directions:
-                        nx, ny = x + dx, y + dy
-                        if 0 <= nx < n and 0 <= ny < n and not visited[nx][ny]:
-                            visited[nx][ny] = True
-                            queue.append((nx, ny, dist + 1))
-                
-                if len(candidates) == 1:
-                    result[i][j] = candidates[0]
+                zeros.append((i, j))
+            else:
+                non_zeros.append((i, j))
     
-    for i in range(n):
-        print(' '.join(map(str, result[i])))
+    if not zeros or not non_zeros:
+        for row in result:
+            print(' '.join(map(str, row)))
+        return
+    
+    for zi, zj in zeros:
+        min_dist = float('inf')
+        candidates = []
+        
+        for ni, nj in non_zeros:
+            dist = abs(zi - ni) + abs(zj - nj)
+            if dist < min_dist:
+                min_dist = dist
+                candidates = [(ni, nj)]
+            elif dist == min_dist:
+                candidates.append((ni, nj))
+        
+        if len(candidates) == 1:
+            ni, nj = candidates[0]
+            result[zi][zj] = matrix[ni][nj]
+    
+    for row in result:
+        print(' '.join(map(str, row)))
 
 if __name__ == "__main__":
     main()

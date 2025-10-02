@@ -1,42 +1,55 @@
 
-import sys
-
 def main():
+    import sys
     data = sys.stdin.read().split()
     if not data:
         return
     
-    U = int(data[0])
-    H = int(data[1])
-    T = int(data[2])
-    L = int(data[3])
-    N = int(data[4])
-    X = list(map(int, data[5:5+N]))
+    idx = 0
+    U = int(data[idx]); idx += 1
+    H = int(data[idx]); idx += 1
+    T = int(data[idx]); idx += 1
+    L = int(data[idx]); idx += 1
+    N = int(data[idx]); idx += 1
+    X = list(map(int, data[idx:idx+N]))
     
-    total_scroll_steps = (L - U + T - 1) // T
-    if L <= U:
-        total_scroll_steps = 0
-    
-    best_ans = float('inf')
-    
-    for cursor_start in range(0, U - H + 1):
-        count = 0
-        for step in range(total_scroll_steps + 1):
-            scroll_offset = step * T
-            cursor_top = cursor_start
-            cursor_bottom = cursor_start + H - 1
-            
-            for i in range(N):
-                line_pos_in_table = X[i]
-                line_pos_on_screen = line_pos_in_table - scroll_offset
-                
-                if cursor_top <= line_pos_on_screen <= cursor_bottom:
-                    count += 1
+    if X[N-1] < U:
+        print(0)
+        return
         
-        if count < best_ans:
-            best_ans = count
+    total_scroll_steps = (X[N-1] - U + T) // T
+    if (X[N-1] - U) % T != 0:
+        total_scroll_steps += 1
+        
+    events = []
+    for line in X:
+        events.append((line, 1))
+        events.append((line + H, -1))
+        
+    events.sort()
     
-    print(best_ans)
+    best_count = float('inf')
+    for start_pos in range(0, U - H + 1):
+        count = 0
+        for event_pos, event_type in events:
+            scroll_pos = event_pos - start_pos
+            if scroll_pos < 0:
+                continue
+            if scroll_pos > total_scroll_steps * T:
+                continue
+                
+            first_step = (scroll_pos + T - 1) // T
+            if first_step < 0:
+                first_step = 0
+                
+            if event_type == 1:
+                count += first_step
+            else:
+                count -= first_step
+                
+        best_count = min(best_count, count)
+        
+    print(best_count)
 
 if __name__ == "__main__":
     main()

@@ -1,25 +1,14 @@
 
 import math
 
-def find_kth_losing_pair(k):
+def find_kth_losing_position(k):
     if k == 0:
         return (0, 0)
     
-    phi = (1 + math.sqrt(5)) / 2
-    n = math.floor(math.sqrt(2 * k))
-    
-    while True:
-        start_index = n * (n + 1) // 2
-        if start_index <= k:
-            n += 1
-        else:
-            n -= 1
-            break
-    
+    n = int((math.isqrt(1 + 8 * k) - 1) // 2)
     remaining = k - n * (n + 1) // 2
     a = n - remaining
     b = n + 1 + remaining
-    
     return (a, b)
 
 def main():
@@ -27,13 +16,13 @@ def main():
     data = sys.stdin.read().split()
     n = int(data[0])
     results = []
-    
-    for i in range(n):
-        k = int(data[i + 1])
-        a, b = find_kth_losing_pair(k)
+    for i in range(1, n + 1):
+        k = int(data[i])
+        a, b = find_kth_losing_position(k)
         results.append(f"{a} {b}")
     
-    print("\n".join(results))
+    for res in results:
+        print(res)
 
 if __name__ == "__main__":
     main()

@@ -6,31 +6,39 @@ def main():
         print(0)
         return
         
-    idx = 0
-    M = int(data[idx]); idx += 1
-    trees = []
+    index = 0
+    M = int(data[index]); index += 1
+    shadows = []
     for i in range(M):
-        W = int(data[idx]); E = int(data[idx+1]); idx += 2
-        trees.append((W, E))
+        W = int(data[index]); E = int(data[index+1]); index += 2
+        shadows.append((W, E))
         
-    N = int(data[idx]); idx += 1
-    flowerbeds = []
+    N = int(data[index]); index += 1
+    coords = []
     for i in range(N):
-        flowerbeds.append(int(data[idx])); idx += 1
+        coords.append(int(data[index])); index += 1
         
+    coords.sort()
+    
     dp = [0] * (N + 1)
     
     for i in range(N):
         dp[i+1] = max(dp[i+1], dp[i])
-        for w, e in trees:
-            left_bound = flowerbeds[i] - w
-            right_bound = flowerbeds[i] + e
+        
+        for W, E in shadows:
+            left_bound = coords[i] - W
+            right_bound = coords[i] + E
             
-            j = i + 1
-            while j < N and flowerbeds[j] < right_bound:
+            j = i
+            while j < N and coords[j] < right_bound:
                 j += 1
                 
-            dp[j] = max(dp[j], dp[i] + 1)
+            k = i
+            while k >= 0 and coords[k] > left_bound:
+                k -= 1
+                
+            next_pos = j
+            dp[next_pos] = max(dp[next_pos], dp[k+1] + 1)
             
     print(dp[N])
 

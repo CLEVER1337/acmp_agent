@@ -1,8 +1,8 @@
 
+import math
+
 def main():
-    import math
-    
-    with open("INPUT.TXT", "r") as f:
+    with open('INPUT.TXT', 'r') as f:
         x0, y0 = map(int, f.readline().split())
         Vx, Vy = map(int, f.readline().split())
         V, t, d = map(int, f.readline().split())
@@ -12,7 +12,7 @@ def main():
     
     max_distance = V * t
     
-    if abs(d - math.sqrt(xt**2 + yt**2)) <= max_distance:
+    if abs(d - math.sqrt(xt*xt + yt*yt)) <= max_distance + 1e-9:
         print("YES")
     else:
         print("NO")

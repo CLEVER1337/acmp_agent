@@ -14,68 +14,52 @@ def main():
     dx = [0, 0, -1, 1]
     dy = [1, -1, 0, 0]
     
-    def get_neighbors(i, j):
+    def get_neighbors(x, y):
         neighbors = []
         for d in range(4):
-            ni, nj = i + dx[d], j + dy[d]
-            if 0 <= ni < n and 0 <= nj < m and grid[ni][nj] != '.':
-                neighbors.append((ni, nj, d))
+            nx, ny = x + dx[d], y + dy[d]
+            if 0 <= nx < n and 0 <= ny < m and grid[nx][ny] != '.':
+                neighbors.append((nx, ny, d))
         return neighbors
     
-    def find_cycle_min(i, j, visited, path):
-        if (i, j) in visited:
-            return
-        visited.add((i, j))
-        path.append((i, j))
+    def find_cycle_count(arrangement):
+        visited = [[False] * m for _ in range(n)]
+        cycles = 0
         
-        neighbors = get_neighbors(i, j)
-        if not neighbors:
-            return
+        def dfs(x, y):
+            stack = [(x, y)]
+            while stack:
+                cx, cy = stack.pop()
+                if visited[cx][cy]:
+                    continue
+                visited[cx][cy] = True
+                d = directions.index(arrangement[cx][cy])
+                nx, ny = cx + dx[d], cy + dy[d]
+                if 0 <= nx < n and 0 <= ny < m and arrangement[nx][ny] != '.':
+                    stack.append((nx, ny))
         
-        ni, nj, d = neighbors[0]
-        grid[i][j] = directions[d]
-        find_cycle_min(ni, nj, visited, path)
+        for i in range(n):
+            for j in range(m):
+                if grid[i][j] != '.' and not visited[i][j]:
+                    cycles += 1
+                    dfs(i, j)
+        return cycles
     
-    def find_cycle_max(i, j, visited, path):
-        if (i, j) in visited:
-            return
-        visited.add((i, j))
-        path.append((i, j))
-        
-        neighbors = get_neighbors(i, j)
-        if not neighbors:
-            return
-        
-        for ni, nj, d in neighbors:
-            if (ni, nj) not in visited:
-                grid[i][j] = directions[d]
-                find_cycle_max(ni, nj, visited, path)
-                break
-        else:
-            ni, nj, d = neighbors[0]
-            grid[i][j] = directions[d]
+    min_grid = [row[:] for row in grid]
+    max_grid = [row[:] for row in grid]
     
-    grid_min = [row[:] for row in grid]
-    visited_min = set()
     for i in range(n):
         for j in range(m):
-            if grid_min[i][j] == '?' and (i, j) not in visited_min:
-                path = []
-                find_cycle_min(i, j, visited_min, path)
+            if grid[i][j] == '?':
+                neighbors = get_neighbors(i, j)
+                if neighbors:
+                    _, _, d = neighbors[0]
+                    min_grid[i][j] = directions[d]
+                    max_grid[i][j] = directions[d]
     
-    grid_max = [row[:] for row in grid]
-    visited_max = set()
-    for i in range(n):
-        for j in range(m):
-            if grid_max[i][j] == '?' and (i, j) not in visited_max:
-                path = []
-                find_cycle_max(i, j, visited_max, path)
-    
-    for row in grid_min:
-        print(''.join(row))
+    print('\n'.join(''.join(row) for row in min_grid))
     print()
-    for row in grid_max:
-        print(''.join(row))
+    print('\n'.join(''.join(row) for row in max_grid))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

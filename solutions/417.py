@@ -5,38 +5,27 @@ def main():
     
     days_of_week = ['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Monday']
     months = [
-        ('January', 31),
-        ('February', 29),  # 2008 год - високосный
-        ('March', 31),
-        ('April', 30),
-        ('May', 31),
-        ('June', 30),
-        ('July', 31),
-        ('August', 31),
-        ('September', 30),
-        ('October', 31),
-        ('November', 30),
-        ('December', 31)
+        (31, 'January'), (29, 'February'), (31, 'March'), (30, 'April'), 
+        (31, 'May'), (30, 'June'), (31, 'July'), (31, 'August'), 
+        (30, 'September'), (31, 'October'), (30, 'November'), (31, 'December')
     ]
     
-    day_of_week = days_of_week[K % 7]
+    total_days = K
+    day_of_week = days_of_week[total_days % 7]
     
-    day_count = K
+    day = 1
     month_index = 0
-    day_number = 1
     
-    for month_name, days_in_month in months:
-        if day_count < days_in_month:
-            day_number += day_count
-            break
-        day_count -= days_in_month
+    while total_days >= months[month_index][0]:
+        total_days -= months[month_index][0]
         month_index += 1
-        day_number = 1
+        day = 1
     
-    month_name = months[month_index][0]
+    day += total_days
+    month = months[month_index][1]
     
     with open('OUTPUT.TXT', 'w') as f:
-        f.write(f"{day_of_week}, {day_number} {month_name}")
+        f.write(f"{day_of_week}, {day} {month}")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -2,41 +2,46 @@
 import re
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
+    with open("INPUT.TXT", "r") as f:
         s = f.readline().strip()
     
-    if not s:
-        print('ERROR')
-        return
-        
     pattern = r'^(-?\d+)([+\-*/])(-?\d+)=(-?\d+)$'
     match = re.fullmatch(pattern, s)
     
     if not match:
-        print('ERROR')
+        print("ERROR")
         return
         
-    num1, op, num2, result = match.groups()
-    num1 = int(num1)
-    num2 = int(num2)
-    result = int(result)
+    num1_str, op, num2_str, result_str = match.groups()
     
+    try:
+        num1 = int(num1_str)
+        num2 = int(num2_str)
+        result = int(result_str)
+    except ValueError:
+        print("ERROR")
+        return
+        
+    if op == '/' and num2 == 0:
+        print("ERROR")
+        return
+        
     if op == '+':
-        calc = num1 + num2
+        calc_result = num1 + num2
     elif op == '-':
-        calc = num1 - num2
+        calc_result = num1 - num2
     elif op == '*':
-        calc = num1 * num2
+        calc_result = num1 * num2
     elif op == '/':
         if num2 == 0:
-            print('ERROR')
+            print("ERROR")
             return
-        calc = num1 // num2
-    
-    if calc == result:
-        print('YES')
+        calc_result = num1 // num2
+        
+    if calc_result == result:
+        print("YES")
     else:
-        print('NO')
+        print("NO")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

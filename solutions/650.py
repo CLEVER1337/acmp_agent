@@ -13,36 +13,40 @@ def main():
     
     graph = [[] for _ in range(n + 1)]
     
+    index = 2
     for i in range(m):
-        u = int(data[2 + 2 * i])
-        v = int(data[3 + 2 * i])
+        u = int(data[index])
+        v = int(data[index + 1])
+        index += 2
         graph[u].append(v)
         graph[v].append(u)
     
     visited = [False] * (n + 1)
-    total_sum = 0
+    components = []
     
     for i in range(1, n + 1):
         if not visited[i]:
-            component_nodes = []
             queue = deque([i])
             visited[i] = True
+            comp = []
             
             while queue:
                 node = queue.popleft()
-                component_nodes.append(node)
+                comp.append(node)
                 
                 for neighbor in graph[node]:
                     if not visited[neighbor]:
                         visited[neighbor] = True
                         queue.append(neighbor)
             
-            k = len(component_nodes)
-            total_sum += k * (k - 1)
+            components.append(comp)
     
-    for i in range(1, n + 1):
-        if not visited[i]:
-            total_sum += 1
+    total_sum = 0
+    
+    for comp in components:
+        size = len(comp)
+        if size > 1:
+            total_sum += size * (size - 1)
     
     print(total_sum)
 

@@ -3,71 +3,48 @@ def main():
     import sys
     data = sys.stdin.read().split()
     if not data:
+        print("NO SOLUTION")
         return
-    
+        
     N = int(data[0])
     K = int(data[1])
     
     # Количество сегментов для каждой цифры
     seg = [6, 2, 5, 5, 4, 5, 6, 3, 7, 6]
     
-    # Проверка на невозможность
-    min_seg = N * 2  # минимально возможное (все цифры 1)
-    max_seg = N * 7  # максимально возможное (все цифры 8)
-    if K < min_seg or K > max_seg:
-        print("NO SOLUTION")
-        return
-    
-    # Минимальное число
-    min_num = [0] * N
-    remaining = K
-    
-    # Сначала пытаемся поставить минимальные цифры слева направо
-    for i in range(N):
-        # Для первой цифры нельзя 0
-        start_digit = 0 if i > 0 else 1
-        for d in range(start_digit, 10):
-            # Минимальное количество сегментов для оставшихся цифр
-            min_rest = (N - i - 1) * 2
-            # Максимальное количество сегментов для оставшихся цифр
-            max_rest = (N - i - 1) * 7
-            
-            # Проверяем, можем ли поставить цифру d
-            if seg[d] <= remaining and (remaining - seg[d]) >= min_rest and (remaining - seg[d]) <= max_rest:
-                min_num[i] = d
-                remaining -= seg[d]
-                break
-    
-    # Максимальное число
-    max_num = [0] * N
-    remaining = K
+    # DP для минимального числа
+    min_dp = [[float('inf')] * (K + 1) for _ in range(N + 1)]
+    min_dp[0][0] = 0
     
     for i in range(N):
-        # Для первой цифры нельзя 0
-        start_digit = 9 if i == 0 else 9
-        end_digit = 1 if i == 0 else 0
-        step = -1
-        
-        for d in range(start_digit, end_digit - 1, step):
-            # Минимальное количество сегментов для оставшихся цифр
-            min_rest = (N - i - 1) * 2
-            # Максимальное количество сегментов для оставшихся цифр
-            max_rest = (N - i - 1) * 7
-            
-            # Проверяем, можем ли поставить цифру d
-            if seg[d] <= remaining and (remaining - seg[d]) >= min_rest and (remaining - seg[d]) <= max_rest:
-                max_num[i] = d
-                remaining -= seg[d]
-                break
+        for j in range(K + 1):
+            if min_dp[i][j] != float('inf'):
+                start_digit = 0 if i > 0 else 1
+                for d in range(start_digit, 10):
+                    cost = seg[d]
+                    if j + cost <= K:
+                        if min_dp[i + 1][j + cost] > min_dp[i][j] * 10 + d:
+                            min_dp[i + 1][j + cost] = min_dp[i][j] * 10 + d
     
-    # Проверяем, что оба числа корректны
-    if min_num[0] == 0 or max_num[0] == 0:
+    # DP для максимального числа
+    max_dp = [[-1] * (K + 1) for _ in range(N + 1)]
+    max_dp[0][0] = 0
+    
+    for i in range(N):
+        for j in range(K + 1):
+            if max_dp[i][j] != -1:
+                start_digit = 0 if i > 0 else 1
+                for d in range(start_digit, 10):
+                    cost = seg[d]
+                    if j + cost <= K:
+                        if max_dp[i + 1][j + cost] < max_dp[i][j] * 10 + d:
+                            max_dp[i + 1][j + cost] = max_dp[i][j] * 10 + d
+    
+    if min_dp[N][K] == float('inf') or max_dp[N][K] == -1:
         print("NO SOLUTION")
-        return
-    
-    # Выводим результаты
-    print(''.join(map(str, min_num)))
-    print(''.join(map(str, max_num)))
+    else:
+        print(str(min_dp[N][K]).zfill(N))
+        print(str(max_dp[N][K]).zfill(N))
 
 if __name__ == "__main__":
     main()

@@ -9,77 +9,81 @@ def main():
         return
         
     idx = 0
-    n = int(data[idx]); m = int(data[idx+1]); idx += 2
+    M = int(data[idx]); N = int(data[idx+1]); idx += 2
     X = int(data[idx]); Y = int(data[idx+1]); idx += 2
-    X -= 1; Y -= 1
     K = int(data[idx]); D = int(data[idx+1]); idx += 2
     
     grid = []
-    for i in range(m):
-        row = []
-        for j in range(n):
-            row.append(int(data[idx])); idx += 1
+    for i in range(M):
+        row = list(map(int, data[idx:idx+N]))
+        idx += N
         grid.append(row)
     
-    if grid[0][0] == 0:
+    target = (X-1, Y-1)
+    start = (0, 0)
+    
+    if grid[0][0] == 0 or grid[target[0]][target[1]] == 0:
         print("IMPOSSIBLE")
         return
         
-    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+    directions = [(0,1), (1,0), (0,-1), (-1,0)]
     
-    INF = float('inf')
-    dist = [[[INF] * (K + 1) for _ in range(n)] for _ in range(m)]
+    INF = 10**9
+    dist = [[[INF] * (K+1) for _ in range(N)] for _ in range(M)]
     dist[0][0][K] = 0
     
     pq = []
     heapq.heappush(pq, (0, 0, 0, K))
     
     while pq:
-        actions, x, y, k_left = heapq.heappop(pq)
+        actions, i, j, k = heapq.heappop(pq)
         
-        if x == X and y == Y:
+        if (i, j) == target:
             print(actions)
             return
             
-        if actions > dist[x][y][k_left]:
+        if actions > dist[i][j][k]:
             continue
             
         for dx, dy in directions:
-            nx, ny = x + dx, y + dy
-            if 0 <= nx < m and 0 <= ny < n:
-                if grid[nx][ny] == 0:
+            ni, nj = i + dx, j + dy
+            if 0 <= ni < M and 0 <= nj < N:
+                if grid[ni][nj] == 0:
                     continue
-                if abs(grid[nx][ny] - grid[x][y]) <= 1:
+                if abs(grid[ni][nj] - grid[i][j]) <= 1:
                     new_actions = actions + 1
-                    if new_actions < dist[nx][ny][k_left]:
-                        dist[nx][ny][k_left] = new_actions
-                        heapq.heappush(pq, (new_actions, nx, ny, k_left))
+                    if new_actions < dist[ni][nj][k]:
+                        dist[ni][nj][k] = new_actions
+                        heapq.heappush(pq, (new_actions, ni, nj, k))
         
-        if k_left > 0:
+        if k > 0:
             for dx, dy in directions:
-                for dist_move in range(1, D + 1):
-                    nx, ny = x + dx * dist_move, y + dy * dist_move
-                    if not (0 <= nx < m and 0 <= ny < n):
+                for dist_move in range(1, D+1):
+                    ni, nj = i + dx * dist_move, j + dy * dist_move
+                    if not (0 <= ni < M and 0 <= nj < N):
+                        break
+                    if grid[ni][nj] == 0:
                         continue
                     
-                    if grid[nx][ny] == 0:
+                    energy_needed = dist_move
+                    height_diff = abs(grid[ni][nj] - grid[i][j])
+                    if height_diff > dist_move:
                         continue
                     
-                    height_diff = abs(grid[nx][ny] - grid[x][y])
-                    energy_needed = dist_move + height_diff
+                    energy_needed += height_diff
                     
                     if energy_needed <= D:
-                        new_k = k_left - 1
                         new_actions = actions + 1
-                        if new_actions < dist[nx][ny][new_k]:
-                            dist[nx][ny][new_k] = new_actions
-                            heapq.heappush(pq, (new_actions, nx, ny, new_k))
+                        new_k = k - 1
+                        if new_actions < dist[ni][nj][new_k]:
+                            dist[ni][nj][new_k] = new_actions
+                            heapq.heappush(pq, (new_actions, ni, nj, new_k))
     
-    min_actions = min(dist[X][Y])
-    if min_actions != INF:
-        print(min_actions)
-    else:
+    min_actions = min(dist[target[0]][target[1]])
+    if min_actions == INF:
         print("IMPOSSIBLE")
+    else:
+        print(min_actions)
 
 if __name__ == "__main__":
     main()

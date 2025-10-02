@@ -1,6 +1,7 @@
 
+import sys
+
 def main():
-    import sys
     data = sys.stdin.read().split()
     if not data:
         return
@@ -11,11 +12,11 @@ def main():
     V = list(map(int, data[2+n:2+n+k]))
     
     left = 0.0
-    right = sum(S) / min(V) + 1.0
+    right = sum(S) / min(V) * 2
     
     for _ in range(100):
-        mid = (left + right) / 2.0
-        total_work = 0.0
+        mid = (left + right) / 2
+        total_work = 0
         for v in V:
             total_work += v * mid
         
@@ -24,29 +25,31 @@ def main():
         else:
             left = mid
     
-    T = (left + right) / 2.0
+    T = (left + right) / 2
     
-    print("{:.6f}".format(T))
-    
-    firm_capacity = [v * T for v in V]
     events = []
-    current_firm_work = [0.0] * k
+    remaining_S = S.copy()
+    firm_available_time = [0.0] * k
     
-    for i in range(n):
-        remaining = S[i]
-        for j in range(k):
-            if remaining <= 0:
-                break
-            if firm_capacity[j] - current_firm_work[j] > 1e-9:
-                work_time = min(remaining, firm_capacity[j] - current_firm_work[j]) / V[j]
-                start_time = current_firm_work[j] / V[j]
-                events.append((start_time, i+1, j+1))
-                current_firm_work[j] += min(remaining, firm_capacity[j] - current_firm_work[j])
-                remaining -= min(remaining, firm_capacity[j] - current_firm_work[j])
+    for obj_idx in range(n):
+        min_start_time = float('inf')
+        best_firm = -1
+        
+        for firm_idx in range(k):
+            if firm_available_time[firm_idx] < min_start_time:
+                min_start_time = firm_available_time[firm_idx]
+                best_firm = firm_idx
+        
+        work_needed = remaining_S[obj_idx]
+        work_time = work_needed / V[best_firm]
+        
+        events.append((min_start_time, obj_idx + 1, best_firm + 1))
+        firm_available_time[best_firm] = min_start_time + work_time
+        remaining_S[obj_idx] = 0
     
-    events.sort(key=lambda x: x[0])
-    for event in events:
-        print("{:.6f} {} {}".format(event[0], event[1], event[2]))
+    print(f"{T:.6f}")
+    for event in sorted(events, key=lambda x: x[0]):
+        print(f"{event[0]:.6f} {event[1]} {event[2]}")
 
 if __name__ == "__main__":
     main()

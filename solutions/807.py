@@ -15,7 +15,7 @@ def main():
         for j in range(1, i):
             dp[i] = (dp[i] + dp[j] * dp[i - j - 1]) % MOD
     
-    print(dp[n] % MOD)
+    print(dp[n])
 
 if __name__ == "__main__":
     main()

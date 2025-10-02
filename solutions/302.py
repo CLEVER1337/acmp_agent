@@ -13,36 +13,23 @@ def main():
         print("0.00")
         return
     
-    INF = float('inf')
     dist = [[0.0] * n for _ in range(n)]
     for i in range(n):
         for j in range(i+1, n):
             dx = cities[i][0] - cities[j][0]
             dy = cities[i][1] - cities[j][1]
-            d = math.sqrt(dx*dx + dy*dy)
-            dist[i][j] = d
-            dist[j][i] = d
+            dist[i][j] = dist[j][i] = math.sqrt(dx*dx + dy*dy)
     
-    min_edge = [INF] * n
-    visited = [False] * n
-    min_edge[0] = 0.0
+    min_r = float('inf')
+    for i in range(n):
+        max_dist = 0.0
+        for j in range(n):
+            if i != j and dist[i][j] > max_dist:
+                max_dist = dist[i][j]
+        if max_dist < min_r:
+            min_r = max_dist
     
-    max_edge = 0.0
-    for _ in range(n):
-        u = -1
-        for v in range(n):
-            if not visited[v] and (u == -1 or min_edge[v] < min_edge[u]):
-                u = v
-        
-        visited[u] = True
-        max_edge = max(max_edge, min_edge[u])
-        
-        for v in range(n):
-            if not visited[v] and dist[u][v] < min_edge[v]:
-                min_edge[v] = dist[u][v]
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write("{:.2f}".format(max_edge))
+    print("{:.2f}".format(min_r/2))
 
 if __name__ == "__main__":
     main()

@@ -1,9 +1,7 @@
 
 def main():
     with open('INPUT.TXT', 'r') as f:
-        data = f.read().split()
-        N = int(data[0])
-        Q = int(data[1])
+        N, Q = map(int, f.read().split())
     
     if Q < N or Q > 6 * N:
         with open('OUTPUT.TXT', 'w') as f:
@@ -16,13 +14,13 @@ def main():
     for i in range(N):
         dp_curr = [0] * (6 * N + 1)
         for j in range(len(dp_prev)):
-            if dp_prev[j] > 0:
+            if dp_prev[j] != 0:
                 for k in range(1, 7):
                     if j + k < len(dp_curr):
                         dp_curr[j + k] += dp_prev[j]
         dp_prev = dp_curr
     
-    favorable = dp_prev[Q] if Q < len(dp_prev) else 0
+    favorable = dp_prev[Q]
     total = 6 ** N
     
     probability = favorable / total

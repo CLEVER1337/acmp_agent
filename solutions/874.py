@@ -11,7 +11,7 @@ def main():
     index = 3
     for i in range(m):
         u = int(data[index]); v = int(data[index+1]); index += 2
-        edges.append((min(u-1, v-1), max(u-1, v-1)))
+        edges.append((min(u, v)-1, max(u, v)-1))
     
     colors = [0] * n
     count = 0

@@ -8,11 +8,11 @@ def main():
     E = int(data[0])
     F = int(data[1])
     total_weight = F - E
-    n = int(data[2])
+    N = int(data[2])
     
     coins = []
     index = 3
-    for i in range(n):
+    for i in range(N):
         p = int(data[index])
         w = int(data[index+1])
         index += 2
@@ -41,10 +41,13 @@ def main():
                     if dp_max[i + w] < dp_max[i] + p:
                         dp_max[i + w] = dp_max[i] + p
     
-    if dp_min[total_weight] == INF:
+    min_sum = dp_min[total_weight]
+    max_sum = dp_max[total_weight]
+    
+    if min_sum == INF:
         print("This is impossible.")
     else:
-        print(f"{dp_min[total_weight]} {dp_max[total_weight]}")
+        print(f"{min_sum} {max_sum}")
 
 if __name__ == "__main__":
     main()

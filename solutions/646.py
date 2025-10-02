@@ -6,20 +6,21 @@ def main():
     k = int(data[1])
     A = list(map(int, data[2:2+n]))
     
-    total = sum(A)
-    if total < 2 * k:
+    total_sum = sum(A)
+    
+    if total_sum < 2 * k:
         print(0)
         return
         
-    dp = [0] * (total + 1)
+    dp = [0] * (total_sum + 1)
     dp[0] = 1
     
     for a in A:
-        for j in range(total, a - 1, -1):
-            dp[j] += dp[j - a]
+        for s in range(total_sum, a - 1, -1):
+            dp[s] += dp[s - a]
                 
     count = 0
-    for s in range(k, total - k + 1):
+    for s in range(k, total_sum - k + 1):
         count += dp[s]
             
     print(count)

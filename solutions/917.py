@@ -2,7 +2,7 @@
 import math
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
+    with open("INPUT.TXT", "r") as f:
         n = int(f.readline().strip())
         lengths = list(map(int, f.readline().split()))
     
@@ -20,14 +20,14 @@ def main():
     best_a = 0
     for a in range(max_side, 0, -1):
         if dp[a]:
-            best_a = a
-            break
+            b = total_length - 2 * a
+            if b > 0:
+                area = math.sqrt(a * b * a * b) / 4
+                if area > best_a:
+                    best_a = area
     
-    b = total_length - best_a
-    area = math.sqrt(best_a * b)
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(f"{area:.2f}")
+    with open("OUTPUT.TXT", "w") as f:
+        f.write("{:.2f}".format(best_a))
 
 if __name__ == "__main__":
     main()

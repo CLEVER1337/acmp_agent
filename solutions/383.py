@@ -4,19 +4,15 @@ def is_beautiful(num):
     total = sum(int(d) for d in s)
     return total % len(s) == 0
 
-def main():
-    with open('INPUT.TXT', 'r') as f:
-        N = int(f.read().strip())
-    
+def find_nth_beautiful(n):
     count = 0
     num = 1
-    while count < N:
+    while count < n:
         if is_beautiful(num):
             count += 1
         num += 1
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(num - 1))
+    return num - 1
 
-if __name__ == '__main__':
-    main()
+n = int(input())
+result = find_nth_beautiful(n)
+print(result)

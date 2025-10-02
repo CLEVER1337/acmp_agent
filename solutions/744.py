@@ -1,15 +1,14 @@
 
 def is_valid(s):
     stack = []
-    matching = {')': '(', '}': '{', ']': '['}
+    mapping = {')': '(', '}': '{', ']': '['}
     for char in s:
-        if char in '({[':
-            stack.append(char)
-        else:
-            if not stack or stack[-1] != matching[char]:
+        if char in mapping:
+            if not stack or stack.pop() != mapping[char]:
                 return False
-            stack.pop()
-    return len(stack) == 0
+        else:
+            stack.append(char)
+    return not stack
 
 def main():
     with open('INPUT.TXT', 'r') as f:

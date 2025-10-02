@@ -20,6 +20,7 @@ def main():
             left -= 1
             right += 1
             
+    for i in range(n - 1):
         diff = 0
         left = i
         right = i + 1

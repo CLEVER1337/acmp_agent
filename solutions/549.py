@@ -1,22 +1,13 @@
 
-def main():
-    with open('INPUT.TXT', 'r') as f:
-        p, q = map(int, f.readline().split())
-    
-    n = 2
-    result = []
-    while p > 0:
-        n += 1
-        a = (p * n) // q
-        result.append(a)
-        p = p * n - a * q
-        if p == 0:
-            break
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(len(result) + 1) + '\n')
-        for a in result:
-            f.write(str(a) + '\n')
-
-if __name__ == '__main__':
-    main()
+p, q = map(int, input().split())
+n = 2
+result = []
+while p > 0:
+    p *= n
+    a = p // q
+    result.append(a)
+    p -= a * q
+    n += 1
+print(n - 2)
+for a in result:
+    print(a)

@@ -1,61 +1,39 @@
 
 import math
+from collections import deque
 
-def min_operations(n, m):
-    if n == m:
+def min_operations(N, M):
+    if N == M:
         return 0
-    if n > m:
+        
+    if M % N != 0:
         return -1
-    
-    queue = [(n, 0)]
-    visited = set()
-    visited.add(n)
-    
-    while queue:
-        current, steps = queue.pop(0)
         
-        if current == m:
-            return steps
-        
-        next1 = current * 2
-        if next1 <= m and next1 not in visited:
-            visited.add(next1)
-            queue.append((next1, steps + 1))
-        
-        next2 = current * 3
-        if next2 <= m and next2 not in visited:
-            visited.add(next2)
-            queue.append((next2, steps + 1))
+    target = M // N
     
-    return -1
+    factors = []
+    temp = target
+    for i in range(2, int(math.isqrt(target)) + 1):
+        while temp % i == 0:
+            factors.append(i)
+            temp //= i
+    if temp > 1:
+        factors.append(temp)
+    
+    for factor in factors:
+        if factor != 2 and factor != 3:
+            return -1
+            
+    return len(factors)
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        n, m = map(int, f.readline().split())
+    with open('INPUT.TXT', 'r') as f:
+        N, M = map(int, f.readline().split())
     
-    if n == m:
-        print(0)
-        return
+    result = min_operations(N, M)
     
-    if m % n != 0:
-        print(-1)
-        return
-    
-    quotient = m // n
-    operations = 0
-    
-    while quotient > 1:
-        if quotient % 2 == 0:
-            quotient //= 2
-            operations += 1
-        elif quotient % 3 == 0:
-            quotient //= 3
-            operations += 1
-        else:
-            print(-1)
-            return
-    
-    print(operations)
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write(str(result))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

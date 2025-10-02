@@ -2,22 +2,20 @@
 n = int(input())
 s = input().strip()
 
-if n == 0:
+if s == '0' * n:
     print('0')
-    exit()
-
-if all(c == '0' for c in s):
-    print('0')
-    exit()
-
-result = []
-for i in range(n):
-    if s[i] == '1':
-        result.append('1')
+else:
+    if s[-1] == '1':
+        print(s)
     else:
-        break
-
-if len(result) < n:
-    result.append('0')
-
-print(''.join(result))
+        count = 0
+        for i in range(len(s)-1, -1, -1):
+            if s[i] == '0':
+                count += 1
+            else:
+                break
+        if count == 0:
+            print(s)
+        else:
+            result = s[:-count] + '0' * (count - 1) + '1'
+            print(result)

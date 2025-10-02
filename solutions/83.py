@@ -1,38 +1,40 @@
 
 def main():
     import sys
-    input = sys.stdin.read().split()
-    M = int(input[0])
-    N = int(input[1])
+    data = sys.stdin.read().split()
+    M = int(data[0])
+    N = int(data[1])
     
     total_cells = M * N
-    max_patterns = 1 << total_cells
-    count = 0
+    max_patterns = 2 ** total_cells
     
-    for pattern in range(max_patterns):
+    patterns = []
+    for i in range(max_patterns):
+        grid = []
+        for row in range(M):
+            row_pattern = []
+            for col in range(N):
+                bit_pos = row * N + col
+                color = (i >> bit_pos) & 1
+                row_pattern.append(color)
+            grid.append(tuple(row_pattern))
+        patterns.append(tuple(grid))
+    
+    valid_count = 0
+    for pattern in patterns:
         valid = True
         for i in range(M - 1):
             for j in range(N - 1):
-                pos1 = i * N + j
-                pos2 = i * N + j + 1
-                pos3 = (i + 1) * N + j
-                pos4 = (i + 1) * N + j + 1
-                
-                bit1 = (pattern >> pos1) & 1
-                bit2 = (pattern >> pos2) & 1
-                bit3 = (pattern >> pos3) & 1
-                bit4 = (pattern >> pos4) & 1
-                
-                if bit1 == bit2 == bit3 == bit4:
+                if (pattern[i][j] == pattern[i][j+1] == 
+                    pattern[i+1][j] == pattern[i+1][j+1]):
                     valid = False
                     break
             if not valid:
                 break
-                
         if valid:
-            count += 1
-            
-    print(count)
+            valid_count += 1
+    
+    print(valid_count)
 
 if __name__ == "__main__":
     main()

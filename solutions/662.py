@@ -17,26 +17,14 @@ def main():
         total_scores = []
         for player in players:
             a1, a2, a3 = player
-            if a1 == p:
-                score1 = 0
+            if p == 0:
+                total = a1 + a2 + a3
             else:
-                score1 = a1
-                
-            if a2 == p:
-                score2 = 0
-            else:
-                score2 = a2
-                
-            if a3 == p:
-                score3 = 0
-            else:
-                score3 = a3
-                
-            total_score = score1 + score2 + score3
-            total_scores.append(total_score)
+                total = (a1 + a2 + a3) % p
+            total_scores.append(total)
         
-        total_scores.sort()
-        results.add(tuple(total_scores))
+        sorted_scores = tuple(sorted(total_scores))
+        results.add(sorted_scores)
     
     print(len(results))
 

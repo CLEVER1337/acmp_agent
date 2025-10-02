@@ -7,13 +7,13 @@ def main():
         print(0)
         return
         
-    doubled_b = b + b
-    target = doubled_b[:n]
+    double_b = b + b
+    pattern = double_b[:n]
     
     count = 0
     for i in range(len(a) - n + 1):
         substring = a[i:i+n]
-        if substring in doubled_b:
+        if substring in double_b:
             count += 1
             
     print(count)

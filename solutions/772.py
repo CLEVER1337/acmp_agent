@@ -11,33 +11,38 @@ def main():
         layers.append((i, 'F'))
     
     for bend in bends:
-        point = int(bend[:-1])
+        idx = int(bend[:-1])
         direction = bend[-1]
         
-        left = layers[:point]
-        right = layers[point:]
+        if idx > len(layers) - 1:
+            print("SCRUFFY")
+            return
+            
+        left_part = layers[:idx]
+        right_part = layers[idx:]
         
         if direction == 'F':
-            right = [(idx, 'R' if side == 'F' else 'F') for idx, side in reversed(right)]
-            layers = left + right
+            right_part = [(num, 'R' if side == 'F' else 'F') for num, side in reversed(right_part)]
         else:
-            left = [(idx, 'R' if side == 'F' else 'F') for idx, side in reversed(left)]
-            layers = left + right
+            right_part = [(num, 'F' if side == 'R' else 'R') for num, side in reversed(right_part)]
             
-        if len(layers) != len(set(idx for idx, _ in layers)):
+        layers = left_part + right_part
+        
+        if len(layers) != n + 1:
             print("SCRUFFY")
             return
             
     result_F = []
     result_R = []
-    for idx, side in layers:
+    
+    for num, side in layers:
         if side == 'F':
-            result_F.append(f"P{idx}F")
+            result_F.append(f"P{num}F")
         else:
-            result_R.append(f"P{idx}R")
+            result_R.append(f"P{num}R")
             
-    output = " ".join(result_F + result_R)
-    print(output)
+    result = result_F + result_R
+    print(" ".join(result))
 
 if __name__ == "__main__":
     main()

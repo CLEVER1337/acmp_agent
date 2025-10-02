@@ -1,9 +1,7 @@
 
 import sys
 import math
-from functools import lru_cache
-
-sys.setrecursionlimit(10000)
+from collections import defaultdict
 
 def main():
     data = sys.stdin.read().split()
@@ -16,56 +14,60 @@ def main():
     K = int(data[2])
     numbers = list(map(int, data[3:3+n]))
     
+    if n == 0:
+        print(-1)
+        return
+        
     numbers.sort()
     
-    @lru_cache(maxsize=None)
-    def dp(mask, last):
-        if mask == (1 << n) - 1:
-            return 1
-            
-        total = 0
-        for i in range(n):
-            if not (mask & (1 << i)):
-                if last is None or math.gcd(numbers[last], numbers[i]) >= K:
-                    total += dp(mask | (1 << i), i)
-        return total
-    
-    def find_mth_permutation():
-        mask = 0
-        last = None
-        m = M
-        result = []
-        
-        for pos in range(n):
-            found = False
-            for i in range(n):
-                if mask & (1 << i):
-                    continue
-                    
-                if last is None or math.gcd(numbers[last], numbers[i]) >= K:
-                    count = dp(mask | (1 << i), i)
-                    if m <= count:
-                        result.append(numbers[i])
-                        mask |= (1 << i)
-                        last = i
-                        found = True
-                        break
-                    else:
-                        m -= count
-            if not found:
-                return None
+    graph = defaultdict(list)
+    for i in range(n):
+        for j in range(i+1, n):
+            if math.gcd(numbers[i], numbers[j]) >= K:
+                graph[i].append(j)
+                graph[j].append(i)
                 
-        return result
+    visited = [False] * n
+    result = []
+    count = [0]
+    found = [False]
+    target_index = [M]
     
-    total_permutations = dp(0, None)
-    if M > total_permutations:
-        print(-1)
+    def backtrack(path):
+        if found[0]:
+            return
+            
+        if len(path) == n:
+            count[0] += 1
+            if count[0] == target_index[0]:
+                result.extend([numbers[i] for i in path])
+                found[0] = True
+            return
+            
+        last = path[-1] if path else -1
+        
+        candidates = []
+        for neighbor in graph[last] if last != -1 else range(n):
+            if not visited[neighbor]:
+                if last == -1 or math.gcd(numbers[last], numbers[neighbor]) >= K:
+                    candidates.append(neighbor)
+                    
+        candidates.sort(key=lambda x: numbers[x])
+        
+        for candidate in candidates:
+            if not visited[candidate]:
+                visited[candidate] = True
+                backtrack(path + [candidate])
+                visited[candidate] = False
+                if found[0]:
+                    return
+                    
+    backtrack([])
+    
+    if result:
+        print(" ".join(map(str, result)))
     else:
-        permutation = find_mth_permutation()
-        if permutation:
-            print(" ".join(map(str, permutation)))
-        else:
-            print(-1)
+        print(-1)
 
 if __name__ == "__main__":
     main()

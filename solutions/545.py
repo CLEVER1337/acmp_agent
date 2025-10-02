@@ -8,60 +8,39 @@ def main():
     a, b, c = sorted(sides)
     
     # Проверяем, является ли треугольник прямоугольным
-    if abs(a**2 + b**2 - c**2) < 1e-9:
+    if math.isclose(a**2 + b**2, c**2, rel_tol=1e-9):
         area = 0.5 * a * b
         with open('OUTPUT.TXT', 'w') as f:
             f.write(f"{area:.10f}")
         return
     
-    # Рассматриваем три варианта прямоугольных треугольников:
-    # 1. Катеты на сторонах a и b
-    # 2. Катеты на сторонах a и c  
-    # 3. Катеты на сторонах b и c
+    # Если треугольник остроугольный
+    if a**2 + b**2 > c**2:
+        # Максимальная площадь - когда гипотенуза совпадает с наибольшей стороной
+        # Катеты будут максимально возможными при этом условии
+        h = 2 * (a * b * c) / (a**2 + b**2 + c**2)
+        cat1 = math.sqrt(a**2 - h**2)
+        cat2 = math.sqrt(b**2 - h**2)
+        area = 0.5 * cat1 * cat2
+        with open('OUTPUT.TXT', 'w') as f:
+            f.write(f"{area:.10f}")
+        return
     
-    max_area = 0.0
+    # Если треугольник тупоугольный
+    # Максимальная площадь достигается, когда прямой угол находится
+    # в вершине напротив наибольшей стороны
+    # Используем формулу для площади через высоту
+    p = (a + b + c) / 2
+    area_triangle = math.sqrt(p * (p - a) * (p - b) * (p - c))
+    h = 2 * area_triangle / c
     
-    # Вариант 1: катеты на сторонах a и b
-    if a > 0 and b > 0:
-        area1 = 0.5 * a * b
-        max_area = max(max_area, area1)
-    
-    # Вариант 2: катеты на сторонах a и c
-    if a > 0 and c > 0:
-        # Находим высоту от вершины между сторонами a и c к стороне b
-        p = (a + b + c) / 2
-        area_total = math.sqrt(p * (p - a) * (p - b) * (p - c))
-        h = 2 * area_total / b
-        
-        if h <= a:
-            angle = math.asin(h / a)
-            cathet1 = a * math.cos(angle)
-            cathet2 = h
-            area2 = 0.5 * cathet1 * cathet2
-            max_area = max(max_area, area2)
-        else:
-            area2 = 0.5 * a * min(a, c)
-            max_area = max(max_area, area2)
-    
-    # Вариант 3: катеты на сторонах b и c
-    if b > 0 and c > 0:
-        # Находим высоту от вершины между сторонами b и c к стороне a
-        p = (a + b + c) / 2
-        area_total = math.sqrt(p * (p - a) * (p - b) * (p - c))
-        h = 2 * area_total / a
-        
-        if h <= b:
-            angle = math.asin(h / b)
-            cathet1 = b * math.cos(angle)
-            cathet2 = h
-            area3 = 0.5 * cathet1 * cathet2
-            max_area = max(max_area, area3)
-        else:
-            area3 = 0.5 * b * min(b, c)
-            max_area = max(max_area, area3)
+    # Катеты прямоугольного треугольника
+    cat1 = math.sqrt(a**2 - h**2)
+    cat2 = math.sqrt(b**2 - h**2)
+    area = 0.5 * cat1 * cat2
     
     with open('OUTPUT.TXT', 'w') as f:
-        f.write(f"{max_area:.10f}")
+        f.write(f"{area:.10f}")
 
 if __name__ == "__main__":
     main()

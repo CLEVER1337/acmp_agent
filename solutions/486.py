@@ -1,23 +1,24 @@
 
 def main():
     with open('INPUT.TXT', 'r') as f:
-        data = f.read().split()
-        N = int(data[0])
-        K = int(data[1])
+        N, K = map(int, f.readline().split())
     
-    x = 1
+    X = 1
     while True:
-        total = x
         valid = True
+        current = X
         for i in range(N):
-            if (total - K) % N != 0:
+            if (current - K) % N != 0:
                 valid = False
                 break
-            total = (total - K) * (N - 1) // N
-        if valid and total >= 0:
-            print(x)
-            return
-        x += 1
+            current = (current - K) // N * (N - 1)
+        
+        if valid:
+            break
+        X += 1
+    
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write(str(X))
 
 if __name__ == '__main__':
     main()

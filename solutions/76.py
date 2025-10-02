@@ -7,27 +7,24 @@ def main():
     
     for i in range(1, n + 1):
         line = data[i].split()
-        start_time = line[0]
-        end_time = line[1]
+        start = list(map(int, line[0].split(':')))
+        end = list(map(int, line[1].split(':')))
         
-        start_h, start_m = map(int, start_time.split(':'))
-        end_h, end_m = map(int, end_time.split(':'))
+        start_minutes = start[0] * 60 + start[1]
+        end_minutes = end[0] * 60 + end[1]
         
-        start_total = start_h * 60 + start_m
-        end_total = end_h * 60 + end_m
-        
-        events.append((start_total, 1))
-        events.append((end_total, -1))
+        events.append((start_minutes, 1))
+        events.append((end_minutes, -1))
     
     events.sort()
     
-    current_visitors = 0
+    current = 0
     max_visitors = 0
     
     for event in events:
-        current_visitors += event[1]
-        if current_visitors > max_visitors:
-            max_visitors = current_visitors
+        current += event[1]
+        if current > max_visitors:
+            max_visitors = current
             
     print(max_visitors)
 

@@ -7,26 +7,10 @@ def main():
         print(0)
         return
         
-    def is_winning_position(a, b):
-        if a == 1 and b == 1:
-            return False
-            
-        moves = []
-        if a > 1:
-            moves.append((1, b))
-        if b > 1:
-            moves.append((a, 1))
-            
-        for move in moves:
-            if not is_winning_position(*move):
-                return True
-                
-        return False
-        
-    if is_winning_position(x, y):
-        print(1)
-    else:
+    if (x - 1) ^ (y - 1) == 0:
         print(2)
+    else:
+        print(1)
 
 if __name__ == "__main__":
     main()

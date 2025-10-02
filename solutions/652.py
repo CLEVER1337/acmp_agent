@@ -6,89 +6,83 @@ def main():
     if not data:
         return
     
-    first_line = data[0].split()
-    N = int(first_line[0])
-    K = int(first_line[1])
-    
+    n, k = map(int, data[0].split())
     operations = []
-    for i in range(1, K + 1):
+    for i in range(1, 1 + k):
         parts = data[i].split()
         op_type = parts[0]
-        L = int(parts[1])
-        R = int(parts[2])
-        operations.append((op_type, L, R))
+        l = int(parts[1])
+        r = int(parts[2])
+        operations.append((op_type, l, r))
     
     class Node:
-        __slots__ = ['l', 'r', 'sum', 'rev', 'left', 'right']
+        __slots__ = ('l', 'r', 'left', 'right', 'sum_val', 'rev')
         def __init__(self, l, r):
             self.l = l
             self.r = r
-            self.sum = (l + r) * (r - l + 1) // 2
-            self.rev = False
             self.left = None
             self.right = None
+            self.sum_val = (l + r) * (r - l + 1) // 2
+            self.rev = False
             
-    root = Node(1, N)
-    
-    def push(node):
-        if node.rev:
-            node.rev = False
-            mid = (node.l + node.r) // 2
-            if node.left is None:
-                node.left = Node(node.l, mid)
-            if node.right is None:
-                node.right = Node(mid + 1, node.r)
-            node.left.rev = not node.left.rev
-            node.right.rev = not node.right.rev
-            left_sum = node.left.sum
-            right_sum = node.right.sum
-            node.left.sum = (node.l + mid) * (mid - node.l + 1) // 2 - left_sum
-            node.right.sum = (mid + 1 + node.r) * (node.r - mid) // 2 - right_sum
+        def push(self):
+            if self.rev:
+                self.rev = False
+                if self.left:
+                    self.left.rev = not self.left.rev
+                if self.right:
+                    self.right.rev = not self.right.rev
+                self.left, self.right = self.right, self.left
+                
+        def update(self, l, r):
+            if l > self.r or r < self.l:
+                return
+            if l <= self.l and self.r <= r:
+                self.rev = not self.rev
+                return
+            mid = (self.l + self.r) // 2
+            if not self.left:
+                self.left = Node(self.l, mid)
+            if not self.right:
+                self.right = Node(mid + 1, self.r)
+            self.push()
+            if l <= mid:
+                self.left.update(l, min(r, mid))
+            if r > mid:
+                self.right.update(max(l, mid + 1), r)
+            self.sum_val = self.left.get_sum() + self.right.get_sum()
             
-    def update(node, l, r):
-        if l > node.r or r < node.l:
-            return
-        if l <= node.l and node.r <= r:
-            node.rev = not node.rev
-            total = (node.l + node.r) * (node.r - node.l + 1) // 2
-            node.sum = total - node.sum
-            return
-        push(node)
-        mid = (node.l + node.r) // 2
-        if node.left is None:
-            node.left = Node(node.l, mid)
-        if node.right is None:
-            node.right = Node(mid + 1, node.r)
-        if l <= mid:
-            update(node.left, l, min(r, mid))
-        if r > mid:
-            update(node.right, max(l, mid + 1), r)
-        node.sum = node.left.sum + node.right.sum
-        
-    def query(node, l, r):
-        if l > node.r or r < node.l:
-            return 0
-        if l <= node.l and node.r <= r:
-            return node.sum
-        push(node)
-        mid = (node.l + node.r) // 2
-        res = 0
-        if node.left and l <= mid:
-            res += query(node.left, l, min(r, mid))
-        if node.right and r > mid:
-            res += query(node.right, max(l, mid + 1), r)
-        return res
-        
+        def get_sum(self):
+            if self.rev:
+                return (self.l + self.r) * (self.r - self.l + 1) // 2 - self.sum_val
+            return self.sum_val
+            
+        def query(self, l, r):
+            if l > self.r or r < self.l:
+                return 0
+            if l <= self.l and self.r <= r:
+                return self.get_sum()
+            self.push()
+            res = 0
+            mid = (self.l + self.r) // 2
+            if l <= mid:
+                res += self.left.query(l, min(r, mid))
+            if r > mid:
+                res += self.right.query(max(l, mid + 1), r)
+            return res
+
+    root = Node(1, n)
     output_lines = []
+    
     for op in operations:
-        op_type, L, R = op
+        op_type, l, r = op
         if op_type == 'I':
-            update(root, L, R)
+            root.update(l, r)
         else:
-            s = query(root, L, R)
+            s = root.query(l, r)
             output_lines.append(str(s))
             
-    print('\n'.join(output_lines))
+    sys.stdout.write('\n'.join(output_lines))
 
 if __name__ == '__main__':
     main()

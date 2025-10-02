@@ -3,62 +3,49 @@ def main():
     import sys
     data = sys.stdin.read().split()
     if not data:
-        print("Impossible")
         return
-        
+    
     n = int(data[0])
     m = int(data[1])
-    idx = 2
     matrix = []
+    index = 2
     for i in range(n):
-        row = list(map(int, data[idx:idx+m]))
-        idx += m
+        row = list(map(int, data[index:index+m]))
+        index += m
         matrix.append(row)
     
-    # Преобразуем в множества защищенных тактик для каждой защиты
-    defense_sets = []
-    for i in range(n):
-        protected = set()
-        for j in range(m):
-            if matrix[i][j] == 1:
-                protected.add(j)
-        defense_sets.append(protected)
+    from itertools import combinations, product
     
-    # Проверяем, есть ли непобедимая защита (защищает от всех атак)
-    for protected in defense_sets:
-        if len(protected) == m:
-            print("Impossible")
-            return
+    def covers(attacks, defense_row):
+        for a in attacks:
+            if defense_row[a] == 0:
+                return True
+        return False
     
-    # Ищем минимальный набор атак, который покрывает все защиты
-    best_attacks = None
-    min_size = m + 1
-    
-    # Перебираем все возможные комбинации атак
-    for mask in range(1, 1 << m):
-        attacks = set()
-        for j in range(m):
-            if mask & (1 << j):
-                attacks.add(j)
+    for k in range(1, m + 1):
+        found_solution = True
+        best_attacks = None
         
-        # Проверяем, покрывает ли этот набор все защиты
-        covers_all = True
-        for protected in defense_sets:
-            if attacks.isdisjoint(protected):
-                # Эта защита не защищена от нашего набора атак
-                continue
-            else:
-                covers_all = False
+        for attack_set in combinations(range(m), k):
+            valid = True
+            for i in range(n):
+                if not covers(attack_set, matrix[i]):
+                    valid = False
+                    break
+            
+            if valid:
+                if best_attacks is None:
+                    best_attacks = attack_set
+                found_solution = True
                 break
         
-        if covers_all and len(attacks) < min_size:
-            min_size = len(attacks)
-            best_attacks = sorted(attacks)
+        if best_attacks is not None:
+            result = [str(x + 1) for x in best_attacks]
+            print(str(k))
+            print(" ".join(result))
+            return
     
-    if best_attacks is None:
-        print("Impossible")
-    else:
-        print(str(min_size) + " " + " ".join(str(x + 1) for x in best_attacks))
+    print("Impossible")
 
 if __name__ == "__main__":
     main()

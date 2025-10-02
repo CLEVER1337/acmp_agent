@@ -3,132 +3,137 @@ import math
 
 def read_input():
     with open('INPUT.TXT', 'r') as f:
-        data = list(map(float, f.readline().split()))
+        data = list(map(float, f.read().split()))
     return data
 
-def write_output(result):
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(f"{result:.10f}")
+def dot(a, b):
+    return a[0]*b[0] + a[1]*b[1]
 
-def point_on_segment(px, py, x1, y1, x2, y2):
-    if min(x1, x2) <= px <= max(x1, x2) and min(y1, y2) <= py <= max(y1, y2):
-        cross = (px - x1) * (y2 - y1) - (py - y1) * (x2 - x1)
-        if abs(cross) < 1e-9:
-            return True
-    return False
+def cross(a, b):
+    return a[0]*b[1] - a[1]*b[0]
 
-def segments_intersect(x1, y1, x2, y2, x3, y3, x4, y4):
-    def orientation(ax, ay, bx, by, cx, cy):
-        val = (by - ay) * (cx - bx) - (bx - ax) * (cy - by)
-        if abs(val) < 1e-9:
-            return 0
+def subtract(a, b):
+    return (a[0]-b[0], a[1]-b[1])
+
+def add(a, b):
+    return (a[0]+b[0], a[1]+b[1])
+
+def multiply(v, t):
+    return (v[0]*t, v[1]*t)
+
+def segments_intersect(a, b, c, d):
+    def orientation(p, q, r):
+        val = (q[1]-p[1])*(r[0]-q[0]) - (q[0]-p[0])*(r[1]-q[1])
+        if val == 0: return 0
         return 1 if val > 0 else 2
-
-    o1 = orientation(x1, y1, x2, y2, x3, y3)
-    o2 = orientation(x1, y1, x2, y2, x4, y4)
-    o3 = orientation(x3, y3, x4, y4, x1, y1)
-    o4 = orientation(x3, y3, x4, y4, x2, y2)
+    
+    def on_segment(p, q, r):
+        return (min(p[0], r[0]) <= q[0] <= max(p[0], r[0]) and 
+                min(p[1], r[1]) <= q[1] <= max(p[1], r[1]))
+    
+    o1 = orientation(a, b, c)
+    o2 = orientation(a, b, d)
+    o3 = orientation(c, d, a)
+    o4 = orientation(c, d, b)
     
     if o1 != o2 and o3 != o4:
         return True
     
-    if o1 == 0 and point_on_segment(x3, y3, x1, y1, x2, y2):
-        return True
-    if o2 == 0 and point_on_segment(x4, y4, x1, y1, x2, y2):
-        return True
-    if o3 == 0 and point_on_segment(x1, y1, x3, y3, x4, y4):
-        return True
-    if o4 == 0 and point_on_segment(x2, y2, x3, y3, x4, y4):
-        return True
+    if o1 == 0 and on_segment(a, c, b): return True
+    if o2 == 0 and on_segment(a, d, b): return True
+    if o3 == 0 and on_segment(c, a, d): return True
+    if o4 == 0 and on_segment(c, b, d): return True
     
     return False
 
-def distance_point_to_segment(px, py, x1, y1, x2, y2):
-    l2 = (x2 - x1)**2 + (y2 - y1)**2
-    if l2 == 0:
-        return math.sqrt((px - x1)**2 + (py - y1)**2)
+def point_to_segment_distance(p, a, b):
+    ab = subtract(b, a)
+    ap = subtract(p, a)
+    bp = subtract(p, b)
     
-    t = max(0, min(1, ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / l2))
-    proj_x = x1 + t * (x2 - x1)
-    proj_y = y1 + t * (y2 - y1)
-    return math.sqrt((px - proj_x)**2 + (py - proj_y)**2)
-
-def distance_between_segments(x1, y1, x2, y2, x3, y3, x4, y4):
-    if segments_intersect(x1, y1, x2, y2, x3, y3, x4, y4):
-        return 0.0
+    if dot(ap, ab) <= 0:
+        return math.sqrt(ap[0]**2 + ap[1]**2)
     
-    d1 = min(distance_point_to_segment(x1, y1, x3, y3, x4, y4),
-             distance_point_to_segment(x2, y2, x3, y3, x4, y4))
-    d2 = min(distance_point_to_segment(x3, y3, x1, y1, x2, y2),
-             distance_point_to_segment(x4, y4, x1, y1, x2, y2))
-    return min(d1, d2)
+    if dot(bp, ab) >= 0:
+        return math.sqrt(bp[0]**2 + bp[1]**2)
+    
+    return abs(cross(ab, ap)) / math.sqrt(ab[0]**2 + ab[1]**2)
 
 def solve():
     data = read_input()
-    x1, y1, x2, y2, x3, y3, x4, y4, v1x, v1y, v2x, v2y = data
+    x1, y1, x2, y2 = data[0], data[1], data[2], data[3]
+    x3, y3, x4, y4 = data[4], data[5], data[6], data[7]
+    v1x, v1y, v2x, v2y = data[8], data[9], data[10], data[11]
     
-    vx = v1x - v2x
-    vy = v1y - v2y
-    
-    if vx == 0 and vy == 0:
-        d0 = distance_between_segments(x1, y1, x2, y2, x3, y3, x4, y4)
-        if d0 < 1e-9:
-            return 0.0
-        else:
-            return -1.0
+    A = (x1, y1)
+    B = (x2, y2)
+    C = (x3, y3)
+    D = (x4, y4)
+    v1 = (v1x, v1y)
+    v2 = (v2x, v2y)
+    v_rel = subtract(v1, v2)
     
     def f(t):
-        new_x1 = x1 + v1x * t
-        new_y1 = y1 + v1y * t
-        new_x2 = x2 + v1x * t
-        new_y2 = y2 + v1y * t
-        new_x3 = x3 + v2x * t
-        new_y3 = y3 + v2y * t
-        new_x4 = x4 + v2x * t
-        new_y4 = y4 + v2y * t
-        return distance_between_segments(new_x1, new_y1, new_x2, new_y2, new_x3, new_y3, new_x4, new_y4)
+        if t < 0:
+            return float('inf')
+        A_t = add(A, multiply(v1, t))
+        B_t = add(B, multiply(v1, t))
+        C_t = add(C, multiply(v2, t))
+        D_t = add(D, multiply(v2, t))
+        return segments_intersect(A_t, B_t, C_t, D_t)
     
-    left, right = 0.0, 1e9
-    best_t = -1.0
-    
-    for _ in range(100):
-        mid1 = left + (right - left) / 3
-        mid2 = right - (right - left) / 3
-        f1 = f(mid1)
-        f2 = f(mid2)
-        
-        if f1 < 1e-9:
-            best_t = mid1
-            right = mid1
-        elif f2 < 1e-9:
-            best_t = mid2
-            left = mid2
-        elif f1 < f2:
-            right = mid2
-        else:
-            left = mid1
-    
-    if best_t != -1:
-        return best_t
-    
-    left, right = 0.0, 1e9
-    min_distance = f(0)
-    
-    if min_distance < 1e-9:
-        return 0.0
+    left, right = 0.0, 1e6
+    best_t = float('inf')
     
     for _ in range(100):
         mid = (left + right) / 2
-        if f(mid) < min_distance:
-            left = mid
-            min_distance = f(mid)
-        else:
+        if f(mid):
             right = mid
+            best_t = min(best_t, mid)
+        else:
+            left = mid
     
-    if min_distance < 1e-9:
-        return left
+    if best_t == float('inf'):
+        left, right = 0.0, 1e6
+        best_t = float('inf')
+        
+        def distance_at_time(t):
+            if t < 0:
+                return float('inf')
+            A_t = add(A, multiply(v1, t))
+            B_t = add(B, multiply(v1, t))
+            C_t = add(C, multiply(v2, t))
+            D_t = add(D, multiply(v2, t))
+            
+            d1 = point_to_segment_distance(A_t, C_t, D_t)
+            d2 = point_to_segment_distance(B_t, C_t, D_t)
+            d3 = point_to_segment_distance(C_t, A_t, B_t)
+            d4 = point_to_segment_distance(D_t, A_t, B_t)
+            return min(d1, d2, d3, d4)
+        
+        def derivative(t):
+            h = 1e-8
+            return (distance_at_time(t+h) - distance_at_time(t)) / h
+        
+        t = 0.0
+        learning_rate = 1e-3
+        for _ in range(100000):
+            grad = derivative(t)
+            t_new = t - learning_rate * grad
+            if t_new < 0:
+                t_new = 0
+            t = t_new
+            
+        if distance_at_time(t) < 1e-8:
+            best_t = t
     
-    return -1.0
+    if best_t == float('inf'):
+        result = -1
+    else:
+        result = best_t
+    
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write(f"{result:.10f}")
 
-result = solve()
-write_output(result)
+if __name__ == "__main__":
+    solve()

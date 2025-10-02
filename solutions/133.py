@@ -1,17 +1,17 @@
 
-import heapq
-
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        data = f.read().split()
-    
+    import sys
+    data = sys.stdin.read().split()
+    if not data:
+        print(-1)
+        return
+        
     n = int(data[0])
-    costs = list(map(int, data[1:1+n]))
+    prices = list(map(int, data[1:1+n]))
     m = int(data[1+n])
     
     graph = [[] for _ in range(n)]
     index = 1 + n + 1
-    
     for i in range(m):
         u = int(data[index]) - 1
         v = int(data[index+1]) - 1
@@ -20,26 +20,35 @@ def main():
         graph[v].append(u)
     
     INF = float('inf')
-    dist = [INF] * n
-    dist[0] = costs[0]
+    cost = [INF] * n
+    cost[0] = prices[0]
     
-    pq = [(costs[0], 0)]
+    visited = [False] * n
     
-    while pq:
-        current_cost, u = heapq.heappop(pq)
-        
-        if current_cost > dist[u]:
-            continue
+    for _ in range(n):
+        min_cost = INF
+        u = -1
+        for i in range(n):
+            if not visited[i] and cost[i] < min_cost:
+                min_cost = cost[i]
+                u = i
+                
+        if u == -1:
+            break
             
+        visited[u] = True
+        
         for v in graph[u]:
-            new_cost = current_cost + costs[v]
-            if new_cost < dist[v]:
-                dist[v] = new_cost
-                heapq.heappush(pq, (new_cost, v))
+            if not visited[v]:
+                new_cost = cost[u] + prices[v]
+                if new_cost < cost[v]:
+                    cost[v] = new_cost
     
-    result = dist[n-1] if dist[n-1] != INF else -1
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(result))
+    result = cost[n-1]
+    if result == INF:
+        print(-1)
+    else:
+        print(result)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

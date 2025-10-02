@@ -16,27 +16,24 @@ def solve():
         A = int(f.read().strip())
     
     if A == 1:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write('1')
-        return
-    
-    factors_A = factorize(A)
-    
-    result = 1
-    for p, exp in factors_A.items():
-        n_candidate = p
-        count = 0
-        while count < exp:
-            temp = n_candidate
-            while temp % p == 0:
-                count += 1
-                temp //= p
-                if count >= exp:
-                    break
-            if count < exp:
-                n_candidate += p
+        result = 1
+    else:
+        factors_A = factorize(A)
+        result = 1
         
-        result = max(result, n_candidate)
+        for p, exp in factors_A.items():
+            n_candidate = 0
+            temp_exp = 0
+            while temp_exp < exp:
+                n_candidate += 1
+                temp_exp += n_candidate
+                count = n_candidate
+                temp = n_candidate
+                while temp % p == 0:
+                    temp_exp += count
+                    temp //= p
+            
+            result = max(result, n_candidate * p)
     
     with open('OUTPUT.TXT', 'w') as f:
         f.write(str(result))

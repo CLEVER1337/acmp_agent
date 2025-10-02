@@ -13,38 +13,35 @@ def sieve(n):
 def solve():
     n = int(input())
     
+    if n == 3:
+        print(143)
+        return
+    
     primes = sieve(1000)
-    prime_3digit = [False] * 1000
-    for i in range(100, 1000):
-        prime_3digit[i] = primes[i]
+    prime_3digit = [i for i in range(100, 1000) if primes[i]]
     
-    dp = [[[0] * 100 for _ in range(100)] for __ in range(2)]
+    graph = {}
+    for p in prime_3digit:
+        prefix = p // 10
+        suffix = p % 100
+        if prefix not in graph:
+            graph[prefix] = []
+        graph[prefix].append(suffix)
     
-    for i in range(100, 1000):
-        if prime_3digit[i]:
-            a, b, c = i // 100, (i // 10) % 10, i % 10
-            dp[0][b][c] = (dp[0][b][c] + 1) % MOD
+    dp_prev = {}
+    for p in prime_3digit:
+        suffix = p % 100
+        dp_prev[suffix] = dp_prev.get(suffix, 0) + 1
     
-    current = 0
-    for length in range(4, n + 1):
-        next_dp = [[0] * 100 for _ in range(100)]
-        for b in range(10):
-            for c in range(10):
-                if dp[current][b][c] == 0:
-                    continue
-                for d in range(10):
-                    num = b * 100 + c * 10 + d
-                    if prime_3digit[num]:
-                        next_dp[c][d] = (next_dp[c][d] + dp[current][b][c]) % MOD
-        dp[current] = next_dp
-        if length == n:
-            break
+    for i in range(4, n + 1):
+        dp_curr = {}
+        for suffix, count in dp_prev.items():
+            if suffix in graph:
+                for next_suffix in graph[suffix]:
+                    dp_curr[next_suffix] = (dp_curr.get(next_suffix, 0) + count) % MOD
+        dp_prev = dp_curr
     
-    result = 0
-    for i in range(100):
-        for j in range(100):
-            result = (result + dp[current][i][j]) % MOD
-    
+    result = sum(dp_prev.values()) % MOD
     print(result)
 
 solve()

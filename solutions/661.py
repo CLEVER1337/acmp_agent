@@ -20,7 +20,7 @@ def main():
         index += 3
         cards.append((bi, ei, si))
     
-    cards.sort(key=lambda x: (x[0], x[1]))
+    cards.sort(key=lambda x: x[0])
     
     heap = []
     current_end = B
@@ -29,22 +29,22 @@ def main():
     
     while current_end < E:
         while i < n and cards[i][0] <= current_end:
-            heapq.heappush(heap, (-cards[i][1], -cards[i][2], cards[i][1], cards[i][2]))
+            heapq.heappush(heap, (-cards[i][1], -cards[i][2]))
             i += 1
         
         if not heap:
             break
             
-        max_end, neg_cost, end, cost = heapq.heappop(heap)
+        max_end, cost = heapq.heappop(heap)
         max_end = -max_end
-        cost = -neg_cost
+        cost = -cost
         
         if max_end <= current_end:
             continue
             
         total_cost += cost
         current_end = max_end
-        
+    
     print(total_cost)
 
 if __name__ == "__main__":

@@ -1,7 +1,6 @@
 
-import sys
-
 def main():
+    import sys
     data = sys.stdin.read().split()
     if not data:
         print(-1)
@@ -21,8 +20,7 @@ def main():
             print(-1)
             return
             
-    result = [str(i + 1) for i in indices]
-    print(" ".join(result))
+    print(' '.join(map(str, [i+1 for i in indices])))
 
 if __name__ == "__main__":
     main()

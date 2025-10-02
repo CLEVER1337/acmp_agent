@@ -1,46 +1,39 @@
 
-def count_numbers_with_k_zeros(N, K):
+def count_numbers(N, K):
     if K < 0:
         return 0
         
-    def count_up_to(n, k):
-        if k < 0:
-            return 0
-            
-        s = bin(n)[2:]
-        length = len(s)
-        
-        if k > length - 1:
-            return 0
-            
-        dp = [[[0] * (k + 1) for _ in range(2)] for __ in range(length + 1)]
-        dp[0][1][0] = 1
-        
-        for i in range(length):
-            for tight in range(2):
-                for zeros in range(k + 1):
-                    if dp[i][tight][zeros] == 0:
-                        continue
-                    limit = int(s[i]) if tight else 1
-                    for d in range(limit + 1):
-                        new_tight = 1 if (tight and d == limit) else 0
-                        new_zeros = zeros
-                        if d == 0 and i > 0:
-                            new_zeros += 1
-                        if new_zeros <= k:
-                            dp[i + 1][new_tight][new_zeros] += dp[i][tight][zeros]
-        
-        return dp[length][0][k] + dp[length][1][k]
+    s = bin(N)[2:]
+    n = len(s)
     
-    return count_up_to(N, K)
+    dp = [[[0] * (K + 2) for _ in range(2)] for __ in range(n + 1)]
+    dp[0][0][0] = 1
+    
+    for i in range(n):
+        for tight in range(2):
+            for zeros in range(K + 1):
+                if dp[i][tight][zeros] == 0:
+                    continue
+                    
+                limit = int(s[i]) if tight else 1
+                for d in range(limit + 1):
+                    new_tight = tight and (d == limit)
+                    new_zeros = zeros + (1 if d == 0 else 0)
+                    if new_zeros <= K:
+                        dp[i + 1][new_tight][new_zeros] += dp[i][tight][zeros]
+    
+    return dp[n][0][K] + dp[n][1][K] - (1 if K == 0 else 0)
 
 def main():
-    import sys
-    data = sys.stdin.read().split()
-    N = int(data[0])
-    K = int(data[1])
-    result = count_numbers_with_k_zeros(N, K)
-    print(result)
+    with open('INPUT.TXT', 'r') as f:
+        data = f.read().split()
+        N = int(data[0])
+        K = int(data[1])
+    
+    result = count_numbers(N, K)
+    
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write(str(result))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

@@ -3,26 +3,24 @@ def main():
     import sys
     data = sys.stdin.read().splitlines()
     n = int(data[0])
-    folds = data[1].strip()
-    parts = data[2].split()
-    k = int(parts[0])
-    edges = list(map(int, parts[1:1+k]))
+    s = data[1].strip()
+    k_and_edges = list(map(int, data[2].split()))
+    k = k_and_edges[0]
+    edges = k_and_edges[1:1+k]
     
     result = []
-    for edge_num in edges:
-        pos = edge_num - 1
-        direction = 'K'
+    for edge in edges:
+        pos = edge - 1
+        fold_type = 'K'
         for i in range(n):
-            fold_type = folds[i]
-            half = (2**n) // (2**(i+1))
-            if pos < half:
-                if fold_type == 'Z':
-                    direction = 'O' if direction == 'K' else 'K'
-            else:
-                pos = 2 * half - 1 - pos
-                if fold_type == 'P':
-                    direction = 'O' if direction == 'K' else 'K'
-        result.append(direction)
+            mid = (2**n - 1) // 2
+            if pos == mid:
+                fold_type = 'K' if s[i] == 'P' else 'O'
+                break
+            elif pos > mid:
+                pos = 2**n - 2 - pos
+            pos %= 2**(n - i - 1)
+        result.append(fold_type)
     
     print(''.join(result))
 

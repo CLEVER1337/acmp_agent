@@ -1,6 +1,8 @@
 
 def main():
-    s = input().strip()
+    with open('INPUT.TXT', 'r') as f:
+        s = f.readline().strip()
+    
     n = len(s)
     dp = [float('inf')] * (n + 1)
     dp[0] = 0
@@ -21,9 +23,10 @@ def main():
         result.append(s[start:pos])
         pos = start
     
-    print(dp[n])
-    for pal in reversed(result):
-        print(pal)
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write(f"{dp[n]}\n")
+        for pal in reversed(result):
+            f.write(f"{pal}\n")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

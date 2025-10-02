@@ -1,12 +1,11 @@
 
-import sys
-
 def main():
+    import sys
     data = sys.stdin.read().splitlines()
     n = int(data[0])
     ingredients = []
     total = 0
-    for i in range(1, n + 1):
+    for i in range(1, n+1):
         parts = data[i].split()
         sign = parts[0]
         amount = int(parts[1])
@@ -15,29 +14,29 @@ def main():
     
     percentages = []
     for sign, amount in ingredients:
-        p = (amount * 100) / total
+        p = (amount / total) * 100
         percentages.append(p)
     
-    floor_sum = 0
-    remainders = []
-    results = []
+    rounded = [int(p) for p in percentages]
+    remainder = 100 - sum(rounded)
     
-    for i, p in enumerate(percentages):
-        floor_val = int(p)
-        remainder = p - floor_val
-        floor_sum += floor_val
-        remainders.append((i, remainder, ingredients[i][0]))
-        results.append(floor_val)
+    diffs = []
+    for i, (sign, p) in enumerate(zip([ing[0] for ing in ingredients], percentages)):
+        diff = p - rounded[i]
+        if sign == '+':
+            priority = diff
+        else:
+            priority = -diff
+        diffs.append((priority, i))
     
-    remaining = 100 - floor_sum
-    remainders.sort(key=lambda x: (-x[1], x[2] == '+'))
+    diffs.sort(reverse=True, key=lambda x: x[0])
     
-    for i in range(remaining):
-        idx, _, sign = remainders[i]
-        results[idx] += 1
+    for i in range(remainder):
+        idx = diffs[i][1]
+        rounded[idx] += 1
     
-    for res in results:
-        print(res)
+    for r in rounded:
+        print(r)
 
 if __name__ == "__main__":
     main()

@@ -13,9 +13,14 @@ def main():
     
     result = 0
     for i in range(n):
-        result += counts[i] * (prefix_sum - counts[i]) * (prefix_sum - counts[i] - 1) // 2
+        if counts[i] >= 3:
+            result += counts[i] * (counts[i] - 1) * (counts[i] - 2) // 6
     
-    result = (result - total) // 3
+    for i in range(n):
+        if counts[i] >= 2:
+            ways = counts[i] * (counts[i] - 1) // 2
+            total_others = prefix_sum - counts[i]
+            result += ways * total_others
     
     with open('OUTPUT.TXT', 'w') as f:
         f.write(str(result))

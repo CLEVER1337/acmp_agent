@@ -11,52 +11,40 @@ def main():
     p = int(data[2])
     
     events = []
-    base_sum = 0
-    passengers = []
+    total = 0
     
-    index = 3
     for i in range(n):
-        a = int(data[index])
-        b = int(data[index+1])
-        c = int(data[index+2])
-        d = int(data[index+3])
-        index += 4
-        passengers.append((a, b, c, d))
-        base_sum += b * (d - c)
-        events.append((c, 1, a - b))
-        events.append((d, -1, a - b))
+        idx = 3 + i * 4
+        a = int(data[idx])
+        b = int(data[idx + 1])
+        c = int(data[idx + 2])
+        d = int(data[idx + 3])
+        
+        total += b * (d - c)
+        diff = a - b
+        events.append((c, diff, 1))
+        events.append((d, -diff, 0))
     
-    events.sort(key=lambda x: (x[0], x[1]))
+    events.sort()
     
     diffs = []
     current_diff = 0
     prev_stop = 1
     
-    i = 0
-    while i < len(events):
-        current_stop = events[i][0]
-        if current_stop > prev_stop:
-            diffs.append((prev_stop, current_diff))
+    for stop, diff, typ in events:
+        if stop > prev_stop:
+            diffs.append(current_diff)
+            prev_stop = stop
         
-        while i < len(events) and events[i][0] == current_stop:
-            if events[i][1] == 1:
-                current_diff += events[i][2]
-            else:
-                current_diff -= events[i][2]
-            i += 1
-        
-        prev_stop = current_stop
+        current_diff += diff
     
-    diffs = [diff for _, diff in diffs]
     diffs.sort(reverse=True)
     
-    additional_sum = 0
     for i in range(min(m, len(diffs))):
         if diffs[i] > 0:
-            additional_sum += diffs[i]
+            total += diffs[i]
     
-    result = base_sum + additional_sum
-    print(result)
+    print(total)
 
 if __name__ == "__main__":
     main()

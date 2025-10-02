@@ -1,43 +1,34 @@
 
 def main():
     import sys
-    sys.setrecursionlimit(10000)
+    N = int(sys.stdin.readline().strip())
     
-    n = int(sys.stdin.readline().strip())
-    
-    if n == 1:
+    if N == 2:
         print(1)
         return
         
-    dp = {}
-    
-    def dfs(count, product, sum_val, last):
-        if count == n:
-            return 1 if product == sum_val else 0
-            
-        key = (count, product, sum_val, last)
-        if key in dp:
-            return dp[key]
-            
-        res = 0
-        start = last
-        max_val = n + 1
+    count = 0
+    for k in range(2, N + 1):
+        product = k
+        sum_val = k
+        numbers = [1] * (N - k) + [k]
         
-        for num in range(start, max_val + 1):
-            new_count = count + 1
-            new_product = product * num
-            new_sum = sum_val + num
+        if len(numbers) != N:
+            continue
             
-            if new_product > new_sum + (n - new_count):
-                break
-                
-            res += dfs(new_count, new_product, new_sum, num)
+        for i in range(N - k - 1, -1, -1):
+            while numbers[i] < numbers[i + 1]:
+                if sum_val + 1 <= product * (numbers[i] + 1) / numbers[i]:
+                    sum_val += 1
+                    product = product * (numbers[i] + 1) // numbers[i]
+                    numbers[i] += 1
+                else:
+                    break
+                    
+        if sum_val == product:
+            count += 1
             
-        dp[key] = res
-        return res
-        
-    result = dfs(0, 1, 0, 2)
-    print(result)
+    print(count)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -16,7 +16,10 @@ def main():
         x1, y1 = stars[i]
         for j in range(i + 1, n):
             x2, y2 = stars[j]
-            if x1 != x2 and y1 != y2:
+            dx = x2 - x1
+            dy = y2 - y1
+            
+            if dx != 0 and dy != 0:
                 if (x1, y2) in star_set and (x2, y1) in star_set:
                     count += 1
     

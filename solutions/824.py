@@ -1,6 +1,27 @@
 
 def main():
     import sys
+    sys.setrecursionlimit(1 << 25)
+    
+    def find(x, parent):
+        if parent[x] != x:
+            parent[x] = find(parent[x], parent)
+        return parent[x]
+    
+    def union(x, y, parent, rank):
+        rx = find(x, parent)
+        ry = find(y, parent)
+        if rx == ry:
+            return False
+        if rank[rx] < rank[ry]:
+            parent[rx] = ry
+        elif rank[rx] > rank[ry]:
+            parent[ry] = rx
+        else:
+            parent[ry] = rx
+            rank[rx] += 1
+        return True
+    
     data = sys.stdin.read().split()
     if not data:
         print(0)
@@ -11,43 +32,32 @@ def main():
     edges = []
     index = 2
     for i in range(m):
-        u = int(data[index]); v = int(data[index+1]); index += 2
-        edges.append((min(u, v), max(u, v)))
+        u = int(data[index]) - 1
+        v = int(data[index + 1]) - 1
+        edges.append((u, v))
+        index += 2
     
-    from collections import defaultdict
-    graph = defaultdict(list)
-    for u, v in edges:
-        graph[u].append(v)
-        graph[v].append(u)
-    
-    visited = [False] * (n + 1)
-    components = 0
-    for i in range(1, n + 1):
-        if not visited[i]:
-            components += 1
-            stack = [i]
-            visited[i] = True
-            while stack:
-                node = stack.pop()
-                for neighbor in graph[node]:
-                    if not visited[neighbor]:
-                        visited[neighbor] = True
-                        stack.append(neighbor)
-    
-    if components > 1:
-        print(0)
-        return
-        
-    total_edges = m
-    required_edges = n - 1
-    
-    if total_edges < required_edges:
-        print(0)
-        return
-        
-    from math import comb
-    result = comb(total_edges, required_edges)
-    print(result)
+    total = 0
+    for mask in range(1 << m):
+        parent = list(range(n))
+        rank = [0] * n
+        cnt = 0
+        for i in range(m):
+            if mask & (1 << i):
+                u, v = edges[i]
+                if union(u, v, parent, rank):
+                    cnt += 1
+        if cnt == n - 1:
+            connected = True
+            root = find(0, parent)
+            for i in range(1, n):
+                if find(i, parent) != root:
+                    connected = False
+                    break
+            if connected:
+                total += 1
+                
+    print(total)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

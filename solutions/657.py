@@ -1,7 +1,7 @@
 
 import sys
 
-def main():
+def solve():
     data = sys.stdin.read().split()
     if not data:
         return
@@ -19,49 +19,41 @@ def main():
             results.append("ERROR")
             continue
             
-        segments = []
-        for i in range(n):
-            segments.append(T[i])
-            
-        total_time = sum(segments)
-        expected_T = total_time / ((n + 1) / 2)
+        total_time = sum(T)
+        segments = n
+        expected_T = total_time / segments
         
         bits = []
         valid = True
         
-        current_pos = 0
-        for i in range((n - 1) // 2):
-            first_half = segments[2*i]
-            second_half = segments[2*i + 1]
-            next_first = segments[2*i + 2]
-            
-            ratio1 = first_half / (first_half + second_half)
-            ratio2 = second_half / (first_half + second_half)
-            
-            if abs(ratio1 - 0.5) / 0.5 <= 0.1 and abs(ratio2 - 0.5) / 0.5 <= 0.1:
-                bits.append('1')
-            elif abs(ratio1 - 0.5) / 0.5 <= 0.1 and abs(ratio2 - 0.5) / 0.5 <= 0.1:
-                bits.append('0')
+        for i in range(n):
+            if i % 2 == 0:
+                if T[i] < expected_T * 0.9 or T[i] > expected_T * 1.1:
+                    valid = False
+                    break
             else:
-                if ratio1 > ratio2:
-                    bits.append('1')
-                else:
-                    bits.append('0')
-                    
-        if len(bits) != (n - 1) // 2:
+                if T[i] < expected_T * 0.9 or T[i] > expected_T * 1.1:
+                    valid = False
+                    break
+        
+        if not valid:
             results.append("ERROR")
             continue
             
-        if bits[0] != '1' or bits[-1] != '0':
-            if bits[0] != '1':
-                bits[0] = '1'
-            if bits[-1] != '0':
-                bits[-1] = '0'
-                
-        results.append(''.join(bits))
+        bits = []
+        for i in range(0, n-2, 2):
+            if T[i] + T[i+2] > T[i+1] * 1.1:
+                bits.append('1')
+            else:
+                bits.append('0')
         
-    for result in results:
-        print(result)
+        if len(bits) == 0:
+            results.append("ERROR")
+        else:
+            results.append('1' + ''.join(bits) + '0')
+    
+    for res in results:
+        print(res)
 
 if __name__ == "__main__":
-    main()
+    solve()

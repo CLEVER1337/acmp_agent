@@ -2,32 +2,37 @@
 import math
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        data = f.read().splitlines()
+    with open('INPUT.TXT', 'r') as f:
+        data = f.read().split()
     
-    n, c, p = map(int, data[0].split())
-    houses = []
-    for i in range(1, 1 + n):
-        x, y = map(int, data[i].split())
-        houses.append((x, y))
+    n = int(data[0])
+    c = int(data[1])
+    p = int(data[2])
     
-    xnet, ynet = map(int, data[1 + n].split())
+    coords = []
+    index = 3
+    for i in range(n):
+        x = int(data[index])
+        y = int(data[index + 1])
+        coords.append((x, y))
+        index += 2
+    
+    xnet = int(data[index])
+    ynet = int(data[index + 1])
     
     total_length = 0.0
-    for x, y in houses:
-        dx = x - xnet
-        dy = y - ynet
-        distance = math.sqrt(dx*dx + dy*dy)
+    for x, y in coords:
+        distance = math.sqrt((x - xnet)**2 + (y - ynet)**2)
         total_length += distance
     
     total_cost = total_length * c
     
     if total_cost <= p:
-        with open("OUTPUT.TXT", "w") as f:
-            f.write("YES")
+        with open('OUTPUT.TXT', 'w') as f:
+            f.write('YES')
     else:
-        with open("OUTPUT.TXT", "w") as f:
-            f.write("NO")
+        with open('OUTPUT.TXT', 'w') as f:
+            f.write('NO')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

@@ -1,42 +1,35 @@
 
 import math
 
+def readints():
+    return list(map(int, input().split()))
+
 def main():
-    import sys
-    data = sys.stdin.read().split()
-    r = int(data[0])
-    n = int(data[1])
-    q = int(data[2])
-    xc = int(data[3])
-    yc = int(data[4])
-    vx = int(data[5])
-    vy = int(data[6])
+    r, n = readints()
+    q = int(input())
+    xc, yc = readints()
+    vx, vy = readints()
     
-    total_hit = 0
-    R = r + q
-    
+    total = 0
     for i in range(1, n + 1):
-        row_y = i - 1
-        for j in range(i):
-            x_keg = -(i - 1) + 2 * j
-            y_keg = row_y
+        y_row = i - 1
+        for j in range(1, i + 1):
+            x_center = -(i - 1) + 2 * (j - 1)
             
-            A = vx * vx + vy * vy
-            B = 2 * (vx * (xc - x_keg) + vy * (yc - y_keg))
-            C = (xc - x_keg) ** 2 + (yc - y_keg) ** 2 - R * R
+            A = vx**2 + vy**2
+            B = 2 * (vx * (xc - x_center) + vy * (yc - y_row))
+            C = (xc - x_center)**2 + (yc - y_row)**2 - (r + q)**2
             
-            discriminant = B * B - 4 * A * C
+            discriminant = B**2 - 4 * A * C
             
-            if discriminant < 0:
-                continue
+            if discriminant >= 0:
+                t1 = (-B - math.sqrt(discriminant)) / (2 * A)
+                t2 = (-B + math.sqrt(discriminant)) / (2 * A)
                 
-            t1 = (-B - math.sqrt(discriminant)) / (2 * A)
-            t2 = (-B + math.sqrt(discriminant)) / (2 * A)
-            
-            if t2 >= 0:
-                total_hit += 1
-                
-    print(total_hit)
+                if (t1 >= 0 and t1 <= 1) or (t2 >= 0 and t2 <= 1) or (t1 <= 0 and t2 >= 0):
+                    total += 1
+                    
+    print(total)
 
 if __name__ == "__main__":
     main()

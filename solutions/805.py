@@ -3,8 +3,9 @@ def main():
     import sys
     data = sys.stdin.read().split()
     if not data:
+        print("0.000")
         return
-    
+        
     n = int(data[0])
     ships = []
     index = 1
@@ -15,28 +16,25 @@ def main():
         index += 3
         ships.append((x, y, s))
     
+    if n == 0:
+        print("0.000")
+        return
+        
     min_x = float('-inf')
     max_x = float('inf')
     min_y = float('-inf')
     max_y = float('inf')
     
     for x, y, s in ships:
-        x1 = x
-        y1 = y
-        x2 = x - s
-        y2 = y
-        x3 = x
-        y3 = y - s
+        ship_min_x = x - s
+        ship_max_x = x
+        ship_min_y = y - s
+        ship_max_y = y
         
-        left_bound = x - s
-        right_bound = x
-        bottom_bound = y - s
-        top_bound = y
-        
-        min_x = max(min_x, left_bound)
-        max_x = min(max_x, right_bound)
-        min_y = max(min_y, bottom_bound)
-        max_y = min(max_y, top_bound)
+        min_x = max(min_x, ship_min_x)
+        max_x = min(max_x, ship_max_x)
+        min_y = max(min_y, ship_min_y)
+        max_y = min(max_y, ship_max_y)
     
     if min_x > max_x or min_y > max_y:
         area = 0.0
@@ -44,7 +42,7 @@ def main():
         width = max_x - min_x
         height = max_y - min_y
         area = width * height
-    
+        
     print("{:.3f}".format(area))
 
 if __name__ == "__main__":

@@ -1,84 +1,133 @@
 
 import sys
+from collections import deque
 
 def main():
     data = sys.stdin.read().splitlines()
-    n = int(data[0])
-    matrix = []
-    for i in range(1, 1+n):
-        matrix.append(list(map(int, list(data[i].strip()))))
-    
-    # Проверяем, что отношение рефлексивно? Нет, условие не требует этого
-    
-    # Построим граф: если R[i][j] = 1, то должно быть f[i] <= g[j]
-    # Если R[i][j] = 0, то должно быть f[i] > g[j]
-    
-    # Создадим списки для f и g
-    f = [0] * n
-    g = [0] * n
-    
-    # Построим граф ограничений
-    # Для каждой пары (i,j):
-    # Если R[i][j] = 1, то f[i] <= g[j]
-    # Если R[i][j] = 0, то f[i] > g[j] => g[j] < f[i] => g[j] <= f[i] - 1
-    
-    # Создадим списки ребер для неравенств
-    edges = []
-    for i in range(n):
-        for j in range(n):
-            if matrix[i][j] == 1:
-                edges.append((i, j, 0))  # f[i] <= g[j]
-            else:
-                edges.append((j, i, -1)) # g[j] <= f[i] - 1
-    
-    # Инициализируем расстояния (используем алгоритм Беллмана-Форда)
-    dist = [0] * (2*n)  # первые n - f, следующие n - g
-    
-    # Добавим фиктивную вершину для инициализации
-    for i in range(2*n):
-        edges.append((2*n, i, 0))
-    
-    dist.append(0)
-    for _ in range(2*n):
-        updated = False
-        for u, v, w in edges:
-            if u <= 2*n and v <= 2*n:
-                if dist[u] + w < dist[v]:
-                    dist[v] = dist[u] + w
-                    updated = True
-        if not updated:
-            break
-    else:
-        # Обнаружен отрицательный цикл
+    if not data:
         print("NO")
         return
+        
+    n = int(data[0])
+    matrix = []
+    for i in range(1, 1 + n):
+        row = data[i].strip()
+        matrix.append([int(c) for c in row])
     
-    # Проверим на отрицательные циклы еще раз
-    for u, v, w in edges:
-        if u <= 2*n and v <= 2*n:
-            if dist[u] + w < dist[v]:
-                print("NO")
-                return
+    graph = [[] for _ in range(n)]
+    trans_graph = [[] for _ in range(n)]
     
-    # Извлечем значения f и g
-    f_vals = dist[:n]
-    g_vals = dist[n:2*n]
-    
-    # Проверим корректность
     for i in range(n):
         for j in range(n):
             if matrix[i][j] == 1:
-                if f_vals[i] > g_vals[j]:
-                    print("NO")
-                    return
-            else:
-                if f_vals[i] <= g_vals[j]:
-                    print("NO")
-                    return
+                graph[i].append(j)
+                trans_graph[j].append(i)
     
+    visited = [False] * n
+    order = []
+    
+    def dfs1(v):
+        visited[v] = True
+        for u in graph[v]:
+            if not visited[u]:
+                dfs1(u)
+        order.append(v)
+    
+    for i in range(n):
+        if not visited[i]:
+            dfs1(i)
+            
+    comp = [-1] * n
+    comp_list = []
+    
+    def dfs2(v, c):
+        comp[v] = c
+        comp_list[-1].append(v)
+        for u in trans_graph[v]:
+            if comp[u] == -1:
+                dfs2(u, c)
+    
+    comp_count = 0
+    visited = [False] * n
+    for i in range(n - 1, -1, -1):
+        v = order[i]
+        if comp[v] == -1:
+            comp_list.append([])
+            dfs2(v, comp_count)
+            comp_count += 1
+            
+    comp_graph = [[] for _ in range(comp_count)]
+    in_degree = [0] * comp_count
+    
+    for i in range(n):
+        for j in graph[i]:
+            if comp[i] != comp[j]:
+                comp_graph[comp[i]].append(comp[j])
+                in_degree[comp[j]] += 1
+                
+    for i in range(comp_count):
+        comp_graph[i] = list(set(comp_graph[i]))
+    
+    topo_order = []
+    q = deque()
+    for i in range(comp_count):
+        if in_degree[i] == 0:
+            q.append(i)
+            
+    while q:
+        u = q.popleft()
+        topo_order.append(u)
+        for v in comp_graph[u]:
+            in_degree[v] -= 1
+            if in_degree[v] == 0:
+                q.append(v)
+                
+    f_vals = [0] * comp_count
+    g_vals = [0] * comp_count
+    
+    for comp_id in reversed(topo_order):
+        max_g = -10**18
+        for v in comp_list[comp_id]:
+            for u in graph[v]:
+                if comp[u] != comp_id:
+                    if g_vals[comp[u]] > max_g:
+                        max_g = g_vals[comp[u]]
+        
+        if max_g == -10**18:
+            f_vals[comp_id] = 0
+        else:
+            f_vals[comp_id] = max_g - 1
+            
+        min_f = 10**18
+        for v in comp_list[comp_id]:
+            for u in trans_graph[v]:
+                if comp[u] != comp_id:
+                    if f_vals[comp[u]] < min_f:
+                        min_f = f_vals[comp[u]]
+        
+        if min_f == 10**18:
+            g_vals[comp_id] = f_vals[comp_id] + 1
+        else:
+            g_vals[comp_id] = min_f + 1
+            
+    f_res = [0] * n
+    g_res = [0] * n
+    
+    for comp_id in range(comp_count):
+        for node in comp_list[comp_id]:
+            f_res[node] = f_vals[comp_id]
+            g_res[node] = g_vals[comp_id]
+            
+    for i in range(n):
+        for j in range(n):
+            expected = 1 if f_res[i] <= g_res[j] else 0
+            if matrix[i][j] != expected:
+                print("NO")
+                return
+                
     print("YES")
-    print(" ".join(map(str, f_vals)))
-    print(" ".join(map(str, g_vals)))
+    print(" ".join(map(str, f_res)))
+    print(" ".join(map(str, g_res)))
 
 if __name__ == "__main__":
     main()

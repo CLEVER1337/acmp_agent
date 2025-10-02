@@ -10,63 +10,72 @@ def read_rects():
 
 def get_events(rects):
     events = []
-    for i, (x1, y1, x2, y2) in enumerate(rects):
-        events.append((x1, 1, i))
-        events.append((x2, -1, i))
+    for x1, y1, x2, y2 in rects:
+        events.append((x1, y1, y2, 1))
+        events.append((x2, y1, y2, -1))
     events.sort()
     return events
 
-def main():
-    import sys
-    data = sys.stdin.read().split()
-    if not data:
-        return
+def process_events(events):
+    active = []
+    result = []
+    prev_x = None
     
-    idx = 0
-    n1, m1 = int(data[idx]), int(data[idx+1]); idx += 2
-    k1 = int(data[idx]); idx += 1
-    rects1 = []
-    for _ in range(k1):
-        x1, y1, x2, y2 = int(data[idx]), int(data[idx+1]), int(data[idx+2]), int(data[idx+3])
-        idx += 4
-        rects1.append((x1, y1, x2, y2))
+    for x, y1, y2, event_type in events:
+        if prev_x is not None and x != prev_x:
+            if active:
+                active.sort()
+                merged = []
+                start, end = active[0]
+                for i in range(1, len(active)):
+                    if active[i][0] <= end:
+                        end = max(end, active[i][1])
+                    else:
+                        merged.append((start, end))
+                        start, end = active[i]
+                merged.append((start, end))
+                result.append((prev_x, x, merged))
         
-    n2, m2 = int(data[idx]), int(data[idx+1]); idx += 2
-    k2 = int(data[idx]); idx += 1
-    rects2 = []
-    for _ in range(k2):
-        x1, y1, x2, y2 = int(data[idx]), int(data[idx+1]), int(data[idx+2]), int(data[idx+3])
-        idx += 4
-        rects2.append((x1, y1, x2, y2))
+        if event_type == 1:
+            active.append((y1, y2))
+        else:
+            new_active = []
+            for seg in active:
+                if seg != (y1, y2):
+                    new_active.append(seg)
+            active = new_active
+        
+        prev_x = x
+    
+    return result
+
+def count_holes(intervals1, intervals2):
+    total = 0
+    for x1_start, x1_end, y_segments1 in intervals1:
+        for x2_start, x2_end, y_segments2 in intervals2:
+            x_overlap_start = max(x1_start, x2_start)
+            x_overlap_end = min(x1_end, x2_end)
+            
+            if x_overlap_start < x_overlap_end:
+                for seg1 in y_segments1:
+                    for seg2 in y_segments2:
+                        y_overlap_start = max(seg1[0], seg2[0])
+                        y_overlap_end = min(seg1[1], seg2[1])
+                        if y_overlap_start < y_overlap_end:
+                            total += 1
+    return total
+
+def main():
+    rects1 = read_rects()
+    rects2 = read_rects()
     
     events1 = get_events(rects1)
     events2 = get_events(rects2)
     
-    active1 = set()
-    active2 = set()
+    intervals1 = process_events(events1)
+    intervals2 = process_events(events2)
     
-    i1 = i2 = 0
-    result = 0
-    
-    while i1 < len(events1) and i2 < len(events2):
-        if events1[i1][0] <= events2[i2][0]:
-            x, op, idx = events1[i1]
-            if op == 1:
-                active1.add(idx)
-            else:
-                active1.discard(idx)
-            i1 += 1
-        else:
-            x, op, idx = events2[i2]
-            if op == 1:
-                active2.add(idx)
-            else:
-                active2.discard(idx)
-            i2 += 1
-        
-        if active1 and active2:
-            result = max(result, len(active1) + len(active2))
-    
+    result = count_holes(intervals1, intervals2)
     print(result)
 
 if __name__ == "__main__":

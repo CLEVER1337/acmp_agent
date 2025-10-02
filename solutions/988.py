@@ -1,7 +1,7 @@
 
 import sys
 
-def main():
+def solve():
     data = sys.stdin.read().split()
     t = int(data[0])
     index = 1
@@ -18,24 +18,29 @@ def main():
                 results.append("No solution")
             continue
             
-        left, right = 0, 10**20
-        found = False
-        while left <= right:
-            mid = (left + right) // 2
-            total = mid * p + 1
-            if total == k:
-                results.append(str(mid))
-                found = True
-                break
-            elif total < k:
-                left = mid + 1
-            else:
-                right = mid - 1
-                
-        if not found:
-            results.append("No solution")
+        if k == 1:
+            results.append("1")
+            continue
             
+        if k == 2:
+            results.append(str(p))
+            continue
+            
+        if k == 3:
+            results.append(str(p - 1))
+            continue
+            
+        if k <= p:
+            results.append(str(p - k + 2))
+            continue
+            
+        if k > 2 * p - 2:
+            results.append("No solution")
+            continue
+            
+        results.append(str(k - p + 1))
+
     sys.stdout.write("\n".join(results))
 
 if __name__ == "__main__":
-    main()
+    solve()

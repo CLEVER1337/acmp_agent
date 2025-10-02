@@ -1,64 +1,63 @@
 
-import sys
-from itertools import permutations
-
-def parse_input():
-    data = sys.stdin.read().splitlines()
-    if not data:
-        return None, None, None
+def main():
+    import sys
+    data = sys.stdin.read().split()
+    n = int(data[0])
+    target = float(data[1])
+    caps = list(map(float, data[2:2+n]))
     
-    n_c_line = data[0].split()
-    n = int(n_c_line[0])
-    c = float(n_c_line[1])
+    from itertools import permutations
     
-    capacitors = list(map(float, data[1].split()))
-    return n, c, capacitors
-
-def series(c1, c2):
-    return (c1 * c2) / (c1 + c2) if c1 + c2 != 0 else 0
-
-def parallel(c1, c2):
-    return c1 + c2
-
-def generate_circuits(capacitors):
-    if len(capacitors) == 1:
-        return {capacitors[0]}
-    
-    results = set()
-    n = len(capacitors)
-    
-    for i in range(1, n):
-        for left_combo in permutations(capacitors, i):
-            right_combo = tuple(x for x in capacitors if x not in left_combo)
+    def compute_capacitance(sequence):
+        stack = []
+        for cap in sequence:
+            stack.append([cap])
+        
+        while len(stack) > 1:
+            # Try both parallel and series combinations
+            new_stack = []
+            for i in range(0, len(stack), 2):
+                if i + 1 >= len(stack):
+                    new_stack.append(stack[i])
+                    continue
+                
+                a = stack[i]
+                b = stack[i+1]
+                
+                # Try parallel combination
+                parallel_results = []
+                for val_a in a:
+                    for val_b in b:
+                        parallel_results.append(val_a + val_b)
+                
+                # Try series combination
+                series_results = []
+                for val_a in a:
+                    for val_b in b:
+                        if val_a + val_b > 0:
+                            series_results.append((val_a * val_b) / (val_a + val_b))
+                
+                combined = parallel_results + series_results
+                new_stack.append(combined)
             
-            left_circuits = generate_circuits(left_combo)
-            right_circuits = generate_circuits(right_combo)
-            
-            for left_cap in left_circuits:
-                for right_cap in right_circuits:
-                    results.add(series(left_cap, right_cap))
-                    results.add(parallel(left_cap, right_cap))
+            stack = new_stack
+        
+        return stack[0]
     
-    return results
-
-def solve():
-    n, target_c, capacitors = parse_input()
-    if n is None:
-        return "NO"
+    found = False
+    for r in range(1, n + 1):
+        for perm in permutations(caps, r):
+            results = compute_capacitance(perm)
+            for result in results:
+                if abs(result - target) <= 0.01:
+                    found = True
+                    break
+            if found:
+                break
+        if found:
+            break
     
-    all_possible = set()
-    
-    for i in range(1, n + 1):
-        for combo in permutations(capacitors, i):
-            circuits = generate_circuits(combo)
-            all_possible.update(circuits)
-    
-    for capacitance in all_possible:
-        if abs(capacitance - target_c) <= 0.01:
-            return "YES"
-    
-    return "NO"
+    print("YES" if found else "NO")
 
 if __name__ == "__main__":
-    result = solve()
-    print(result)
+    main()

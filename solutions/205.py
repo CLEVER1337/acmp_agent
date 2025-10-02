@@ -1,44 +1,43 @@
 
 def parse_time(s):
-    parts = list(map(int, s.split(':')))
+    parts = s.split(':')
     if len(parts) == 1:
-        return 0, 0, parts[0]
+        return 0, 0, int(parts[0])
     elif len(parts) == 2:
-        return 0, parts[0], parts[1]
+        return 0, int(parts[0]), int(parts[1])
     else:
-        return parts[0], parts[1], parts[2]
+        return int(parts[0]), int(parts[1]), int(parts[2])
 
-def to_seconds(h, m, s):
-    return h * 3600 + m * 60 + s
-
-def from_seconds(total_seconds):
+def normalize(h, m, s):
+    total_seconds = h * 3600 + m * 60 + s
     days = total_seconds // 86400
-    remaining = total_seconds % 86400
-    h = remaining // 3600
-    remaining %= 3600
-    m = remaining // 60
-    s = remaining % 60
+    remaining_seconds = total_seconds % 86400
+    h = remaining_seconds // 3600
+    remaining_seconds %= 3600
+    m = remaining_seconds // 60
+    s = remaining_seconds % 60
     return h, m, s, days
 
-def format_time(h, m, s):
-    return f"{h:02d}:{m:02d}:{s:02d}"
-
-with open("INPUT.TXT", "r") as f:
+with open('INPUT.TXT', 'r') as f:
     current_time = f.readline().strip()
     interval = f.readline().strip()
 
 h_cur, m_cur, s_cur = map(int, current_time.split(':'))
 h_int, m_int, s_int = parse_time(interval)
 
-total_current = to_seconds(h_cur, m_cur, s_cur)
-total_interval = to_seconds(h_int, m_int, s_int)
-total_result = total_current + total_interval
+total_seconds_current = h_cur * 3600 + m_cur * 60 + s_cur
+total_seconds_interval = h_int * 3600 + m_int * 60 + s_int
+total_seconds_result = total_seconds_current + total_seconds_interval
 
-h_res, m_res, s_res, days = from_seconds(total_result)
+days = total_seconds_result // 86400
+remaining_seconds = total_seconds_result % 86400
 
-result = format_time(h_res, m_res, s_res)
-if days > 0:
-    result += f" +{days} days"
+h_res = remaining_seconds // 3600
+remaining_seconds %= 3600
+m_res = remaining_seconds // 60
+s_res = remaining_seconds % 60
 
-with open("OUTPUT.TXT", "w") as f:
-    f.write(result)
+with open('OUTPUT.TXT', 'w') as f:
+    f.write(f"{h_res:02d}:{m_res:02d}:{s_res:02d}")
+    if days > 0:
+        f.write(f" +{days} days")

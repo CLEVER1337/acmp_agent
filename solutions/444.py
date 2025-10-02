@@ -1,6 +1,6 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
+    with open("INPUT.TXT", "r") as f:
         n = int(f.readline().strip())
         numbers = list(map(int, f.readline().split()))
     
@@ -16,13 +16,13 @@ def main():
         
         if j > i:
             result.append(f"<{start}, ..., {numbers[j]}>")
-            i = j + 1
         else:
             result.append(str(start))
-            i += 1
+        
+        i = j + 1
     
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(', '.join(result))
+    with open("OUTPUT.TXT", "w") as f:
+        f.write(", ".join(result))
 
 if __name__ == "__main__":
     main()

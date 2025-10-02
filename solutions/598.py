@@ -6,53 +6,69 @@ def main():
         return
     
     n = int(data[0])
-    graph = []
+    adj = []
     index = 1
     for i in range(n):
         row = list(map(int, data[index:index+n]))
+        adj.append(row)
         index += n
-        graph.append(row)
     
-    max_group_size = 0
-    best_assignment = None
+    groups = []
+    assigned = [-1] * n
     
-    def is_valid(group, person):
-        for member in group:
-            if graph[person][member] == 0:
-                return False
+    def is_clique(mask):
+        nodes = []
+        for i in range(n):
+            if mask & (1 << i):
+                nodes.append(i)
+        k = len(nodes)
+        for i in range(k):
+            for j in range(i+1, k):
+                if not adj[nodes[i]][nodes[j]]:
+                    return False
         return True
     
-    def backtrack(assignment, groups, person_idx):
-        nonlocal max_group_size, best_assignment
-        
-        if person_idx == n:
-            current_max = max(len(group) for group in groups)
-            if current_max > max_group_size:
-                max_group_size = current_max
-                best_assignment = assignment.copy()
-            return
-        
-        for group_id in range(len(groups)):
-            if len(groups[group_id]) < 5 and is_valid(groups[group_id], person_idx):
-                groups[group_id].append(person_idx)
-                assignment[person_idx] = group_id
-                backtrack(assignment, groups, person_idx + 1)
-                groups[group_id].pop()
-        
-        if len(groups) < n:
-            new_group_id = len(groups)
-            groups.append([person_idx])
-            assignment[person_idx] = new_group_id
-            backtrack(assignment, groups, person_idx + 1)
-            groups.pop()
+    max_size = 0
+    best_mask = 0
+    for mask in range(1, 1 << n):
+        cnt = bin(mask).count('1')
+        if cnt > 5:
+            continue
+        if is_clique(mask):
+            if cnt > max_size:
+                max_size = cnt
+                best_mask = mask
     
-    assignment = [0] * n
-    groups = [[]]
-    backtrack(assignment, groups, 0)
+    group_id = 1
+    remaining = set(range(n))
     
-    group_count = max(best_assignment) + 1
-    print(group_count)
-    print(' '.join(str(x + 1) for x in best_assignment))
+    while remaining:
+        best_size = 0
+        best_set = None
+        
+        for mask in range(1, 1 << n):
+            cnt = bin(mask).count('1')
+            if cnt > 5:
+                continue
+            nodes = []
+            for i in range(n):
+                if mask & (1 << i) and i in remaining:
+                    nodes.append(i)
+            if len(nodes) != cnt:
+                continue
+            if is_clique(mask):
+                if cnt > best_size:
+                    best_size = cnt
+                    best_set = set(nodes)
+        
+        if best_set:
+            for node in best_set:
+                assigned[node] = group_id
+                remaining.remove(node)
+            group_id += 1
+    
+    print(group_id - 1)
+    print(' '.join(map(str, assigned)))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

@@ -17,6 +17,11 @@ def main():
                 elif grid[i][j] == 'X':
                     end = (i, j)
     
+    if not start or not end:
+        with open('OUTPUT.TXT', 'w') as f:
+            f.write('N\n')
+        return
+    
     directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
     visited = [[False] * n for _ in range(n)]
     parent = [[None] * n for _ in range(n)]
@@ -40,27 +45,28 @@ def main():
                     parent[nx][ny] = (x, y)
                     queue.append((nx, ny))
     
-    with open('OUTPUT.TXT', 'w') as f:
-        if not found:
+    if not found:
+        with open('OUTPUT.TXT', 'w') as f:
             f.write('N\n')
-        else:
-            f.write('Y\n')
-            
-            path = []
-            current = end
-            while current != start:
-                path.append(current)
-                current = parent[current[0]][current[1]]
-            
-            for x, y in path:
-                if grid[x][y] == '.' or grid[x][y] == 'X':
-                    grid[x][y] = '+'
-            
-            if grid[start[0]][start[1]] == '@':
-                grid[start[0]][start[1]] = '+'
-            
-            for row in grid:
-                f.write(''.join(row) + '\n')
+        return
+    
+    path = []
+    current = end
+    while current != start:
+        path.append(current)
+        current = parent[current[0]][current[1]]
+    
+    for x, y in path:
+        if grid[x][y] == '.' or grid[x][y] == 'X':
+            grid[x][y] = '+'
+    
+    grid[start[0]][start[1]] = '+'
+    grid[end[0]][end[1]] = 'X'
+    
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write('Y\n')
+        for row in grid:
+            f.write(''.join(row) + '\n')
 
 if __name__ == '__main__':
     main()

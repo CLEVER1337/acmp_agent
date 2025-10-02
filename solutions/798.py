@@ -5,6 +5,6 @@ if total % 2 == 0:
     print("equal")
 else:
     if (i + j) % 2 == c:
-        print("black")
-    else:
         print("white")
+    else:
+        print("black")

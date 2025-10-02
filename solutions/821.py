@@ -2,45 +2,49 @@
 def main():
     import sys
     data = sys.stdin.read().splitlines()
-    if not data:
-        return
-    
     n = int(data[0])
-    moves = data[1].strip()
+    commands = data[1].strip()
     
     board = []
     num = 1
     for i in range(n):
         row = []
         for j in range(n):
-            if i == n - 1 and j == n - 1:
+            if i == n-1 and j == n-1:
                 row.append(0)
             else:
                 row.append(num)
                 num += 1
         board.append(row)
     
-    empty_i, empty_j = n - 1, n - 1
+    empty_row = n - 1
+    empty_col = n - 1
     
-    for idx, move in enumerate(moves, 1):
-        di, dj = 0, 0
-        if move == 'U':
-            di = -1
-        elif move == 'D':
-            di = 1
-        elif move == 'L':
-            dj = -1
-        elif move == 'R':
-            dj = 1
-        
-        new_i, new_j = empty_i + di, empty_j + dj
-        
-        if new_i < 0 or new_i >= n or new_j < 0 or new_j >= n:
-            print(f"ERROR {idx}")
-            return
-        
-        board[empty_i][empty_j], board[new_i][new_j] = board[new_i][new_j], board[empty_i][empty_j]
-        empty_i, empty_j = new_i, new_j
+    for idx, cmd in enumerate(commands):
+        if cmd == 'U':
+            if empty_row == 0:
+                print(f"ERROR {idx + 1}")
+                return
+            board[empty_row][empty_col], board[empty_row-1][empty_col] = board[empty_row-1][empty_col], board[empty_row][empty_col]
+            empty_row -= 1
+        elif cmd == 'D':
+            if empty_row == n - 1:
+                print(f"ERROR {idx + 1}")
+                return
+            board[empty_row][empty_col], board[empty_row+1][empty_col] = board[empty_row+1][empty_col], board[empty_row][empty_col]
+            empty_row += 1
+        elif cmd == 'L':
+            if empty_col == 0:
+                print(f"ERROR {idx + 1}")
+                return
+            board[empty_row][empty_col], board[empty_row][empty_col-1] = board[empty_row][empty_col-1], board[empty_row][empty_col]
+            empty_col -= 1
+        elif cmd == 'R':
+            if empty_col == n - 1:
+                print(f"ERROR {idx + 1}")
+                return
+            board[empty_row][empty_col], board[empty_row][empty_col+1] = board[empty_row][empty_col+1], board[empty_row][empty_col]
+            empty_col += 1
     
     for i in range(n):
         line = []

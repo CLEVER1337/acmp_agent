@@ -17,28 +17,21 @@ def main():
     for i in range(n):
         for j in range(m):
             if matrix[i][j] == max_val:
-                max_i = i
-                max_j = j
+                target_row = i
+                target_col = j
                 break
     
-    matrix[0], matrix[max_i] = matrix[max_i], matrix[0]
+    row_sorted = sorted(range(n), key=lambda i: matrix[i][target_col], reverse=True)
+    col_sorted = sorted(range(m), key=lambda j: matrix[target_row][j], reverse=True)
     
-    for j in range(m):
-        col = [matrix[i][j] for i in range(n)]
-        if j == 0:
-            max_col_val = max(col)
-            max_col_idx = j
-        else:
-            current_max = max(col)
-            if current_max > max_col_val:
-                max_col_val = current_max
-                max_col_idx = j
+    sorted_matrix = []
+    for i in row_sorted:
+        new_row = []
+        for j in col_sorted:
+            new_row.append(matrix[i][j])
+        sorted_matrix.append(new_row)
     
-    matrix = [list(row) for row in zip(*matrix)]
-    matrix[0], matrix[max_col_idx] = matrix[max_col_idx], matrix[0]
-    matrix = [list(row) for row in zip(*matrix)]
-    
-    print(matrix[n-1][m-1])
+    print(sorted_matrix[-1][-1])
 
 if __name__ == "__main__":
     main()

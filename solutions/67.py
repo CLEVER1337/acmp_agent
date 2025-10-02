@@ -9,29 +9,24 @@ def main():
     
     n = int(data[0])
     masks = []
-    for i in range(1, 1 + n):
-        masks.append(data[i])
+    for i in range(1, n+1):
+        mask = data[i].strip()
+        masks.append(ip_to_bin(mask))
     
-    m = int(data[1 + n])
-    pairs = []
-    for i in range(2 + n, 2 + n + m):
-        pairs.append(data[i].split())
-    
-    bin_masks = []
-    for mask in masks:
-        bin_mask = ip_to_bin(mask)
-        bin_masks.append(bin_mask)
-    
+    m = int(data[n+1])
     results = []
-    for pair in pairs:
-        ip1, ip2 = pair
+    
+    for i in range(n+2, n+2+m):
+        ip1, ip2 = data[i].strip().split()
         bin_ip1 = ip_to_bin(ip1)
         bin_ip2 = ip_to_bin(ip2)
         
         count = 0
-        for bin_mask in bin_masks:
-            masked_ip1 = ''.join('1' if bm == '1' and bi == '1' else '0' for bm, bi in zip(bin_mask, bin_ip1))
-            masked_ip2 = ''.join('1' if bm == '1' and bi == '1' else '0' for bm, bi in zip(bin_mask, bin_ip2))
+        for mask in masks:
+            masked_ip1 = ''.join('1' if m_bit == '1' and ip1_bit == '1' else '0' 
+                               for m_bit, ip1_bit in zip(mask, bin_ip1))
+            masked_ip2 = ''.join('1' if m_bit == '1' and ip2_bit == '1' else '0' 
+                               for m_bit, ip2_bit in zip(mask, bin_ip2))
             
             if masked_ip1 == masked_ip2:
                 count += 1

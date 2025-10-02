@@ -1,22 +1,30 @@
 
 def main():
     with open("INPUT.TXT", "r") as f:
-        L, N = map(int, f.readline().split())
-        numbers = list(map(int, f.readline().split()))
+        data = f.read().split()
+    
+    L = int(data[0])
+    N = int(data[1])
+    numbers = list(map(int, data[2:2+N]))
     
     numbers.sort()
-    dp = [1] * N
     
+    min_count = N
     for i in range(N):
-        dp[i] = 1
-        for j in range(i):
-            if abs(numbers[i] - numbers[j]) <= L:
-                dp[i] = max(dp[i], dp[j] + 1)
-    
-    result = N - max(dp) if N > 0 else 0
+        count = 1
+        current_max = numbers[i] + L
+        
+        for j in range(i + 1, N):
+            if numbers[j] - L > current_max:
+                count += 1
+                current_max = numbers[j] + L
+            else:
+                current_max = min(current_max, numbers[j] + L)
+        
+        min_count = min(min_count, count)
     
     with open("OUTPUT.TXT", "w") as f:
-        f.write(str(result))
+        f.write(str(min_count))
 
 if __name__ == "__main__":
     main()

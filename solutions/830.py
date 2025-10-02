@@ -1,18 +1,21 @@
 
 def main():
     with open("INPUT.TXT", "r") as f:
-        n, m = map(int, f.readline().split())
+        data = f.read().split()
+        n = int(data[0])
+        m = int(data[1])
     
-    if n < m:
+    if n > m:
         n, m = m, n
         
-    k = 0
-    while (1 << (k + 1)) <= m:
-        k += 1
+    if n == 0:
+        result = m * (m + 1) // 2
+    else:
+        k = 0
+        while (1 << k) <= n:
+            k += 1
         
-    result = ((1 << (2 * k)) + 3 * (1 << k)) // 3
-    result += (n + m - (1 << (k + 1)) + 1) * (1 << k)
-    result += (n - m) * m
+        result = ((n + 1) * (m + 1) - (1 << (2 * k))) // 3 + (1 << (2 * k - 1))
     
     with open("OUTPUT.TXT", "w") as f:
         f.write(str(result))

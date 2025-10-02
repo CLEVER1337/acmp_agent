@@ -9,17 +9,14 @@ def main():
         return
         
     n, k = map(int, data[0].split())
-    graph = [[0] * (n+1) for _ in range(n+1)]
+    graph = [['' for _ in range(n+1)] for _ in range(n+1)]
     
     for i in range(1, n+1):
         line = data[i].strip()
         for j in range(1, n+1):
             if i == j:
                 continue
-            if line[j-1] == '+':
-                graph[j][i] = 1
-            elif line[j-1] == '-':
-                graph[i][j] = 1
+            graph[i][j] = line[j-1]
     
     routes = []
     for i in range(n+1, n+1+k):
@@ -33,23 +30,26 @@ def main():
     for route in routes:
         for i in range(len(route)-1):
             u, v = route[i], route[i+1]
-            if v not in constraints:
-                constraints[v] = set()
-            constraints[v].add(u)
-    
-    for v in range(1, n+1):
-        if v in constraints:
-            for u in constraints[v]:
-                if graph[u][v] == 1:
-                    adj[u].append(v)
-                    in_degree[v] += 1
+            if u not in constraints:
+                constraints[u] = set()
+            constraints[u].add(v)
     
     for u in range(1, n+1):
         for v in range(1, n+1):
-            if u != v and graph[u][v] == 1:
-                if v in constraints and u not in constraints[v]:
-                    adj[u].append(v)
-                    in_degree[v] += 1
+            if u == v:
+                continue
+            if graph[u][v] == '+':
+                adj[u].append(v)
+                in_degree[v] += 1
+            elif graph[u][v] == '-':
+                adj[v].append(u)
+                in_degree[u] += 1
+    
+    for u in constraints:
+        for v in constraints[u]:
+            if v not in adj[u]:
+                adj[u].append(v)
+                in_degree[v] += 1
     
     q = deque()
     for i in range(1, n+1):

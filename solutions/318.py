@@ -1,7 +1,7 @@
 
-def next_same_popcount(n):
+def next_number_with_same_popcount(n):
     if n == 0:
-        return 0
+        return 1
     
     c = n
     c0 = 0
@@ -18,8 +18,8 @@ def next_same_popcount(n):
     p = c0 + c1
     
     if p == 31 or p == 0:
-        return -1
-    
+        return None
+        
     n |= (1 << p)
     n &= ~((1 << p) - 1)
     n |= (1 << (c1 - 1)) - 1
@@ -29,7 +29,7 @@ def next_same_popcount(n):
 with open('INPUT.TXT', 'r') as f:
     n = int(f.read().strip())
     
-result = next_same_popcount(n)
+result = next_number_with_same_popcount(n)
 
 with open('OUTPUT.TXT', 'w') as f:
     f.write(str(result))

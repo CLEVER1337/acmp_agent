@@ -1,6 +1,7 @@
 
+import sys
+
 def main():
-    import sys
     data = sys.stdin.read().split()
     n = int(data[0])
     matrix = []
@@ -10,29 +11,29 @@ def main():
         index += n
         matrix.append(row)
     
-    max_sum = -10**9
+    max_sum = -10**18
     
     for i in range(n):
         for j in range(n):
             current = matrix[i][j]
             
             if i > 0:
-                top = matrix[i-1][j]
+                up = matrix[i-1][j]
                 if i > 1:
-                    max_sum = max(max_sum, current + top + matrix[i-2][j])
+                    max_sum = max(max_sum, current + up + matrix[i-2][j])
                 if j > 0:
-                    max_sum = max(max_sum, current + top + matrix[i-1][j-1])
+                    max_sum = max(max_sum, current + up + matrix[i-1][j-1])
                 if j < n-1:
-                    max_sum = max(max_sum, current + top + matrix[i-1][j+1])
+                    max_sum = max(max_sum, current + up + matrix[i-1][j+1])
             
             if i < n-1:
-                bottom = matrix[i+1][j]
+                down = matrix[i+1][j]
                 if i < n-2:
-                    max_sum = max(max_sum, current + bottom + matrix[i+2][j])
+                    max_sum = max(max_sum, current + down + matrix[i+2][j])
                 if j > 0:
-                    max_sum = max(max_sum, current + bottom + matrix[i+1][j-1])
+                    max_sum = max(max_sum, current + down + matrix[i+1][j-1])
                 if j < n-1:
-                    max_sum = max(max_sum, current + bottom + matrix[i+1][j+1])
+                    max_sum = max(max_sum, current + down + matrix[i+1][j+1])
             
             if j > 0:
                 left = matrix[i][j-1]

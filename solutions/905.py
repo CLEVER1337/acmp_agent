@@ -6,38 +6,29 @@ def main():
     lines = data[1:1+n]
     
     key_phrase = "the quick brown fox jumps over the lazy dog"
-    key_words = key_phrase.split()
+    key_found = False
+    mapping = {}
     
-    mapping = None
-    for i, line in enumerate(lines):
-        words = line.split()
-        if len(words) != len(key_words):
-            continue
-            
-        valid = True
-        temp_mapping = {}
-        
-        for j in range(len(words)):
-            if len(words[j]) != len(key_words[j]):
-                valid = False
-                break
-                
-            for k in range(len(words[j])):
-                cipher_char = words[j][k]
-                plain_char = key_words[j][k]
-                
-                if cipher_char in temp_mapping:
-                    if temp_mapping[cipher_char] != plain_char:
-                        valid = False
-                        break
-                else:
-                    temp_mapping[cipher_char] = plain_char
-        
-        if valid and len(temp_mapping) == 26:
-            mapping = temp_mapping
-            break
+    for line in lines:
+        if len(line) == len(key_phrase):
+            if all(c1 == ' ' and c2 == ' ' or c1 != ' ' and c2 != ' ' 
+                   for c1, c2 in zip(line, key_phrase)):
+                temp_mapping = {}
+                valid = True
+                for c1, c2 in zip(line, key_phrase):
+                    if c1 != ' ':
+                        if c1 in temp_mapping:
+                            if temp_mapping[c1] != c2:
+                                valid = False
+                                break
+                        else:
+                            temp_mapping[c1] = c2
+                if valid and len(set(temp_mapping.values())) == len(temp_mapping):
+                    mapping = temp_mapping
+                    key_found = True
+                    break
     
-    if mapping is None:
+    if not key_found:
         print("No solution")
         return
         

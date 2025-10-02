@@ -7,7 +7,7 @@ def main():
     n = len(S)
     m = len(T)
     
-    if m == 0 or n == 0 or m > n:
+    if m == 0 or n < m:
         with open('OUTPUT.TXT', 'w') as f:
             f.write('')
         return

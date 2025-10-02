@@ -14,8 +14,10 @@ def main():
             i += 1
         j += 1
     
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write('YES' if i == n else 'NO')
+    if i == n:
+        print("YES")
+    else:
+        print("NO")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

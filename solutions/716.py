@@ -1,40 +1,39 @@
 
 def main():
-    import sys
-    data = sys.stdin.read().splitlines()
-    n = int(data[0])
-    events = []
+    n = int(input())
+    frequencies = []
+    comparisons = []
+    for i in range(n):
+        data = input().split()
+        frequencies.append(float(data[0]))
+        if i > 0:
+            comparisons.append(data[1])
+    
+    low_bound = 30.0
+    high_bound = 4000.0
+    
     for i in range(1, n):
-        parts = data[i].split()
-        f = float(parts[0])
-        word = parts[1]
-        events.append((f, word))
-    
-    low = 30.0
-    high = 4000.0
-    prev_f = float(data[1].split()[0])
-    
-    for i in range(len(events)):
-        current_f, word = events[i]
-        if current_f == prev_f:
+        prev_freq = frequencies[i-1]
+        curr_freq = frequencies[i]
+        comp = comparisons[i-1]
+        
+        if prev_freq == curr_freq:
             continue
             
-        mid = (prev_f + current_f) / 2.0
+        mid = (prev_freq + curr_freq) / 2.0
         
-        if word == 'closer':
-            if current_f > prev_f:
-                high = min(high, mid)
+        if comp == 'closer':
+            if curr_freq > prev_freq:
+                high_bound = min(high_bound, mid)
             else:
-                low = max(low, mid)
-        else:  # further
-            if current_f > prev_f:
-                low = max(low, mid)
+                low_bound = max(low_bound, mid)
+        else:
+            if curr_freq > prev_freq:
+                low_bound = max(low_bound, mid)
             else:
-                high = min(high, mid)
+                high_bound = min(high_bound, mid)
                 
-        prev_f = current_f
-    
-    print(f"{low:.6f} {high:.6f}")
+    print(f"{low_bound:.6f} {high_bound:.6f}")
 
 if __name__ == "__main__":
     main()

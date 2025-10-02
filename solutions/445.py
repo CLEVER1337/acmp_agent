@@ -15,72 +15,63 @@ def main():
     plan = []
     for i in range(1, 1 + n):
         parts = data[i].split()
-        name = parts[0].lower()
-        quantity = float(parts[1])
+        name = ' '.join(parts[:-1]).lower()
+        quantity = float(parts[-1])
         plan.append((name, quantity))
     
     old_prices = {}
-    start_old = 1 + n + 1
-    for i in range(start_old, start_old + k1):
+    new_prices = {}
+    
+    current_line = n + 1
+    
+    for i in range(current_line, current_line + k1):
         parts = data[i].split()
-        name = parts[0].lower()
-        price = float(parts[1])
+        if not parts:
+            continue
+        name = ' '.join(parts[:-1]).lower()
+        price = float(parts[-1])
         old_prices[name] = price
     
-    new_prices = {}
-    start_new = start_old + k1 + 1
-    for i in range(start_new, start_new + k2):
+    current_line += k1 + 1
+    
+    for i in range(current_line, current_line + k2):
         parts = data[i].split()
-        name = parts[0].lower()
-        price = float(parts[1])
+        if not parts:
+            continue
+        name = ' '.join(parts[:-1]).lower()
+        price = float(parts[-1])
         new_prices[name] = price
     
-    total_planned_cost = 0.0
-    for name, quantity in plan:
-        total_planned_cost += quantity * old_prices[name]
-    
-    max_new_cost = total_planned_cost - d
-    
-    benefits = []
+    savings = []
     for name, quantity in plan:
         old_price = old_prices[name]
         new_price = new_prices.get(name, float('inf'))
-        benefit_per_unit = old_price - new_price
-        benefits.append((benefit_per_unit, quantity, name))
+        saving_per_unit = old_price - new_price
+        savings.append((saving_per_unit, quantity, name))
     
-    benefits.sort(reverse=True, key=lambda x: x[0])
+    savings.sort(reverse=True)
     
     result = [0.0] * n
-    remaining_cost = max_new_cost
+    remaining_d = d
     
-    for i, (benefit_per_unit, quantity, name) in enumerate(benefits):
-        old_price = old_prices[name]
-        new_price = new_prices[name]
-        
-        max_possible_cost = quantity * old_price
-        
-        if benefit_per_unit <= 0:
-            result[i] = 0.0
+    for i, (saving_per_unit, quantity, name) in enumerate(savings):
+        if saving_per_unit <= 0:
             continue
-            
-        if remaining_cost <= 0:
-            result[i] = 0.0
-            continue
-            
-        max_affordable_quantity = remaining_cost / old_price
         
-        if max_affordable_quantity >= quantity:
+        max_possible = min(quantity, remaining_d / old_prices[name])
+        if max_possible * saving_per_unit >= quantity * saving_per_unit:
             result[i] = quantity
-            remaining_cost -= quantity * old_price
+            remaining_d -= quantity * old_prices[name]
         else:
-            result[i] = max_affordable_quantity
-            remaining_cost = 0.0
+            result[i] = max_possible
+            remaining_d -= max_possible * old_prices[name]
+            break
     
     output_lines = []
-    for name, quantity in plan:
-        for i, (benefit_per_unit, q, n_name) in enumerate(benefits):
-            if n_name == name:
-                output_lines.append(str(result[i]))
+    for name, _ in plan:
+        for idx, (_, _, item_name) in enumerate(savings):
+            if item_name == name:
+                output_lines.append(str(result[idx]))
                 break
     
     for line in output_lines:

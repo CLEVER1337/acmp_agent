@@ -12,39 +12,34 @@ def main():
     queries = list(map(int, data[3:3+l]))
     
     if k == 1:
-        for q in queries:
-            if q <= n:
-                print(q)
+        for query in queries:
+            if query <= n:
+                print(query)
             else:
                 print(0)
         return
     
     answers = []
-    for q in queries:
-        if q > n:
+    for pos in queries:
+        if pos > n:
             answers.append(0)
             continue
             
-        pos = q
         time = 0
+        current_pos = pos
         step = 1
         total_removed = 0
         
         while True:
-            if pos % k != 0:
-                pos -= pos // k
-                time += step * (pos // k)
-                step *= k
-            else:
+            if current_pos % k != 0:
                 break
                 
-            if pos < k:
+            round_num = current_pos // k
+            if round_num == 0:
                 break
-        
-        if pos % k == 0:
-            time += step * (pos // k)
-        else:
-            time = 0
+                
+            time += round_num
+            current_pos = round_num
             
         answers.append(time)
     

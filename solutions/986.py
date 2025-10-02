@@ -26,7 +26,7 @@ def main():
         if distance <= L:
             print(i + 1)
             return
-            
+    
     print("Yes")
 
 if __name__ == "__main__":

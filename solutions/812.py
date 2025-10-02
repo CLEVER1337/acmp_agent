@@ -1,9 +1,7 @@
 
 def main():
     with open('INPUT.TXT', 'r') as f:
-        data = f.read().split()
-        N = int(data[0])
-        A = int(data[1])
+        N, A = map(int, f.readline().split())
     
     dp = [0] * (N + 1)
     dp[0] = 1

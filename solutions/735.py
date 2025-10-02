@@ -11,24 +11,20 @@ def main():
         print("YES")
         return
         
-    # Проверяем, является ли t подстрокой бесконечной строки s, повторенной много раз
-    for start_pos in range(n):
-        # Пробуем начать с каждой позиции в s
-        i = start_pos
-        j = 0
-        valid = True
+    if n == 0:
+        print("NO")
+        return
         
-        while j < m:
-            if t[j] != s[i % n]:
-                valid = False
+    for start in range(n):
+        pos = 0
+        for i in range(start, start + m):
+            if s[i % n] != t[pos]:
                 break
-            j += 1
-            i += 1
-        
-        if valid:
-            print("YES")
-            return
-    
+            pos += 1
+            if pos == m:
+                print("YES")
+                return
+                
     print("NO")
 
 if __name__ == "__main__":

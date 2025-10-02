@@ -8,9 +8,6 @@ def read_points():
         points.append((x, y))
     return points
 
-def distance(p1, p2):
-    return math.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2)
-
 def circle_from_three_points(p1, p2, p3):
     x1, y1 = p1
     x2, y2 = p2
@@ -21,42 +18,57 @@ def circle_from_three_points(p1, p2, p3):
     C = x3 - x1
     D = y3 - y1
     
-    E = A*(x1 + x2) + B*(y1 + y2)
-    F = C*(x1 + x3) + D*(y1 + y3)
+    E = A * (x1 + x2) + B * (y1 + y2)
+    F = C * (x1 + x3) + D * (y1 + y3)
     
-    G = 2*(A*(y3 - y1) - B*(x3 - x1))
+    G = 2 * (A * (y3 - y1) - C * (y2 - y1))
     
     if abs(G) < 1e-10:
         return None
     
-    cx = (D*E - B*F) / G
-    cy = (A*F - C*E) / G
+    cx = (D * E - B * F) / G
+    cy = (A * F - C * E) / G
     
-    r = distance((cx, cy), p1)
+    r = math.sqrt((x1 - cx)**2 + (y1 - cy)**2)
+    
     return (cx, cy, r)
 
-def are_points_cocircular(points):
-    p1, p2, p3, p4 = points
-    circle = circle_from_three_points(p1, p2, p3)
-    if circle is None:
-        return False
+def point_to_circle_distance(point, circle):
     cx, cy, r = circle
-    return abs(distance((cx, cy), p4) - r) < 1e-10
+    px, py = point
+    distance = math.sqrt((px - cx)**2 + (py - cy)**2)
+    return abs(distance - r)
+
+def are_points_on_circle(points, circle, tolerance=1e-8):
+    cx, cy, r = circle
+    for point in points:
+        px, py = point
+        distance = math.sqrt((px - cx)**2 + (py - cy)**2)
+        if abs(distance - r) > tolerance:
+            return False
+    return True
+
+def are_points_concyclic(points):
+    p1, p2, p3, p4 = points
+    
+    circle1 = circle_from_three_points(p1, p2, p3)
+    if circle1 is None:
+        return False
+    
+    return are_points_on_circle([p4], circle1)
 
 def solve():
     points = read_points()
     
-    if are_points_cocircular(points):
+    if are_points_concyclic(points):
         print("Infinity")
-        p1, p2, p3, p4 = points
-        circle = circle_from_three_points(p1, p2, p3)
-        cx, cy, r = circle
-        print(f"{cx:.10f} {cy:.10f} {r:.10f}")
+        circle = circle_from_three_points(points[0], points[1], points[2])
+        print(f"{circle[0]:.10f} {circle[1]:.10f} {circle[2]:.10f}")
         return
     
-    solutions = set()
-    min_circle = None
-    min_radius = float('inf')
+    min_length = float('inf')
+    best_circle = None
+    count = 0
     
     for i in range(4):
         for j in range(i+1, 4):
@@ -66,49 +78,21 @@ def solve():
                     continue
                 
                 cx, cy, r = circle
-                distances = [abs(distance((cx, cy), p) - r) for p in points]
                 
-                if all(abs(d) < 1e-10 for d in distances):
-                    solutions.add((round(cx, 8), round(cy, 8), round(r, 8)))
-                    if r < min_radius:
-                        min_radius = r
-                        min_circle = (cx, cy, r)
+                distances = []
+                for l in range(4):
+                    dist = point_to_circle_distance(points[l], circle)
+                    distances.append(dist)
+                
+                if max(distances) - min(distances) < 1e-8:
+                    count += 1
+                    if r < min_length:
+                        min_length = r
+                        best_circle = circle
     
-    for i in range(4):
-        for j in range(i+1, 4):
-            p1, p2 = points[i], points[j]
-            mid = ((p1[0] + p2[0])/2, (p1[1] + p2[1])/2)
-            
-            for k in range(4):
-                if k == i or k == j:
-                    continue
-                
-                p3 = points[k]
-                dx, dy = p2[0] - p1[0], p2[1] - p1[1]
-                if abs(dx) < 1e-10 and abs(dy) < 1e-10:
-                    continue
-                
-                normal = (-dy, dx)
-                normal_len = math.sqrt(normal[0]**2 + normal[1]**2)
-                normal = (normal[0]/normal_len, normal[1]/normal_len)
-                
-                d1 = distance(mid, p1)
-                d2 = distance(mid, p3)
-                
-                if abs(d2 - d1) < 1e-10:
-                    cx, cy = mid
-                    r = d1
-                    distances = [abs(distance((cx, cy), p) - r) for p in points]
-                    if all(abs(d) < 1e-10 for d in distances):
-                        solutions.add((round(cx, 8), round(cy, 8), round(r, 8)))
-                        if r < min_radius:
-                            min_radius = r
-                            min_circle = (cx, cy, r)
-    
-    print(len(solutions))
-    if min_circle:
-        cx, cy, r = min_circle
-        print(f"{cx:.10f} {cy:.10f} {r:.10f}")
+    print(count)
+    if best_circle:
+        print(f"{best_circle[0]:.10f} {best_circle[1]:.10f} {best_circle[2]:.10f}")
 
 if __name__ == "__main__":
     solve()

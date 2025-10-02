@@ -1,5 +1,5 @@
 
-def product_digits(n):
+def product_of_digits(n):
     product = 1
     for digit in str(n):
         if digit == '0':
@@ -7,7 +7,7 @@ def product_digits(n):
         product *= int(digit)
     return product
 
-def solve():
+def main():
     with open('INPUT.TXT', 'r') as f:
         L, R = map(int, f.readline().split())
     
@@ -15,11 +15,12 @@ def solve():
     for num in range(L, R + 1):
         if num == 0:
             continue
-        prod = product_digits(num)
-        if prod != 0 and num % prod == 0:
+        product = product_of_digits(num)
+        if product != 0 and num % product == 0:
             count += 1
     
     with open('OUTPUT.TXT', 'w') as f:
         f.write(str(count))
 
-solve()
+if __name__ == '__main__':
+    main()

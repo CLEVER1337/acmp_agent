@@ -12,99 +12,46 @@ def main():
     for _ in range(6):
         view = []
         for i in range(n):
-            view.append(data[index].strip())
+            line = data[index].strip()
             index += 1
-            if i < n - 1 and index < len(data) and data[index].strip() == '':
-                index += 1
+            view.append(line)
         views.append(view)
     
     front, left, back, right, top, bottom = views
     
-    cube = [[[True for _ in range(n)] for _ in range(n)] for _ in range(n)]
+    def get_view_color(view, i, j):
+        return view[i][j]
     
-    for x in range(n):
-        for y in range(n):
-            for z in range(n):
-                if front[z][x] == '.':
-                    cube[x][y][n-1-z] = False
-                if back[z][n-1-x] == '.':
-                    cube[x][y][z] = False
-                if left[z][y] == '.':
-                    cube[n-1-y][x][z] = False
-                if right[z][n-1-y] == '.':
-                    cube[y][x][z] = False
-                if top[y][x] == '.':
-                    cube[x][n-1-y][n-1-z] = False
-                if bottom[n-1-y][x] == '.':
-                    cube[x][y][z] = False
-    
-    for i in range(n):
-        for j in range(n):
-            if front[i][j] != '.':
-                found = False
-                for k in range(n):
-                    if cube[j][k][n-1-i]:
-                        found = True
-                        break
-                if not found:
-                    for k in range(n):
-                        cube[j][k][n-1-i] = False
+    def is_possible(x, y, z):
+        if get_view_color(front, z, x) == '.':
+            return False
+        if get_view_color(left, z, y) == '.':
+            return False
+        if get_view_color(back, z, n-1-x) == '.':
+            return False
+        if get_view_color(right, z, n-1-y) == '.':
+            return False
+        if get_view_color(top, n-1-z, x) == '.':
+            return False
+        if get_view_color(bottom, z, x) == '.':
+            return False
             
-            if left[i][j] != '.':
-                found = False
-                for k in range(n):
-                    if cube[n-1-j][k][i]:
-                        found = True
-                        break
-                if not found:
-                    for k in range(n):
-                        cube[n-1-j][k][i] = False
-            
-            if back[i][j] != '.':
-                found = False
-                for k in range(n):
-                    if cube[n-1-j][k][n-1-i]:
-                        found = True
-                        break
-                if not found:
-                    for k in range(n):
-                        cube[n-1-j][k][n-1-i] = False
-            
-            if right[i][j] != '.':
-                found = False
-                for k in range(n):
-                    if cube[j][k][n-1-i]:
-                        found = True
-                        break
-                if not found:
-                    for k in range(n):
-                        cube[j][k][n-1-i] = False
-            
-            if top[i][j] != '.':
-                found = False
-                for k in range(n):
-                    if cube[j][i][k]:
-                        found = True
-                        break
-                if not found:
-                    for k in range(n):
-                        cube[j][i][k] = False
-            
-            if bottom[i][j] != '.':
-                found = False
-                for k in range(n):
-                    if cube[j][n-1-i][k]:
-                        found = True
-                        break
-                if not found:
-                    for k in range(n):
-                        cube[j][n-1-i][k] = False
+        c1 = get_view_color(front, z, x)
+        c2 = get_view_color(left, z, y)
+        c3 = get_view_color(back, z, n-1-x)
+        c4 = get_view_color(right, z, n-1-y)
+        c5 = get_view_color(top, n-1-z, x)
+        c6 = get_view_color(bottom, z, x)
+        
+        colors = [c1, c2, c3, c4, c5, c6]
+        unique_colors = set(colors)
+        return len(unique_colors) == 1
     
     count = 0
     for x in range(n):
         for y in range(n):
             for z in range(n):
-                if cube[x][y][z]:
+                if is_possible(x, y, z):
                     count += 1
                     
     print(count)
