@@ -1,24 +1,25 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        kirill = f.readline().strip()
-        dima = f.readline().strip()
+    s1 = input().strip()
+    s2 = input().strip()
     
-    if len(kirill) != len(dima):
+    if len(s1) != len(s2):
         print(-1)
         return
         
-    if kirill == dima:
+    if s1 == s2:
         print(0)
         return
         
-    double = kirill + kirill
-    pos = double.find(dima)
+    n = len(s1)
+    doubled = s1 + s1
     
-    if pos == -1:
-        print(-1)
-    else:
-        print(pos)
+    for shift in range(1, n):
+        if doubled[n - shift:2 * n - shift] == s2:
+            print(shift)
+            return
+            
+    print(-1)
 
 if __name__ == "__main__":
     main()

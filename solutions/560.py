@@ -1,6 +1,7 @@
 
+import sys
+
 def main():
-    import sys
     data = sys.stdin.read().split()
     if not data:
         print("No solution.")
@@ -12,7 +13,7 @@ def main():
         L = int(data[2])
         r = int(data[3])
         R = int(data[4])
-        costs = list(map(int, data[5:5+L]))
+        a_list = list(map(int, data[5:5+L]))
     except:
         print("No solution.")
         return
@@ -21,58 +22,63 @@ def main():
         print(0)
         return
         
-    if L < w:
+    if w == 0:
+        print(0)
+        return
+        
+    total_length = L
+    platform_length = w
+    
+    left_bound = 0
+    right_bound = total_length - platform_length
+    
+    if right_bound < left_bound:
         print("No solution.")
         return
         
-    min_distance = r
-    max_distance = R
+    min_gap = r
+    max_gap = R
     
-    total_length_needed = (N - 1) * min_distance + w
-    if total_length_needed > L:
-        print("No solution.")
-        return
-        
-    dp = [float('inf')] * (L + 1)
-    prefix_sum = [0] * (L + 1)
+    dp = [float('inf')] * (right_bound + 1)
+    cost_prefix = [0] * (total_length + 1)
     
-    for i in range(1, L + 1):
-        prefix_sum[i] = prefix_sum[i - 1] + costs[i - 1]
+    for i in range(1, total_length + 1):
+        cost_prefix[i] = cost_prefix[i-1] + a_list[i-1]
         
-    def get_sum(l, r):
-        if l < 1:
-            l = 1
-        if r > L:
-            r = L
-        return prefix_sum[r] - prefix_sum[l - 1]
+    def get_cost(start, end):
+        if start < 0:
+            start = 0
+        if end > total_length:
+            end = total_length
+        return cost_prefix[end] - cost_prefix[start]
         
-    for pos in range(1, L - w + 2):
-        dp[pos] = get_sum(pos, pos + w - 1)
+    for pos in range(left_bound, right_bound + 1):
+        dp[pos] = get_cost(pos, pos + platform_length)
         
-    for stop in range(2, N + 1):
-        new_dp = [float('inf')] * (L + 1)
-        
-        for prev_pos in range(1, L + 1):
+    for stop in range(1, N):
+        new_dp = [float('inf')] * (right_bound + 1)
+        for prev_pos in range(left_bound, right_bound + 1):
             if dp[prev_pos] == float('inf'):
                 continue
                 
-            min_next = prev_pos + w + min_distance
-            max_next = prev_pos + w + max_distance
+            min_next = prev_pos + platform_length + min_gap
+            max_next = prev_pos + platform_length + max_gap
             
-            if min_next > L:
+            min_next = max(min_next, left_bound)
+            max_next = min(max_next, right_bound)
+            
+            if min_next > max_next:
                 continue
                 
-            start = min_next
-            end = min(max_next, L - w + 1)
-            
-            for next_pos in range(start, end + 1):
-                cost = dp[prev_pos] + get_sum(next_pos, next_pos + w - 1)
+            for next_pos in range(min_next, max_next + 1):
+                cost = dp[prev_pos] + get_cost(next_pos, next_pos + platform_length)
                 if cost < new_dp[next_pos]:
                     new_dp[next_pos] = cost
                     
         dp = new_dp
         
-    result = min(dp)
+    result = min(dp) if min(dp) != float('inf') else float('inf')
+    
     if result == float('inf'):
         print("No solution.")
     else:

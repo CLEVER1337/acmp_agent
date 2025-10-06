@@ -1,26 +1,17 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        s = int(f.read().strip())
-    
+    S = int(input().strip())
     result = []
-    while s > 0:
-        result.append(str(s))
-        if s == 1:
+    current = S
+    while current > 0:
+        result.append(str(current))
+        if current == 1:
             break
-        layer = 1
-        total = 1
-        while total < s:
-            layer += 1
-            total += layer
-        pos_in_layer = s - (total - layer)
-        if pos_in_layer % 2 == 1:
-            s = total - layer + (pos_in_layer + 1) // 2
+        if current % 2 == 0:
+            current = current // 2
         else:
-            s = total - layer + layer + (pos_in_layer // 2)
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(' '.join(result))
+            current = (current - 1) // 2
+    print(' '.join(result))
 
 if __name__ == '__main__':
     main()

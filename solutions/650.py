@@ -22,33 +22,46 @@ def main():
         graph[v].append(u)
     
     visited = [False] * (n + 1)
-    components = []
+    total_sum = 0
     
     for i in range(1, n + 1):
         if not visited[i]:
             queue = deque([i])
             visited[i] = True
-            comp = []
+            component = []
             
             while queue:
                 node = queue.popleft()
-                comp.append(node)
-                
+                component.append(node)
                 for neighbor in graph[node]:
                     if not visited[neighbor]:
                         visited[neighbor] = True
                         queue.append(neighbor)
             
-            components.append(comp)
-    
-    total_sum = 0
-    
-    for comp in components:
-        size = len(comp)
-        if size > 1:
+            size = len(component)
             total_sum += size * (size - 1)
     
-    print(total_sum)
+    result = 0
+    for i in range(1, n + 1):
+        if not graph[i]:
+            continue
+            
+        visited = [False] * (n + 1)
+        distance = [0] * (n + 1)
+        queue = deque([i])
+        visited[i] = True
+        
+        while queue:
+            node = queue.popleft()
+            result += distance[node]
+            
+            for neighbor in graph[node]:
+                if not visited[neighbor]:
+                    visited[neighbor] = True
+                    distance[neighbor] = distance[node] + 1
+                    queue.append(neighbor)
+    
+    print(result - total_sum)
 
 if __name__ == "__main__":
     main()

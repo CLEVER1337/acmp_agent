@@ -10,39 +10,53 @@ def main():
     segments = []
     index = 2
     for i in range(n):
-        D = float(data[index])
+        d = float(data[index])
         L = float(data[index+1])
         H = float(data[index+2])
         index += 3
-        segments.append((D, L, H))
+        segments.append((d, L, H))
+    
+    def total_time(speed):
+        if speed <= 0:
+            return float('inf')
+        total = 0.0
+        for d, L, H in segments:
+            if speed > L:
+                total += H
+            total += d / speed
+        return total
     
     left = 0.0
-    right = float(M)
-    best_speed = 0.0
+    right = M
+    best_speed = M
+    eps = 1e-9
     
     for _ in range(100):
-        mid = (left + right) / 2.0
-        total_time = 0.0
-        valid = True
-        
-        for D, L, H in segments:
-            if mid > L:
-                total_time += H
-            total_time += D / mid
-            
-        mid_next = (mid + right) / 2.0
-        total_time_next = 0.0
-        for D, L, H in segments:
-            if mid_next > L:
-                total_time_next += H
-            total_time_next += D / mid_next
-            
-        if total_time_next < total_time:
-            left = mid
+        mid1 = left + (right - left) / 3
+        mid2 = right - (right - left) / 3
+        t1 = total_time(mid1)
+        t2 = total_time(mid2)
+        if t1 < t2:
+            right = mid2
         else:
-            right = mid
-            
-    best_speed = left
+            left = mid1
+    
+    best_speed = (left + right) / 2
+    best_time = total_time(best_speed)
+    
+    candidate_speeds = [M]
+    for d, L, H in segments:
+        candidate_speeds.append(L)
+    
+    candidate_speeds.sort()
+    for speed in candidate_speeds:
+        if speed <= M:
+            t = total_time(speed)
+            if t < best_time - eps:
+                best_time = t
+                best_speed = speed
+            elif abs(t - best_time) < eps and speed > best_speed:
+                best_speed = speed
     
     print(int(best_speed + 0.5))
 

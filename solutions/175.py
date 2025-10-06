@@ -1,68 +1,65 @@
 
-def get_digits(n):
-    return [n // 10, n % 10]
+digits = {
+    '0': [1, 1, 1, 1, 1, 1, 0],
+    '1': [0, 1, 1, 0, 0, 0, 0],
+    '2': [1, 1, 0, 1, 1, 0, 1],
+    '3': [1, 1, 1, 1, 0, 0, 1],
+    '4': [0, 1, 1, 0, 0, 1, 1],
+    '5': [1, 0, 1, 1, 0, 1, 1],
+    '6': [1, 0, 1, 1, 1, 1, 1],
+    '7': [1, 1, 1, 0, 0, 0, 0],
+    '8': [1, 1, 1, 1, 1, 1, 1],
+    '9': [1, 1, 1, 1, 0, 1, 1]
+}
 
-def get_segments(digit, is_hour=False):
-    segments = {
-        0: [1, 1, 1, 1, 1, 1, 0],
-        1: [0, 1, 1, 0, 0, 0, 0],
-        2: [1, 1, 0, 1, 1, 0, 1],
-        3: [1, 1, 1, 1, 0, 0, 1],
-        4: [0, 1, 1, 0, 0, 1, 1],
-        5: [1, 0, 1, 1, 0, 1, 1],
-        6: [1, 0, 1, 1, 1, 1, 1],
-        7: [1, 1, 1, 0, 0, 0, 0],
-        8: [1, 1, 1, 1, 1, 1, 1],
-        9: [1, 1, 1, 1, 0, 1, 1]
-    }
-    if is_hour and digit == 0:
-        return [0, 0, 0, 0, 0, 0, 0]
-    return segments[digit]
-
-def get_state(time_str):
-    hh, mm = map(int, time_str.split(':'))
-    h1, h2 = get_digits(hh)
-    m1, m2 = get_digits(mm)
+def get_display_state(time_str):
+    hh, mm = time_str.split(':')
+    h1 = '0' if hh[0] == '0' else hh[0]
+    h2 = hh[1]
+    m1 = mm[0]
+    m2 = mm[1]
     
-    state = []
-    state.extend(get_segments(h1, True))
-    state.extend(get_segments(h2))
-    state.extend(get_segments(m1))
-    state.extend(get_segments(m2))
-    return state
+    states = []
+    if h1 != '0':
+        states.append(digits[h1])
+    states.append(digits[h2])
+    states.append(digits[m1])
+    states.append(digits[m2])
+    
+    return states
+
+def count_active_segments(states):
+    total_segments = [0] * 7
+    for state in states:
+        for i in range(7):
+            total_segments[i] += state[i]
+    return total_segments
+
+def is_valid_display(states):
+    active_segments = count_active_segments(states)
+    return all(0 < count < len(states) for count in active_segments)
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        start_time = f.readline().strip()
+    start_time = input().strip()
+    hh, mm = map(int, start_time.split(':'))
     
-    total_segments = 28
-    segment_changes = [set() for _ in range(total_segments)]
-    
-    time_str = start_time
-    hh, mm = map(int, time_str.split(':'))
-    total_minutes = 0
+    time = hh * 60 + mm
+    minutes_passed = 0
     
     while True:
-        current_state = get_state(time_str)
+        current_time = (time + minutes_passed) % (24 * 60)
+        hours = current_time // 60
+        minutes = current_time % 60
         
-        for i in range(total_segments):
-            segment_changes[i].add(current_state[i])
+        time_str = f"{hours:02d}:{minutes:02d}"
+        display_states = get_display_state(time_str)
         
-        if all(len(changes) == 2 for changes in segment_changes):
+        if is_valid_display(display_states):
             break
+            
+        minutes_passed += 1
         
-        total_minutes += 1
-        mm += 1
-        if mm == 60:
-            mm = 0
-            hh += 1
-            if hh == 24:
-                hh = 0
-        
-        time_str = f"{hh:02d}:{mm:02d}"
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(total_minutes))
+    print(minutes_passed)
 
 if __name__ == "__main__":
     main()

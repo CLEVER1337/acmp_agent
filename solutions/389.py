@@ -1,44 +1,43 @@
 
 import sys
 
-def is_gray(arr, n):
-    size = len(arr)
-    for i in range(size):
-        prev = arr[(i - 1) % size]
-        curr = arr[i]
-        next_val = arr[(i + 1) % size]
-        
-        diff_prev = bin(prev ^ curr).count('1')
-        diff_next = bin(curr ^ next_val).count('1')
-        
-        if diff_prev != 1 or diff_next != 1:
-            return False
-    return True
-
 def main():
     data = sys.stdin.read().split()
     if not data:
         return
     
     n = int(data[0])
-    arr = list(map(int, data[1:1+2**n]))
-    m = int(data[1+2**n])
-    
+    size = 1 << n
+    arr = list(map(int, data[1:1+size]))
+    m = int(data[1+size])
+    swaps = []
+    index = 2 + size
+    for i in range(m):
+        i1 = int(data[index]); i2 = int(data[index+1])
+        swaps.append((i1, i2))
+        index += 2
+        
+    def is_gray_neighbors(a, b):
+        xor_val = a ^ b
+        return xor_val & (xor_val - 1) == 0 and xor_val != 0
+        
+    def check_gray(arr):
+        for i in range(size):
+            left = arr[i-1]
+            right = arr[(i+1) % size]
+            current = arr[i]
+            if not (is_gray_neighbors(current, left) and is_gray_neighbors(current, right)):
+                return False
+        return True
+        
     results = []
-    idx = 1 + 2**n + 1
-    
-    for _ in range(m):
-        i = int(data[idx])
-        j = int(data[idx+1])
-        idx += 2
-        
-        arr[i], arr[j] = arr[j], arr[i]
-        
-        if is_gray(arr, n):
+    for i1, i2 in swaps:
+        arr[i1], arr[i2] = arr[i2], arr[i1]
+        if check_gray(arr):
             results.append("Yes")
         else:
             results.append("No")
-    
+            
     for res in results:
         print(res)
 

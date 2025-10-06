@@ -1,32 +1,30 @@
 
 def main():
-    import sys
-    data = sys.stdin.read().split()
-    n = int(data[0])
-    directions = list(map(int, data[1:1+n]))
+    n = int(input().strip())
+    directions = list(map(int, input().split()))
     
-    if n < 3:
+    if n % 3 != 0:
         print(0)
         return
         
-    sides = []
-    current_side = 0
-    for d in directions:
-        if d == 1:
-            current_side += 1
-        else:
-            if current_side > 0:
-                sides.append(current_side)
-                current_side = 0
-    if current_side > 0:
-        sides.append(current_side)
+    side_length = n // 3
+    count = 0
     
-    total = 0
-    for side_length in sides:
-        if side_length >= 2:
-            total += (side_length - 1) * (side_length) // 2
+    for start in range(n):
+        valid = True
+        for i in range(side_length):
+            pos1 = (start + i) % n
+            pos2 = (start + i + side_length) % n
+            pos3 = (start + i + 2 * side_length) % n
             
-    print(total)
+            if directions[pos1] != directions[pos2] or directions[pos1] != directions[pos3]:
+                valid = False
+                break
+                
+        if valid:
+            count += 1
+            
+    print(count)
 
 if __name__ == "__main__":
     main()

@@ -9,13 +9,13 @@ def main():
     stack = []
     count = 0
     
-    for num in A:
-        while stack and stack[-1] > num:
+    for h in A:
+        while stack and stack[-1] > h:
             stack.pop()
-        if stack and stack[-1] == num:
+        if stack and stack[-1] == h:
             continue
-        if num > 0:
-            stack.append(num)
+        if h > 0:
+            stack.append(h)
             count += 1
             
     print(count)

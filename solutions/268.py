@@ -5,7 +5,7 @@ def main():
     n, k = map(int, data[0].split())
     s = data[1].strip()
     
-    count = 0
+    total = 0
     for i in range(n):
         diff = 0
         left = i
@@ -14,7 +14,7 @@ def main():
             if s[left] != s[right]:
                 diff += 1
             if diff <= k:
-                count += 1
+                total += 1
             else:
                 break
             left -= 1
@@ -28,13 +28,13 @@ def main():
             if s[left] != s[right]:
                 diff += 1
             if diff <= k:
-                count += 1
+                total += 1
             else:
                 break
             left -= 1
             right += 1
             
-    print(count)
+    print(total)
 
 if __name__ == "__main__":
     main()

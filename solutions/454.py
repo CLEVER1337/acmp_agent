@@ -6,21 +6,24 @@ def main():
     
     length = N - M + 1
     step = 1
-    left = M
-    right = N
+    start = M
+    direction = 1
     
     while length > 1:
-        if step % 2 == 1:
-            left += (1 << (step - 1))
-            length = (length + 1) // 2
+        if direction == 1:
+            start = start + step
+            length = (length - 1) // 2
+            step *= 2
+            direction = -1
         else:
             if length % 2 == 1:
-                left += (1 << (step - 1))
+                start = start + step
             length = length // 2
-        step += 1
+            step *= 2
+            direction = 1
     
     with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(left))
+        f.write(str(start))
 
 if __name__ == '__main__':
     main()

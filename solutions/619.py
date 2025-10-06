@@ -1,32 +1,27 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        N, Q = map(int, f.read().split())
+    import sys
+    data = sys.stdin.read().split()
+    n = int(data[0])
+    q = int(data[1])
     
-    if Q < N or Q > 6 * N:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write('0.0')
+    if q < n or q > 6 * n:
+        print("0.0")
         return
+        
+    dp_prev = [0.0] * (6 * n + 1)
+    dp_prev[0] = 1.0
     
-    dp_prev = [0] * (6 * N + 1)
-    dp_prev[0] = 1
-    
-    for i in range(N):
-        dp_curr = [0] * (6 * N + 1)
-        for j in range(len(dp_prev)):
-            if dp_prev[j] != 0:
-                for k in range(1, 7):
-                    if j + k < len(dp_curr):
-                        dp_curr[j + k] += dp_prev[j]
+    for i in range(1, n + 1):
+        dp_curr = [0.0] * (6 * n + 1)
+        for s in range(i - 1, 6 * (i - 1) + 1):
+            if dp_prev[s] > 0:
+                for d in range(1, 7):
+                    if s + d <= 6 * n:
+                        dp_curr[s + d] += dp_prev[s] / 6.0
         dp_prev = dp_curr
-    
-    favorable = dp_prev[Q]
-    total = 6 ** N
-    
-    probability = favorable / total
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(f'{probability:.15f}')
+        
+    print("{:.15f}".format(dp_prev[q]))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,32 +1,27 @@
 
 def main():
-    import sys
-    data = sys.stdin.read().splitlines()
-    n = int(data[0])
+    n = int(input().strip())
     events = []
-    
-    for i in range(1, n + 1):
-        line = data[i].split()
-        start = list(map(int, line[0].split(':')))
-        end = list(map(int, line[1].split(':')))
-        
-        start_minutes = start[0] * 60 + start[1]
-        end_minutes = end[0] * 60 + end[1]
-        
-        events.append((start_minutes, 1))
-        events.append((end_minutes, -1))
+    for _ in range(n):
+        start, end = input().split()
+        h1, m1 = map(int, start.split(':'))
+        h2, m2 = map(int, end.split(':'))
+        time_in = h1 * 60 + m1
+        time_out = h2 * 60 + m2
+        events.append((time_in, 1))
+        events.append((time_out, -1))
     
     events.sort()
     
-    current = 0
-    max_visitors = 0
+    max_count = 0
+    current_count = 0
     
     for event in events:
-        current += event[1]
-        if current > max_visitors:
-            max_visitors = current
+        current_count += event[1]
+        if current_count > max_count:
+            max_count = current_count
             
-    print(max_visitors)
+    print(max_count)
 
 if __name__ == "__main__":
     main()

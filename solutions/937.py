@@ -1,108 +1,66 @@
 
-import sys
-
 def main():
+    import sys
     data = sys.stdin.read().splitlines()
-    if not data:
-        return
-        
     n = int(data[0])
     lines = data[1:1+n]
+    
     text = '\n'.join(lines)
-    
     stack = [{}]
-    output = []
+    result = []
     i = 0
-    n = len(text)
     
-    def parse_block():
-        nonlocal i
-        block_macros = stack[-1].copy()
-        content = []
-        
-        while i < n and text[i] != '}':
-            if text[i] == '{':
-                i += 1
-                sub_content, sub_macros = parse_block()
-                content.append(sub_content)
-                block_macros.update(sub_macros)
-            elif text[i] == '#':
-                i += 1
-                if i < n and text[i] == '#':
-                    i += 1
-                    name_start = i
-                    while i < n and text[i] != ' ' and text[i] != '\n' and text[i] != '}':
-                        i += 1
-                    macro_name = text[name_start:i]
-                    if i < n and text[i] == ' ':
-                        i += 1
-                    def_start = i
-                    brace_count = 0
-                    while i < n and (brace_count > 0 or text[i] != '#'):
-                        if text[i] == '{':
-                            brace_count += 1
-                        elif text[i] == '}':
-                            brace_count -= 1
-                        i += 1
-                    if i < n and text[i] == '#':
-                        macro_def = text[def_start:i].strip()
-                        i += 1
-                        block_macros[macro_name] = macro_def
-                    else:
-                        i = def_start
-                else:
-                    name_start = i
-                    while i < n and text[i] != ' ' and text[i] != '\n' and text[i] != '}':
-                        i += 1
-                    macro_name = text[name_start:i]
-                    if macro_name in block_macros:
-                        content.append(expand_macro(block_macros[macro_name], block_macros))
-                    else:
-                        content.append('#' + macro_name)
-            else:
-                content.append(text[i])
-                i += 1
-        
-        if i < n and text[i] == '}':
+    while i < len(text):
+        if text[i] == '{':
+            stack.append({})
+            result.append('{')
             i += 1
-        
-        return ''.join(content), block_macros
-    
-    def expand_macro(macro_def, macros):
-        result = []
-        j = 0
-        m_len = len(macro_def)
-        
-        while j < m_len:
-            if macro_def[j] == '#':
+        elif text[i] == '}':
+            stack.pop()
+            result.append('}')
+            i += 1
+        elif i + 1 < len(text) and text[i:i+2] == '{{':
+            result.append('{')
+            i += 2
+        elif i + 1 < len(text) and text[i:i+2] == '}}':
+            result.append('}')
+            i += 2
+        elif text[i] == '#':
+            j = i + 1
+            while j < len(text) and text[j] != '#':
                 j += 1
-                if j < m_len and macro_def[j] == '#':
-                    j += 1
-                    name_start = j
-                    while j < m_len and macro_def[j] != ' ' and macro_def[j] != '\n':
-                        j += 1
-                    macro_name = macro_def[name_start:j]
-                    if macro_name in macros:
-                        result.append(expand_macro(macros[macro_name], macros))
-                    else:
-                        result.append('##' + macro_name)
-                else:
-                    name_start = j
-                    while j < m_len and macro_def[j] != ' ' and macro_def[j] != '\n':
-                        j += 1
-                    macro_name = macro_def[name_start:j]
-                    if macro_name in macros:
-                        result.append(expand_macro(macros[macro_name], macros))
-                    else:
-                        result.append('#' + macro_name)
+            if j < len(text) and text[j] == '#':
+                parts = text[i+1:j].split()
+                if len(parts) >= 2 and parts[0] == 'define':
+                    macro_name = parts[1]
+                    macro_value = ' '.join(parts[2:])
+                    stack[-1][macro_name] = macro_value
+                i = j + 1
             else:
-                result.append(macro_def[j])
+                result.append(text[i])
+                i += 1
+        elif text[i] == '$':
+            j = i + 1
+            while j < len(text) and text[j] != '$':
                 j += 1
-        
-        return ''.join(result)
+            if j < len(text) and text[j] == '$':
+                macro_name = text[i+1:j]
+                for level in range(len(stack)-1, -1, -1):
+                    if macro_name in stack[level]:
+                        result.append(stack[level][macro_name])
+                        break
+                else:
+                    pass
+                i = j + 1
+            else:
+                result.append(text[i])
+                i += 1
+        else:
+            result.append(text[i])
+            i += 1
     
-    result, _ = parse_block()
-    print(result)
+    output = ''.join(result)
+    print(output)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

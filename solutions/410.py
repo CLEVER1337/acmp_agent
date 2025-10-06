@@ -1,7 +1,9 @@
 
 def main():
     with open("INPUT.TXT", "r") as f:
-        N, M = map(int, f.read().split())
+        data = f.read().split()
+        N = int(data[0])
+        M = int(data[1])
     
     remainder = N % M
     if remainder == 0:

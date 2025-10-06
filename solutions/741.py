@@ -10,51 +10,55 @@ def main():
     n = int(data[0])
     m = int(data[1])
     edges = []
-    graph = [[] for _ in range(n + 1)]
-    degrees = [0] * (n + 1)
+    graph = [[] for _ in range(n+1)]
+    degree = [0] * (n+1)
     
     index = 2
     for i in range(m):
         u = int(data[index])
-        v = int(data[index + 1])
+        v = int(data[index+1])
         index += 2
         edges.append((u, v))
-        graph[u].append((v, i))
-        graph[v].append((u, i))
-        degrees[u] += 1
-        degrees[v] += 1
+        graph[u].append(v)
+        graph[v].append(u)
+        degree[u] += 1
+        degree[v] += 1
     
-    max_degree = max(degrees) if n > 0 else 0
+    max_degree = max(degree) if n > 0 else 0
     k = max_degree if max_degree % 2 == 1 else max_degree + 1
     
-    colors = [-1] * m
-    used_colors = [False] * (k + 1)
-    
+    color_map = {}
     for u, v in edges:
-        pass
+        color_map[(min(u, v), max(u, v))] = -1
     
-    for node in range(1, n + 1):
-        neighbors = graph[node]
-        if not neighbors:
-            continue
-            
-        available_colors = set(range(1, k + 1))
-        for neighbor, edge_idx in neighbors:
-            if colors[edge_idx] != -1:
-                if colors[edge_idx] in available_colors:
-                    available_colors.remove(colors[edge_idx])
+    for node in range(1, n+1):
+        used_colors = set()
+        available_edges = []
         
-        for neighbor, edge_idx in neighbors:
-            if colors[edge_idx] == -1:
-                if available_colors:
-                    color = available_colors.pop()
-                    colors[edge_idx] = color
-                else:
-                    colors[edge_idx] = 1
+        for neighbor in graph[node]:
+            edge_key = (min(node, neighbor), max(node, neighbor))
+            if color_map[edge_key] != -1:
+                used_colors.add(color_map[edge_key])
+            else:
+                available_edges.append(neighbor)
+        
+        available_colors = []
+        for c in range(k):
+            if c not in used_colors:
+                available_colors.append(c)
+        
+        idx = 0
+        for neighbor in available_edges:
+            edge_key = (min(node, neighbor), max(node, neighbor))
+            if color_map[edge_key] == -1:
+                color_map[edge_key] = available_colors[idx]
+                idx += 1
     
     print(k)
-    for i, (u, v) in enumerate(edges):
-        print(u, v, colors[i] if colors[i] != -1 else 1)
+    for u, v in edges:
+        edge_key = (min(u, v), max(u, v))
+        color = color_map[edge_key]
+        print(u, v, color + 1)
 
 if __name__ == "__main__":
     main()

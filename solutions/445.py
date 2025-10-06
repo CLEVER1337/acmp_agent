@@ -13,68 +13,65 @@ def main():
     k2 = int(first_line[3])
     
     plan = []
-    for i in range(1, 1 + n):
+    for i in range(1, n + 1):
         parts = data[i].split()
-        name = ' '.join(parts[:-1]).lower()
-        quantity = float(parts[-1])
+        name = parts[0].lower()
+        quantity = float(parts[1])
         plan.append((name, quantity))
     
     old_prices = {}
-    new_prices = {}
-    
-    current_line = n + 1
-    
-    for i in range(current_line, current_line + k1):
+    start_old = n + 1
+    for i in range(start_old, start_old + k1):
         parts = data[i].split()
-        if not parts:
-            continue
-        name = ' '.join(parts[:-1]).lower()
-        price = float(parts[-1])
+        name = parts[0].lower()
+        price = float(parts[1])
         old_prices[name] = price
     
-    current_line += k1 + 1
-    
-    for i in range(current_line, current_line + k2):
+    new_prices = {}
+    start_new = start_old + k1
+    for i in range(start_new, start_new + k2):
         parts = data[i].split()
-        if not parts:
-            continue
-        name = ' '.join(parts[:-1]).lower()
-        price = float(parts[-1])
+        name = parts[0].lower()
+        price = float(parts[1])
         new_prices[name] = price
     
-    savings = []
+    items = []
+    total_planned_cost = 0.0
     for name, quantity in plan:
         old_price = old_prices[name]
         new_price = new_prices.get(name, float('inf'))
+        planned_cost = quantity * old_price
+        total_planned_cost += planned_cost
         saving_per_unit = old_price - new_price
-        savings.append((saving_per_unit, quantity, name))
+        items.append((saving_per_unit, planned_cost, quantity, name))
     
-    savings.sort(reverse=True)
+    items.sort(key=lambda x: x[0], reverse=True)
     
     result = [0.0] * n
     remaining_d = d
     
-    for i, (saving_per_unit, quantity, name) in enumerate(savings):
+    for i, (saving_per_unit, planned_cost, quantity, name) in enumerate(items):
         if saving_per_unit <= 0:
             continue
         
-        max_possible = min(quantity, remaining_d / old_prices[name])
-        if max_possible * saving_per_unit >= quantity * saving_per_unit:
+        if remaining_d >= planned_cost:
             result[i] = quantity
-            remaining_d -= quantity * old_prices[name]
+            remaining_d -= planned_cost
         else:
-            result[i] = max_possible
-            remaining_d -= max_possible * old_prices[name]
-            break
+            result[i] = remaining_d / old_prices[name]
+            remaining_d = 0
     
     output_lines = []
-    for name, _ in plan:
-        for idx, (_, _, item_name) in enumerate(savings):
-            if item_name == name:
-                output_lines.append(str(result[idx]))
+    for i in range(n):
+        original_index = -1
+        for idx, (name, _) in enumerate(plan):
+            if name == items[i][3]:
+                original_index = idx
                 break
+        output_lines.append((original_index, f"{result[i]:.6f}"))
     
-    for line in output_lines:
+    output_lines.sort(key=lambda x: x[0])
+    for idx, line in output_lines:
         print(line)
 
 if __name__ == "__main__":

@@ -2,21 +2,37 @@
 import math
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        N = int(f.read().strip())
-    
-    if N == 0:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write('LOSE')
+    n = int(input().strip())
+    if n == 0:
+        print("LOSE")
         return
+        
+    dp = {}
+    dp[0] = False
     
-    sqrt_n = int(math.isqrt(N))
-    if sqrt_n * sqrt_n == N:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write('LOSE')
+    def can_win(k):
+        if k in dp:
+            return dp[k]
+            
+        max_take = int(math.isqrt(k))
+        if max_take == 0:
+            dp[k] = False
+            return False
+            
+        moves = set()
+        for take in range(1, max_take + 1):
+            moves.add(can_win(k - take))
+            
+        if False not in moves:
+            dp[k] = False
+        else:
+            dp[k] = True
+        return dp[k]
+        
+    if can_win(n):
+        print("WIN")
     else:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write('WIN')
+        print("LOSE")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

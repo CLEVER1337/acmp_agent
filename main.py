@@ -177,7 +177,7 @@ with open(f"excepted.lst", "r") as file:
 print(len(KEYS))
 
 except_list = [int(i) for i in excepted.split(" ")]
-for task_id in range(start_id, 1000):
+for task_id in range(start_id, 1001):
     if task_id not in except_list:
         try:
             print(f"Current task is {task_id}")

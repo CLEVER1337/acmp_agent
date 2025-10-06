@@ -1,46 +1,70 @@
 
 import sys
+from collections import defaultdict
 
 def main():
     data = sys.stdin.read().splitlines()
     n = int(data[0])
     names = data[1:1+n]
     
-    start_count = {}
-    end_count = {}
+    in_degree = defaultdict(int)
+    out_degree = defaultdict(int)
+    edges = defaultdict(int)
     
     for name in names:
-        first_char = name[:3]
-        last_char = name[-3:]
-        start_count[first_char] = start_count.get(first_char, 0) + 1
-        end_count[last_char] = end_count.get(last_char, 0) + 1
+        first_char = name[0]
+        last_char = name[-1]
+        out_degree[first_char] += 1
+        in_degree[last_char] += 1
+        edges[(first_char, last_char)] += 1
     
-    all_chars = set(start_count.keys()) | set(end_count.keys())
+    chars = set(in_degree.keys()) | set(out_degree.keys())
     
-    balance = {}
-    for char in all_chars:
-        balance[char] = start_count.get(char, 0) - end_count.get(char, 0)
+    components = []
+    visited = set()
     
-    positive = []
-    negative = []
+    def dfs(node, component):
+        stack = [node]
+        while stack:
+            current = stack.pop()
+            if current in visited:
+                continue
+            visited.add(current)
+            component.add(current)
+            for neighbor in chars:
+                if (current, neighbor) in edges and edges[(current, neighbor)] > 0:
+                    stack.append(neighbor)
+                if (neighbor, current) in edges and edges[(neighbor, current)] > 0:
+                    stack.append(neighbor)
     
-    for char, diff in balance.items():
-        if diff > 0:
-            positive.append((char, diff))
-        elif diff < 0:
-            negative.append((char, -diff))
+    for char in chars:
+        if char not in visited:
+            component = set()
+            dfs(char, component)
+            components.append(component)
     
-    if not positive and not negative:
-        print(0)
-        return
+    total_added = 0
+    for comp in components:
+        comp_chars = comp
+        balance_sum = 0
+        in_minus_out = []
         
-    total_positive = sum(diff for _, diff in positive)
-    total_negative = sum(diff for _, diff in negative)
+        for char in comp_chars:
+            balance = out_degree[char] - in_degree[char]
+            in_minus_out.append(balance)
+            balance_sum += balance
+        
+        if balance_sum != 0:
+            total_added += abs(balance_sum)
+        else:
+            has_imbalance = any(b != 0 for b in in_minus_out)
+            if has_imbalance:
+                total_added += 1
     
-    if total_positive == total_negative:
-        print(total_positive)
-    else:
-        print(max(total_positive, total_negative))
+    if len(components) > 1:
+        total_added += len(components) - 1
+    
+    print(total_added)
 
 if __name__ == "__main__":
     main()

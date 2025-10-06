@@ -1,5 +1,5 @@
 
-n = int(input())
+n = int(input().strip())
 matrix = [[0] * n for _ in range(n)]
 num = 1
 
@@ -13,6 +13,5 @@ for i in range(n):
             matrix[i][j] = num
             num += 1
 
-with open('OUTPUT.TXT', 'w') as f:
-    for row in matrix:
-        f.write(' '.join(map(str, row)) + '\n')
+for i in range(n):
+    print(' '.join(map(str, matrix[i])))

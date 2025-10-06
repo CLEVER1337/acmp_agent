@@ -12,58 +12,71 @@ def main():
     n = int(data[0])
     M = int(data[1])
     K = int(data[2])
-    numbers = list(map(int, data[3:3+n]))
+    arr = list(map(int, data[3:3+n]))
     
     if n == 0:
         print(-1)
         return
         
-    numbers.sort()
+    arr.sort()
+    total_permutations = 0
+    result = []
+    used = [False] * n
     
     graph = defaultdict(list)
     for i in range(n):
-        for j in range(i+1, n):
-            if math.gcd(numbers[i], numbers[j]) >= K:
+        for j in range(n):
+            if i != j and math.gcd(arr[i], arr[j]) >= K:
                 graph[i].append(j)
-                graph[j].append(i)
-                
-    visited = [False] * n
-    result = []
-    count = [0]
-    found = [False]
-    target_index = [M]
     
-    def backtrack(path):
-        if found[0]:
-            return
+    memo = {}
+    
+    def count_permutations(mask, last):
+        if mask == (1 << n) - 1:
+            return 1
             
-        if len(path) == n:
-            count[0] += 1
-            if count[0] == target_index[0]:
-                result.extend([numbers[i] for i in path])
-                found[0] = True
-            return
+        if (mask, last) in memo:
+            return memo[(mask, last)]
             
-        last = path[-1] if path else -1
+        total = 0
+        for i in range(n):
+            if not (mask & (1 << i)):
+                if last == -1 or math.gcd(arr[last], arr[i]) >= K:
+                    total += count_permutations(mask | (1 << i), i)
+                    
+        memo[(mask, last)] = total
+        return total
         
+    total_count = count_permutations(0, -1)
+    if M > total_count:
+        print(-1)
+        return
+        
+    def find_mth(mask, last, m):
+        if mask == (1 << n) - 1:
+            return []
+            
         candidates = []
-        for neighbor in graph[last] if last != -1 else range(n):
-            if not visited[neighbor]:
-                if last == -1 or math.gcd(numbers[last], numbers[neighbor]) >= K:
-                    candidates.append(neighbor)
+        for i in range(n):
+            if not (mask & (1 << i)):
+                if last == -1 or math.gcd(arr[last], arr[i]) >= K:
+                    cnt = count_permutations(mask | (1 << i), i)
+                    candidates.append((i, cnt))
                     
-        candidates.sort(key=lambda x: numbers[x])
+        candidates.sort(key=lambda x: arr[x[0]])
         
-        for candidate in candidates:
-            if not visited[candidate]:
-                visited[candidate] = True
-                backtrack(path + [candidate])
-                visited[candidate] = False
-                if found[0]:
-                    return
-                    
-    backtrack([])
-    
+        for i, cnt in candidates:
+            if m <= cnt:
+                next_mask = mask | (1 << i)
+                rest = find_mth(next_mask, i, m)
+                if rest is not None:
+                    return [arr[i]] + rest
+            else:
+                m -= cnt
+                
+        return None
+        
+    result = find_mth(0, -1, M)
     if result:
         print(" ".join(map(str, result)))
     else:

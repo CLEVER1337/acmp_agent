@@ -1,7 +1,8 @@
 
+import sys
+sys.setrecursionlimit(10000)
+
 def main():
-    import sys
-    sys.setrecursionlimit(10000)
     data = sys.stdin.read().split()
     if not data:
         print(0)
@@ -22,43 +23,46 @@ def main():
         edges.append((u, v))
     
     parent = [0] * (n+1)
+    children = [[] for _ in range(n+1)]
     size = [0] * (n+1)
     
-    def dfs(u, par):
-        parent[u] = par
-        size[u] = 1
+    stack = [1]
+    parent[1] = 0
+    order = []
+    while stack:
+        u = stack.pop()
+        order.append(u)
         for v in graph[u]:
-            if v != par:
-                dfs(v, u)
-                size[u] += size[v]
+            if v != parent[u]:
+                parent[v] = u
+                children[u].append(v)
+                stack.append(v)
     
-    dfs(1, 0)
+    for u in reversed(order):
+        size[u] = 1
+        for v in children[u]:
+            size[u] += size[v]
     
     dp = [[float('inf')] * (n+1) for _ in range(n+1)]
     for i in range(1, n+1):
-        dp[i][1] = len(graph[i])
-        if parent[i] != 0:
-            dp[i][1] -= 1
+        dp[i][1] = len(children[i])
     
-    for u in range(1, n+1):
-        for v in graph[u]:
-            if v == parent[u]:
-                continue
+    for u in reversed(order):
+        for v in children[u]:
             new_dp = [float('inf')] * (n+1)
-            for j in range(1, n+1):
-                if dp[u][j] == float('inf'):
-                    continue
-                new_dp[j] = min(new_dp[j], dp[u][j])
-                for k in range(1, size[v]+1):
-                    if j+k > n:
-                        break
-                    if dp[v][k] != float('inf'):
-                        new_dp[j+k] = min(new_dp[j+k], dp[u][j] + dp[v][k] - 1)
-            dp[u] = new_dp
+            for j in range(size[u], 0, -1):
+                for k in range(1, min(j, size[v]+1)):
+                    if dp[u][j] != float('inf') and dp[v][k] != float('inf'):
+                        new_dp[j-k] = min(new_dp[j-k], dp[u][j] + dp[v][k] - 1)
+                if dp[u][j] != float('inf'):
+                    new_dp[j] = min(new_dp[j], dp[u][j])
+            for j in range(n+1):
+                if new_dp[j] != float('inf'):
+                    dp[u][j] = new_dp[j]
     
     result = float('inf')
     for i in range(1, n+1):
-        if dp[i][p] != float('inf'):
+        if size[i] >= p:
             if i == 1:
                 result = min(result, dp[i][p])
             else:
@@ -66,5 +70,5 @@ def main():
     
     print(result)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

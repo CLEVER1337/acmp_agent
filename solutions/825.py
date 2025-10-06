@@ -1,24 +1,26 @@
 
 import math
 
-def find_kth_losing_position(k):
-    if k == 0:
-        return (0, 0)
-    
-    n = int((math.isqrt(1 + 8 * k) - 1) // 2)
-    remaining = k - n * (n + 1) // 2
-    a = n - remaining
-    b = n + 1 + remaining
-    return (a, b)
-
 def main():
     import sys
-    data = sys.stdin.read().split()
+    input = sys.stdin.read
+    data = input().split()
     n = int(data[0])
+    k_list = list(map(int, data[1:1+n]))
+    
     results = []
-    for i in range(1, n + 1):
-        k = int(data[i])
-        a, b = find_kth_losing_position(k)
+    for k in k_list:
+        if k == 0:
+            results.append("1 2")
+            continue
+            
+        a = int((1 + math.sqrt(1 + 8 * k)) / 2)
+        while a * (a - 1) // 2 <= k:
+            a += 1
+        a -= 1
+        
+        rem = k - a * (a - 1) // 2
+        b = a + rem + 1
         results.append(f"{a} {b}")
     
     for res in results:

@@ -1,6 +1,7 @@
 
+import sys
+
 def main():
-    import sys
     data = sys.stdin.read().split()
     if not data:
         return
@@ -11,28 +12,44 @@ def main():
     index = 2
     for i in range(m):
         p = int(data[index])
-        h = int(data[index+1])
+        h = int(data[index + 1])
         index += 2
         connections.append((p, h))
     
-    connections.sort(key=lambda x: x[1], reverse=True)
-    
-    left = k
-    right = k
-    
+    left = {}
+    right = {}
     for p, h in connections:
-        if p >= left - 1 and p <= right:
-            if p == left - 1:
-                left = p
-            elif p == right:
-                right = p + 1
-            else:
-                if p - left + 1 < right - p:
-                    left = p
-                else:
-                    right = p + 1
+        if p not in left:
+            left[p] = h
+        else:
+            if h > left[p]:
+                left[p] = h
+                
+        if p - 1 not in right:
+            right[p - 1] = h
+        else:
+            if h > right[p - 1]:
+                right[p - 1] = h
     
-    print(left)
+    current_thread = k
+    current_height = float('inf')
+    
+    while True:
+        found = False
+        
+        if current_thread in left and left[current_thread] < current_height:
+            current_height = left[current_thread]
+            current_thread += 1
+            found = True
+        elif current_thread - 1 in right and right[current_thread - 1] < current_height:
+            current_height = right[current_thread - 1]
+            current_thread -= 1
+            found = True
+            
+        if not found:
+            break
+            
+    print(current_thread)
 
 if __name__ == "__main__":
     main()

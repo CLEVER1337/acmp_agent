@@ -1,16 +1,28 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        data = f.read().splitlines()
+    import sys
+    data = sys.stdin.read().splitlines()
+    if not data:
+        return
     
     w, h = map(int, data[0].split())
-    img1 = data[1:1+h]
-    img2 = data[1+h:1+2*h]
-    op = list(map(int, data[1+2*h].split()))
+    img1 = []
+    img2 = []
+    
+    index = 1
+    for i in range(h):
+        img1.append(data[index].strip())
+        index += 1
+        
+    for i in range(h):
+        img2.append(data[index].strip())
+        index += 1
+        
+    op = list(map(int, data[index].split()))
     
     result = []
     for i in range(h):
-        row = ''
+        row = []
         for j in range(w):
             p1 = int(img1[i][j])
             p2 = int(img2[i][j])
@@ -22,11 +34,11 @@ def main():
                 res = op[2]
             else:
                 res = op[3]
-            row += str(res)
-        result.append(row)
+            row.append(str(res))
+        result.append(''.join(row))
     
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write('\n'.join(result))
+    for line in result:
+        print(line)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

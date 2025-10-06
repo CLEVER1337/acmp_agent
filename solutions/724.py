@@ -3,8 +3,9 @@ def main():
     import sys
     data = sys.stdin.read().split()
     if not data:
+        print("Impossible")
         return
-    
+        
     n = int(data[0])
     m = int(data[1])
     matrix = []
@@ -16,35 +17,23 @@ def main():
     
     from itertools import combinations, product
     
-    def covers(attacks, defense_row):
-        for a in attacks:
-            if defense_row[a] == 0:
-                return True
-        return False
-    
     for k in range(1, m + 1):
-        found_solution = True
-        best_attacks = None
-        
-        for attack_set in combinations(range(m), k):
+        for attacks in combinations(range(1, m + 1), k):
+            attacks_set = set(attacks)
             valid = True
-            for i in range(n):
-                if not covers(attack_set, matrix[i]):
+            for row in matrix:
+                found = False
+                for j in range(m):
+                    if row[j] == 1 and (j + 1) in attacks_set:
+                        found = True
+                        break
+                if not found:
                     valid = False
                     break
-            
             if valid:
-                if best_attacks is None:
-                    best_attacks = attack_set
-                found_solution = True
-                break
-        
-        if best_attacks is not None:
-            result = [str(x + 1) for x in best_attacks]
-            print(str(k))
-            print(" ".join(result))
-            return
-    
+                print(str(k) + " " + " ".join(map(str, attacks)))
+                return
+                
     print("Impossible")
 
 if __name__ == "__main__":

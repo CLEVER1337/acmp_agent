@@ -1,4 +1,4 @@
 
-n = int(input())
-coordinates = list(map(int, input().split()))
-print(coordinates[(n - 1) // 2])
+n = int(input().strip())
+houses = list(map(int, input().split()))
+print(houses[(n - 1) // 2])

@@ -13,13 +13,16 @@ def main():
         
         count = 0
         for i in range(1, n):
-            current = row[i]
-            for j in range(i):
-                if row[j] > current:
-                    count += 1
-        
+            key = row[i]
+            j = i - 1
+            while j >= 0 and row[j] > key:
+                count += 1
+                row[j + 1] = row[j]
+                j -= 1
+            row[j + 1] = key
+            
         total_pushups += count
-    
+        
     print(total_pushups)
 
 if __name__ == "__main__":

@@ -1,7 +1,5 @@
 
-import sys
 import math
-from functools import lru_cache
 
 def factorize(n):
     factors = {}
@@ -15,47 +13,24 @@ def factorize(n):
         factors[n] = factors.get(n, 0) + 1
     return factors
 
-def get_divisors(factors):
-    divisors = [1]
-    for p, exp in factors.items():
-        new_divisors = []
-        for d in divisors:
-            for i in range(exp + 1):
-                new_divisors.append(d * (p ** i))
-        divisors = new_divisors
-    return sorted(divisors)
-
-def solve():
-    data = sys.stdin.read().split()
-    n = int(data[0])
-    k = int(data[1])
-    
+def main():
+    n, k = map(int, input().split())
     factors = factorize(n)
-    divisors = get_divisors(factors)
+    primes = list(factors.keys())
+    exponents = list(factors.values())
+    m = len(primes)
     
-    @lru_cache(maxsize=None)
-    def count_normal_sets(start_idx, remaining_k, gcd_val):
-        if remaining_k == 0:
-            return 1
-        
-        total = 0
-        for i in range(start_idx, len(divisors)):
-            d = divisors[i]
-            if d == 1:
-                continue
-                
-            if gcd_val == 0:
-                new_gcd = d
-            else:
-                new_gcd = math.gcd(gcd_val, d)
-                
-            if new_gcd == 1:
-                total += count_normal_sets(i + 1, remaining_k - 1, new_gcd)
-        
-        return total
+    dp = [[0] * (k + 1) for _ in range(m + 1)]
+    dp[0][0] = 1
     
-    result = count_normal_sets(0, k, 0)
-    print(result)
+    for i in range(1, m + 1):
+        exp = exponents[i - 1]
+        for j in range(k + 1):
+            dp[i][j] = dp[i - 1][j] * (exp + 1)
+            if j > 0:
+                dp[i][j] += dp[i - 1][j - 1] * exp
+    
+    print(dp[m][k])
 
 if __name__ == "__main__":
-    solve()
+    main()

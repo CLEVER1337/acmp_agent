@@ -2,34 +2,34 @@
 def main():
     import sys
     data = sys.stdin.read().splitlines()
+    if not data:
+        print("NO")
+        return
+        
     n, m = map(int, data[0].split())
-    
-    ad = []
-    for i in range(1, 1 + n):
-        ad.append(data[i].strip())
-    
-    screen = []
-    for i in range(1 + n, 1 + n + n):
-        row = list(map(int, data[i].split()))
-        screen.append(row)
+    ad_lines = data[1:1+n]
+    screen_lines = data[1+n:1+2*n]
     
     color_map = {
-        '.': 0,
         'R': 1,
         'G': 2,
-        'B': 4
+        'B': 4,
+        '.': 0
     }
     
     for i in range(n):
+        ad_row = ad_lines[i].strip()
+        screen_row = list(map(int, screen_lines[i].split()))
+        
         for j in range(m):
-            ad_color = ad[i][j]
-            screen_capabilities = screen[i][j]
+            ad_color = ad_row[j]
+            required = color_map[ad_color]
+            available = screen_row[j]
             
-            if ad_color == '.':
+            if required == 0:
                 continue
                 
-            required_color = color_map[ad_color]
-            if (screen_capabilities & required_color) == 0:
+            if (available & required) == 0:
                 print("NO")
                 return
                 

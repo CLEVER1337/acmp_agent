@@ -1,39 +1,27 @@
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        x = int(f.read().strip())
-    
+    x = int(input().strip())
     if x == 1:
-        with open("OUTPUT.TXT", "w") as f:
-            f.write("1")
+        print(1)
         return
-    
-    # Факторизуем число x (по условию простые делители ≤ 1000)
+        
     factors = {}
     temp = x
-    d = 2
-    while d * d <= temp:
-        while temp % d == 0:
-            factors[d] = factors.get(d, 0) + 1
-            temp //= d
-        d += 1
+    p = 2
+    while p * p <= temp:
+        while temp % p == 0:
+            factors[p] = factors.get(p, 0) + 1
+            temp //= p
+        p += 1
     if temp > 1:
         factors[temp] = factors.get(temp, 0) + 1
-    
-    # Получаем список простых делителей
+        
     primes = list(factors.keys())
-    
-    # Любой делитель, делящийся на все простые делители x, имеет вид:
-    # y = p1^a1 * p2^a2 * ... * pk^ak * m, где 0 <= ai <= factors[pi]
-    # и m - любое число, взаимно простое с x
-    
-    # Количество возможных значений для каждого простого множителя
     count = 1
     for p in primes:
         count *= (factors[p] + 1)
-    
-    with open("OUTPUT.TXT", "w") as f:
-        f.write(str(count))
+        
+    print(count)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

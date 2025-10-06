@@ -1,29 +1,29 @@
 
 def main():
-    with open('input.txt', 'r') as f:
-        n, m = map(int, f.read().split())
+    import sys
+    data = sys.stdin.read().split()
+    if not data:
+        return
+    n = int(data[0])
+    m = int(data[1])
     
     if n == 0:
         result = 1 % m
-    elif n == 1:
-        result = 2 % m
     else:
-        def euler_phi(k):
-            result = k
+        def phi(x):
+            res = x
             i = 2
-            while i * i <= k:
-                if k % i == 0:
-                    while k % i == 0:
-                        k //= i
-                    result -= result // i
+            while i * i <= x:
+                if x % i == 0:
+                    while x % i == 0:
+                        x //= i
+                    res -= res // i
                 i += 1
-            if k > 1:
-                result -= result // k
-            return result
+            if x > 1:
+                res -= res // x
+            return res
         
         def power_mod(a, b, mod):
-            if mod == 1:
-                return 0
             result = 1
             a = a % mod
             while b > 0:
@@ -42,15 +42,18 @@ def main():
                 return 2 % mod
             if n == 2:
                 return 4 % mod
+            if n == 3:
+                return 16 % mod
             
-            phi = euler_phi(mod)
-            exp = tetration_mod(n - 1, phi)
-            return power_mod(2, exp + phi, mod)
+            phi_mod = phi(mod)
+            exp = tetration_mod(n - 1, phi_mod)
+            if exp == 0:
+                exp = phi_mod
+            return power_mod(2, exp, mod)
         
         result = tetration_mod(n, m)
     
-    with open('output.txt', 'w') as f:
-        f.write(str(result))
+    print(result)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

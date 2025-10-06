@@ -27,11 +27,8 @@ def main():
     for i in range(0, n):
         if z[i] >= n - i:
             count += 1
-        else:
-            if s[z[i]] > s[i + z[i]]:
-                count += 1
-                
+            
     print(count)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

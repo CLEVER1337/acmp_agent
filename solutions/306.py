@@ -1,12 +1,13 @@
 
 n = int(input().strip())
 result = [''] * n
-left, right = 0, n - 1
+left = 0
+right = n - 1
 for i in range(n):
     if i % 2 == 0:
-        result[left] = 'B' if i % 2 == 0 else 'R'
+        result[left] = 'B' if (left % 2 == 0) else 'R'
         left += 1
     else:
-        result[right] = 'R' if i % 2 == 1 else 'B'
+        result[right] = 'B' if (right % 2 == 0) else 'R'
         right -= 1
 print(''.join(result))

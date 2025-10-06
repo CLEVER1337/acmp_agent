@@ -1,8 +1,6 @@
 
 def main():
     import sys
-    from collections import deque
-    
     data = sys.stdin.read().split()
     if not data:
         return
@@ -10,91 +8,95 @@ def main():
     W = int(data[0])
     H = int(data[1])
     n = int(data[2])
-    
     segments = []
     index = 3
     for i in range(n):
         a, b, c, d = map(int, data[index:index+4])
         index += 4
-        segments.append((min(a, c), min(b, d), max(a, c), max(b, d)))
+        if a == c:
+            if b > d:
+                b, d = d, b
+            segments.append(('v', a, b, d))
+        else:
+            if a > c:
+                a, c = c, a
+            segments.append(('h', b, a, c))
     
-    vertical_segments = []
-    horizontal_segments = []
-    
+    verticals = []
+    horizontals = []
     for seg in segments:
-        x1, y1, x2, y2 = seg
-        if x1 == x2:
-            vertical_segments.append((x1, y1, y2))
-        elif y1 == y2:
-            horizontal_segments.append((y1, x1, x2))
+        if seg[0] == 'v':
+            verticals.append(seg)
+        else:
+            horizontals.append(seg)
     
-    vertical_segments.sort(key=lambda x: x[0])
-    horizontal_segments.sort(key=lambda x: x[0])
+    verticals.sort(key=lambda x: x[1])
+    horizontals.sort(key=lambda x: x[1])
     
-    x_lines = sorted(set([0, W] + [x for x, _, _ in vertical_segments]))
-    y_lines = sorted(set([0, H] + [y for y, _, _ in horizontal_segments]))
+    xs = [0, W]
+    ys = [0, H]
+    
+    for seg in verticals:
+        xs.append(seg[1])
+    for seg in horizontals:
+        ys.append(seg[1])
+    
+    xs = sorted(set(xs))
+    ys = sorted(set(ys))
+    
+    grid = [[False] * (len(ys) - 1) for _ in range(len(xs) - 1)]
+    
+    for seg in verticals:
+        x = seg[1]
+        y1 = seg[2]
+        y2 = seg[3]
+        idx_x = xs.index(x)
+        for j in range(len(ys) - 1):
+            if ys[j] >= y1 and ys[j+1] <= y2:
+                if idx_x > 0:
+                    grid[idx_x - 1][j] = True
+                if idx_x < len(xs) - 1:
+                    grid[idx_x][j] = True
+    
+    for seg in horizontals:
+        y = seg[1]
+        x1 = seg[2]
+        x2 = seg[3]
+        idx_y = ys.index(y)
+        for i in range(len(xs) - 1):
+            if xs[i] >= x1 and xs[i+1] <= x2:
+                if idx_y > 0:
+                    grid[i][idx_y - 1] = True
+                if idx_y < len(ys) - 1:
+                    grid[i][idx_y] = True
     
     areas = []
-    visited = set()
+    visited = [[False] * (len(ys) - 1) for _ in range(len(xs) - 1)]
     
-    for i in range(len(x_lines) - 1):
-        for j in range(len(y_lines) - 1):
-            x_start, x_end = x_lines[i], x_lines[i + 1]
-            y_start, y_end = y_lines[j], y_lines[j + 1]
-            
-            if (x_start, y_start) in visited:
-                continue
-                
-            queue = deque([(x_start, y_start)])
-            visited.add((x_start, y_start))
-            area = 0
-            
-            while queue:
-                x, y = queue.popleft()
-                area += (min(x_end, x_lines[x_lines.index(x) + 1]) - x) * (min(y_end, y_lines[y_lines.index(y) + 1]) - y)
-                
-                for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
-                    nx, ny = x + dx, y + dy
-                    
-                    if (nx, ny) in visited:
-                        continue
-                    
-                    if not (x_start <= nx < x_end and y_start <= ny < y_end):
-                        continue
-                    
-                    can_move = True
-                    
-                    if dx == 1:
-                        for seg in vertical_segments:
-                            if seg[0] == x and seg[1] <= y < seg[2]:
-                                can_move = False
-                                break
-                    elif dx == -1:
-                        for seg in vertical_segments:
-                            if seg[0] == x - 1 and seg[1] <= y < seg[2]:
-                                can_move = False
-                                break
-                    elif dy == 1:
-                        for seg in horizontal_segments:
-                            if seg[0] == y and seg[1] <= x < seg[2]:
-                                can_move = False
-                                break
-                    elif dy == -1:
-                        for seg in horizontal_segments:
-                            if seg[0] == y - 1 and seg[1] <= x < seg[2]:
-                                can_move = False
-                                break
-                    
-                    if can_move:
-                        visited.add((nx, ny))
-                        queue.append((nx, ny))
-            
-            if area > 0:
+    from collections import deque
+    directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+    
+    for i in range(len(xs) - 1):
+        for j in range(len(ys) - 1):
+            if not visited[i][j] and not grid[i][j]:
+                area = 0
+                queue = deque()
+                queue.append((i, j))
+                visited[i][j] = True
+                while queue:
+                    ci, cj = queue.popleft()
+                    cell_area = (xs[ci+1] - xs[ci]) * (ys[cj+1] - ys[cj])
+                    area += cell_area
+                    for dx, dy in directions:
+                        ni, nj = ci + dx, cj + dy
+                        if 0 <= ni < len(xs)-1 and 0 <= nj < len(ys)-1:
+                            if not visited[ni][nj] and not grid[ni][nj]:
+                                visited[ni][nj] = True
+                                queue.append((ni, nj))
                 areas.append(area)
     
     areas.sort(reverse=True)
-    for area in areas:
-        print(area)
+    print(' '.join(map(str, areas)))
 
 if __name__ == "__main__":
     main()

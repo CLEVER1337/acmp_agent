@@ -11,31 +11,27 @@ def factorize(n):
         factors[n] = factors.get(n, 0) + 1
     return factors
 
-def solve():
-    with open('INPUT.TXT', 'r') as f:
-        A = int(f.read().strip())
-    
+def main():
+    A = int(input().strip())
     if A == 1:
-        result = 1
-    else:
-        factors_A = factorize(A)
-        result = 1
+        print(1)
+        return
         
-        for p, exp in factors_A.items():
-            n_candidate = 0
-            temp_exp = 0
-            while temp_exp < exp:
-                n_candidate += 1
-                temp_exp += n_candidate
-                count = n_candidate
-                temp = n_candidate
-                while temp % p == 0:
-                    temp_exp += count
-                    temp //= p
-            
-            result = max(result, n_candidate * p)
+    factors_A = factorize(A)
+    result = 1
     
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(result))
+    for p, exp in factors_A.items():
+        n = 0
+        current_exp = 0
+        while current_exp < exp:
+            n += 1
+            temp = n
+            while temp % p == 0:
+                current_exp += 1
+                temp //= p
+        result = max(result, n * p)
+    
+    print(result)
 
-solve()
+if __name__ == '__main__':
+    main()

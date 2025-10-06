@@ -1,23 +1,28 @@
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        n = int(f.readline().strip())
-    
+    n = int(input().strip())
     if n == 1:
-        result = 0
-    else:
-        length = 1
-        k = 0
+        print(0)
+        return
         
-        while length * 2 < n:
-            length *= 2
-            k += 1
+    length = 1
+    k = 0
+    while length < n:
+        k += 1
+        length = 2 * length
         
-        pos_in_block = n - length - 1
-        result = (k % 3 + pos_in_block) % 3
-    
-    with open("OUTPUT.TXT", "w") as f:
-        f.write(str(result))
+    def find_digit(pos, level, value):
+        if level == 0:
+            return value
+            
+        half = 1 << (level - 1)
+        if pos <= half:
+            return find_digit(pos, level - 1, value)
+        else:
+            return find_digit(pos - half, level - 1, (value + 1) % 3)
+            
+    result = find_digit(n, k, 0)
+    print(result)
 
 if __name__ == "__main__":
     main()

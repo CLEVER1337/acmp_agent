@@ -17,30 +17,23 @@ def main():
     girls = list(range(m))
     
     count = 0
-    
     for perm in permutations(girls, k):
         used_boys = set()
-        used_girls = set()
+        used_girls = set(perm)
         valid = True
-        
         for boy_idx, girl_idx in enumerate(perm):
-            if boy_idx >= n or girl_idx >= m:
-                valid = False
-                break
-                
             if grid[boy_idx][girl_idx] != 'Y':
                 valid = False
                 break
-                
-            if boy_idx in used_boys or girl_idx in used_girls:
-                valid = False
-                break
-                
             used_boys.add(boy_idx)
-            used_girls.add(girl_idx)
         
-        if valid:
-            count += 1
+        if not valid:
+            continue
+            
+        if len(used_boys) != k or len(used_girls) != k:
+            continue
+            
+        count += 1
     
     print(count)
 

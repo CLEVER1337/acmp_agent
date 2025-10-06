@@ -7,26 +7,37 @@ def main():
     people = []
     index = 1
     for i in range(n):
-        t = int(data[index])
-        w = int(data[index + 1])
+        t_i = int(data[index])
+        w_i = int(data[index + 1])
         index += 2
-        people.append((t, w, i))
+        people.append((t_i, w_i, i))
     
-    people.sort(key=lambda x: x[1], reverse=True)
+    groups = []
+    current_max_t = 0
+    group_start = 0
+    
+    for i in range(n):
+        if people[i][0] > current_max_t:
+            current_max_t = people[i][0]
+        if i == n - 1 or people[i + 1][0] < current_max_t:
+            groups.append((group_start, i))
+            group_start = i + 1
+            current_max_t = 0
     
     result = [0] * n
-    stack = []
+    total_time = 0
+    prev_end = n
     
-    for t, w, idx in people:
-        current_time = t * w
-        while stack:
-            prev_t, prev_w, prev_idx, prev_total = stack[-1]
-            if prev_t * prev_w >= current_time:
-                break
-            stack.pop()
-            current_time = max(current_time, prev_total + t * (w - prev_w))
-        stack.append((t, w, idx, current_time))
-        result[idx] = current_time
+    for start, end in reversed(groups):
+        group_people = people[start:end + 1]
+        max_t = max(t for t, w, idx in group_people)
+        total_steps = 0
+        for i in range(start, prev_end):
+            total_steps = max(total_steps, people[i][1])
+        total_time += max_t * total_steps
+        for i in range(start, end + 1):
+            result[people[i][2]] = total_time
+        prev_end = start
     
     for res in result:
         print(res)

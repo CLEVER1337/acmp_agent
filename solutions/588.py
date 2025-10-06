@@ -1,17 +1,17 @@
 
 def main():
-    b = int(input())
+    b = int(input().strip())
     if b <= 3:
         print(-1)
         return
         
-    digits = [0] * b
-    digits[0] = b - 4
-    digits[1] = 2
-    digits[2] = 1
-    digits[b-4] = 1
+    n = b
+    digits = [0] * n
+    digits[0] = n - 2
+    digits[n - 3] = 1
+    digits[n - 1] = 1
     
-    for i in range(b):
+    for i in range(n):
         print(digits[i])
 
 if __name__ == "__main__":

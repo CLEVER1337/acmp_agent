@@ -16,13 +16,13 @@ def days_in_month(month, year):
     return 31
 
 def date_to_days(d, m, y):
-    days = 0
+    total = 0
     for year in range(1, y):
-        days += 366 if is_leap(year) else 365
+        total += 366 if is_leap(year) else 365
     for month in range(1, m):
-        days += days_in_month(month, y)
-    days += d
-    return days
+        total += days_in_month(month, y)
+    total += d
+    return total
 
 def main():
     with open('INPUT.TXT', 'r') as f:
@@ -32,10 +32,10 @@ def main():
     d1, m1, y1 = map(int, start_date.split('.'))
     d2, m2, y2 = map(int, end_date.split('.'))
     
-    start_days = date_to_days(d1, m1, y1)
-    end_days = date_to_days(d2, m2, y2)
+    days1 = date_to_days(d1, m1, y1)
+    days2 = date_to_days(d2, m2, y2)
     
-    result = end_days - start_days
+    result = days2 - days1
     
     with open('OUTPUT.TXT', 'w') as f:
         f.write(str(result))

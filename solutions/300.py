@@ -1,41 +1,54 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        data = f.read().split()
-    
+    import sys
+    data = sys.stdin.read().split()
+    if not data:
+        print("ALIVE")
+        return
+        
     rockets = []
     for i in range(4):
         t = int(data[i*2])
-        v = int(data[i*2 + 1])
+        v = int(data[i*2+1])
         rockets.append((t, v))
-    
+        
     Tpov = int(data[8])
     D = int(data[9])
     
-    arrival_times = []
+    times = []
     for i, (t, v) in enumerate(rockets):
-        arrival_time = t + D / v
-        arrival_times.append((arrival_time, i))
+        time_to_reach = t + D / v
+        times.append((time_to_reach, i))
     
-    arrival_times.sort()
+    times.sort(key=lambda x: x[0])
     
-    shield_pos = arrival_times[0][1]
+    shield_pos = 0
     blocked = 0
+    first_rocket_index = times[0][1]
+    shield_pos = first_rocket_index
     
-    for arrival_time, rocket_idx in arrival_times:
-        if rocket_idx == shield_pos:
+    for time, idx in times:
+        if shield_pos == idx:
             blocked += 1
-            continue
-        
-        needed_turns = abs(rocket_idx - shield_pos)
-        needed_turns = min(needed_turns, 4 - needed_turns)
-        
-        if arrival_time >= arrival_times[shield_pos][0] + needed_turns * Tpov:
-            blocked += 1
-            shield_pos = rocket_idx
         else:
-            break
-    
+            diff = abs(shield_pos - idx)
+            if diff == 2:
+                needed_time = 2 * Tpov
+            else:
+                needed_time = Tpov
+                
+            prev_time = 0
+            for prev in times:
+                if prev[1] == shield_pos:
+                    prev_time = prev[0]
+                    break
+                    
+            if time - prev_time >= needed_time:
+                blocked += 1
+                shield_pos = idx
+            else:
+                break
+                
     if blocked == 4:
         print("ALIVE")
     else:

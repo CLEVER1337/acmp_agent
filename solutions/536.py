@@ -6,10 +6,11 @@ def main():
     if not data:
         return
     
-    n, C, k = map(int, data[0].split())
+    n, C, K = map(int, data[0].split())
     s = data[1].strip()
     
-    MOD = 10**k
+    MOD = 10 ** K
+    max_len = len(str(C))
     
     dp = [0] * (n + 1)
     dp[0] = 1
@@ -19,27 +20,27 @@ def main():
         j = i - 1
         num = 0
         base = 1
+        max_j = max(0, i - max_len)
         
-        while j >= 0:
+        for j in range(i - 1, max_j - 1, -1):
             digit = int(s[j])
             num += digit * base
-            if base > C:
-                break
-            if digit == 0 and j != i - 1:
-                j -= 1
-                base *= 10
-                continue
-                
-            if num > C:
-                break
-                
-            total = (total + dp[j]) % MOD
-            j -= 1
             base *= 10
             
+            if base > C:
+                break
+                
+            if digit == 0 and j != i - 1:
+                continue
+                
+            if num <= C:
+                total = (total + dp[j]) % MOD
+            else:
+                break
+                
         dp[i] = total % MOD
         
-    print(str(dp[n] % MOD).zfill(k))
+    print(str(dp[n] % MOD).zfill(K))
 
 if __name__ == "__main__":
     main()

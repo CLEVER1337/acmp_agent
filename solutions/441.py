@@ -3,58 +3,55 @@ def main():
     import sys
     data = sys.stdin.read().split()
     n = int(data[0])
-    a = list(map(int, data[1:1+n]))
-    b = list(map(int, data[1+n:1+2*n]))
+    a_list = list(map(int, data[1:1+n]))
+    b_list = list(map(int, data[1+n:1+2*n]))
     
-    if sorted(a) != sorted(b):
+    if sorted(a_list) != sorted(b_list):
         print(-1)
         return
         
-    pos_in_b = {}
-    for idx, num in enumerate(b):
-        pos_in_b[num] = idx
-        
-    target_indices = [pos_in_b[x] for x in a]
+    b_index = {}
+    for idx, num in enumerate(b_list):
+        if num not in b_index:
+            b_index[num] = []
+        b_index[num].append(idx)
+    
+    for key in b_index:
+        b_index[key].sort(reverse=True)
+    
+    target_positions = []
+    for num in a_list:
+        pos = b_index[num].pop()
+        target_positions.append(pos)
     
     inversions = 0
     temp = [0] * n
     
-    def merge_sort(arr, left, right):
+    def merge_count(left, right):
         nonlocal inversions
-        if left >= right:
-            return
-        mid = (left + right) // 2
-        merge_sort(arr, left, mid)
-        merge_sort(arr, mid+1, right)
-        merge(arr, left, mid, right)
-    
-    def merge(arr, left, mid, right):
-        nonlocal inversions, temp
-        i, j, k = left, mid+1, left
-        while i <= mid and j <= right:
-            if arr[i] <= arr[j]:
-                temp[k] = arr[i]
+        i = j = 0
+        merged = []
+        while i < len(left) and j < len(right):
+            if left[i] <= right[j]:
+                merged.append(left[i])
                 i += 1
             else:
-                temp[k] = arr[j]
+                merged.append(right[j])
                 j += 1
-                inversions += (mid - i + 1)
-            k += 1
-        
-        while i <= mid:
-            temp[k] = arr[i]
-            i += 1
-            k += 1
-        
-        while j <= right:
-            temp[k] = arr[j]
-            j += 1
-            k += 1
-        
-        for idx in range(left, right+1):
-            arr[idx] = temp[idx]
+                inversions += len(left) - i
+        merged.extend(left[i:])
+        merged.extend(right[j:])
+        return merged
     
-    merge_sort(target_indices, 0, n-1)
+    def merge_sort(arr):
+        if len(arr) <= 1:
+            return arr
+        mid = len(arr) // 2
+        left = merge_sort(arr[:mid])
+        right = merge_sort(arr[mid:])
+        return merge_count(left, right)
+    
+    merge_sort(target_positions)
     print(inversions)
 
 if __name__ == "__main__":

@@ -5,51 +5,53 @@ def char_to_value(c):
     else:
         return ord(c) - ord('A') + 10
 
-def convert_number(s, base):
-    if base == 1:
-        return len(s)
-    try:
-        result = 0
-        for char in s:
-            digit = char_to_value(char)
-            if digit >= base:
-                return -1
-            result = result * base + digit
-            if result > 10**7:
-                return -1
-        return result
-    except:
-        return -1
+def convert_to_decimal(s, base):
+    num = 0
+    for char in s:
+        digit = char_to_value(char)
+        if digit >= base:
+            return -1
+        num = num * base + digit
+        if num > 10**7:
+            return -1
+    return num
 
-def solve():
+def find_min_base(s):
+    min_base = 2
+    for char in s:
+        digit = char_to_value(char)
+        min_base = max(min_base, digit + 1)
+    return min_base
+
+def main():
     with open('INPUT.TXT', 'r') as f:
         A = f.readline().strip()
         B = int(f.readline().strip())
     
-    min_base = 1
-    for char in A:
-        value = char_to_value(char)
-        min_base = max(min_base, value + 1)
+    min_possible_base = find_min_base(A)
+    left = min_possible_base
+    right = 36
+    solution = 0
     
-    left, right = min_base, max(min_base, B + 1)
-    found_base = 0
+    while left <= right:
+        mid = (left + right) // 2
+        decimal_val = convert_to_decimal(A, mid)
+        if decimal_val == -1 or decimal_val > B:
+            right = mid - 1
+        elif decimal_val < B:
+            left = mid + 1
+        else:
+            solution = mid
+            right = mid - 1
     
-    if convert_number(A, min_base) == B:
-        found_base = min_base
-    
-    if found_base == 0:
-        while left <= right:
-            mid = (left + right) // 2
-            converted = convert_number(A, mid)
-            if converted == B:
-                found_base = mid
-                right = mid - 1
-            elif converted == -1 or converted > B:
-                right = mid - 1
-            else:
-                left = mid + 1
+    if solution == 0:
+        for base in range(min_possible_base, 37):
+            if convert_to_decimal(A, base) == B:
+                solution = base
+                break
     
     with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(found_base))
+        f.write(str(solution))
 
-solve()
+if __name__ == "__main__":
+    main()

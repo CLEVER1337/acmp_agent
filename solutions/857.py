@@ -22,7 +22,7 @@ def main():
             if char not in node.children:
                 node.children[char] = TrieNode()
             node = node.children[char]
-            node.count += 1
+        node.count += 1
     
     results = []
     for pattern in patterns:
@@ -35,7 +35,14 @@ def main():
             node = node.children[char]
         
         if found:
-            results.append(str(node.count))
+            stack = [node]
+            total = 0
+            while stack:
+                current = stack.pop()
+                total += current.count
+                for child in current.children.values():
+                    stack.append(child)
+            results.append(str(total))
         else:
             results.append("0")
     

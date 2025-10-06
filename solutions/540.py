@@ -1,7 +1,6 @@
 
-import sys
-
 def main():
+    import sys
     data = sys.stdin.read().split()
     n = int(data[0])
     m = int(data[1])
@@ -12,20 +11,19 @@ def main():
         print(" ".join(map(str, first_row)))
         return
         
-    dp_prev = first_row[:]
-    dp_curr = [0] * m
-    
+    row = first_row[:]
     for i in range(1, n):
+        new_row = [0] * m
         prefix = [0] * (m + 1)
         for j in range(m):
-            prefix[j + 1] = (prefix[j] + dp_prev[j]) % r
+            prefix[j+1] = (prefix[j] + row[j]) % r
             
         for j in range(m):
-            dp_curr[j] = prefix[j + 1] % r
+            new_row[j] = prefix[j+1] % r
             
-        dp_prev, dp_curr = dp_curr, dp_prev
+        row = new_row
         
-    print(" ".join(map(str, dp_prev)))
+    print(" ".join(map(str, row)))
 
 if __name__ == "__main__":
     main()

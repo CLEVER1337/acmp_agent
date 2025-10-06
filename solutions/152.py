@@ -1,8 +1,11 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        data = f.read().split()
-    
+    import sys
+    data = sys.stdin.read().split()
+    if not data:
+        print("No")
+        return
+        
     n = int(data[0])
     m = int(data[1])
     
@@ -16,35 +19,30 @@ def main():
         index += 2
         graph[a].append(b)
         in_degree[b] += 1
-    
-    from collections import deque
-    q = deque()
-    
+        
+    queue = []
     for i in range(1, n+1):
         if in_degree[i] == 0:
-            q.append(i)
-    
+            queue.append(i)
+            
     count = 0
-    while q:
-        if len(q) > 1:
-            with open('OUTPUT.TXT', 'w') as f:
-                f.write("No")
+    while queue:
+        if len(queue) > 1:
+            print("No")
             return
-        
-        u = q.popleft()
+            
+        u = queue.pop(0)
         count += 1
         
         for v in graph[u]:
             in_degree[v] -= 1
             if in_degree[v] == 0:
-                q.append(v)
-    
+                queue.append(v)
+                
     if count == n:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write("Yes")
+        print("Yes")
     else:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write("No")
+        print("No")
 
 if __name__ == "__main__":
     main()

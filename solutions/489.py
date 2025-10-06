@@ -1,6 +1,7 @@
 
+import sys
+
 def main():
-    import sys
     data = sys.stdin.read().split()
     if not data:
         return
@@ -11,44 +12,47 @@ def main():
     final_coins = list(map(int, data[2+n:2+n+n-1]))
     protocol = list(map(int, data[2+n+n-1:2+n+n-1+k]))
     
-    initial_state = {}
+    initial_count = {}
     for coin in initial_coins:
-        nominal = abs(coin)
-        side = 1 if coin < 0 else 0
-        initial_state[nominal] = initial_state.get(nominal, 0) + (1 if side == 1 else 0)
+        abs_coin = abs(coin)
+        sign = -1 if coin < 0 else 1
+        initial_count[abs_coin] = initial_count.get(abs_coin, 0) + sign
     
-    final_state = {}
+    final_count = {}
     for coin in final_coins:
-        nominal = abs(coin)
-        side = 1 if coin < 0 else 0
-        final_state[nominal] = final_state.get(nominal, 0) + (1 if side == 1 else 0)
+        abs_coin = abs(coin)
+        sign = -1 if coin < 0 else 1
+        final_count[abs_coin] = final_count.get(abs_coin, 0) + sign
     
     flip_count = {}
-    for nominal in protocol:
-        flip_count[nominal] = flip_count.get(nominal, 0) + 1
+    for coin_val in protocol:
+        flip_count[coin_val] = flip_count.get(coin_val, 0) + 1
     
-    all_nominals = set(initial_state.keys()) | set(final_state.keys()) | set(flip_count.keys())
+    possible_coins = {}
+    for coin_val in set(initial_count.keys()) | set(final_count.keys()) | set(flip_count.keys()):
+        initial_sign = initial_count.get(coin_val, 0)
+        final_sign = final_count.get(coin_val, 0)
+        flips = flip_count.get(coin_val, 0)
+        
+        expected_final_sign = initial_sign
+        if flips % 2 == 1:
+            expected_final_sign = -expected_final_sign
+        
+        if expected_final_sign != final_sign:
+            diff = abs(expected_final_sign - final_sign)
+            if diff == 2:
+                possible_coins[coin_val] = expected_final_sign
     
-    for nominal in all_nominals:
-        initial_heads = initial_state.get(nominal, 0)
-        final_heads = final_state.get(nominal, 0)
-        flips = flip_count.get(nominal, 0)
-        
-        expected_final_heads = (initial_heads + flips) % 2
-        
-        if nominal not in final_state:
-            if expected_final_heads == 0:
-                print(nominal)
-            else:
-                print(-nominal)
-            return
-        
-        if expected_final_heads != final_heads:
-            if expected_final_heads == 0:
-                print(nominal)
-            else:
-                print(-nominal)
-            return
+    if len(possible_coins) == 1:
+        coin_val, sign = next(iter(possible_coins.items()))
+        result = -coin_val if sign == -1 else coin_val
+        print(result)
+    else:
+        for coin_val in possible_coins:
+            if possible_coins[coin_val] == 1:
+                print(coin_val)
+                return
+        print(-coin_val)
 
 if __name__ == "__main__":
     main()

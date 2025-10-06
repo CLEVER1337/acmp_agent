@@ -1,21 +1,22 @@
 
-n, m, k = map(int, input().split())
-
-if k == 1:
-    print(n * m)
-else:
+def main():
+    import sys
+    data = sys.stdin.read().split()
+    n = int(data[0])
+    m = int(data[1])
+    k = int(data[2])
+    
     total_icons = 0
-    max_white = k - 1
-    
-    for x in range(1, m + 1):
+    for _ in range(n):
+        x = m
         red_needed = x // k
-        remaining = x % k
-        
-        if remaining > max_white:
-            icons_needed = red_needed + 1 + max_white
-        else:
-            icons_needed = red_needed + remaining
-        
-        total_icons += icons_needed
+        white_needed = x % k
+        if white_needed > k - 1:
+            red_needed += 1
+            white_needed = 0
+        total_icons += red_needed + white_needed
     
-    print(total_icons * n)
+    print(total_icons)
+
+if __name__ == "__main__":
+    main()

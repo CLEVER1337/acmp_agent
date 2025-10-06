@@ -5,53 +5,42 @@ import math
 def log_tower_value(tower):
     if len(tower) == 1:
         return math.log(tower[0])
+    if tower[0] == 1:
+        return 0.0
     
     result = math.log(tower[-1])
-    for i in range(len(tower)-2, -1, -1):
-        result = result * tower[i]
-    
+    for i in range(len(tower)-2, 0, -1):
+        if result == 0:
+            return 0.0
+        result = math.log(tower[i]) * result
+    result = math.log(tower[0]) * result
     return result
 
 def main():
     data = sys.stdin.read().splitlines()
     n = int(data[0])
     towers = []
+    indices = []
     
-    for i in range(1, n+1):
-        parts = list(map(int, data[i].split()))
+    for idx, line in enumerate(data[1:1+n]):
+        parts = list(map(int, line.split()))
         k = parts[0]
         tower = parts[1:1+k]
-        towers.append((i-1, tower))
+        towers.append((idx + 1, tower))
     
-    def compare_towers(tower1, tower2):
-        idx1, t1 = tower1
-        idx2, t2 = tower2
+    def compare_key(item):
+        idx, tower = item
+        if len(tower) == 1:
+            return (0, tower[0])
         
-        if len(t1) == 1 and len(t2) == 1:
-            return t1[0] - t2[0]
+        if tower[0] == 1:
+            return (0, 1)
         
-        if t1[0] == 1 and t2[0] == 1:
-            return 0
-        
-        if t1[0] == 1:
-            return -1
-        
-        if t2[0] == 1:
-            return 1
-        
-        log_val1 = log_tower_value(t1)
-        log_val2 = log_tower_value(t2)
-        
-        if abs(log_val1 - log_val2) < 1e-10:
-            return 0
-        elif log_val1 < log_val2:
-            return -1
-        else:
-            return 1
+        log_val = log_tower_value(tower)
+        return (1, log_val)
     
-    sorted_towers = sorted(towers, key=lambda x: (x[1], x[0]))
-    
-    result = [str(idx + 1) for idx, _ in sorted_towers]
+    sorted_towers = sorted(towers, key=compare_key)
+    result = [str(item[0]) for item in sorted_towers]
     print(" ".join(result))
 
 if __name__ == "__main__":

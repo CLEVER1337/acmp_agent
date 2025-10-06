@@ -4,10 +4,28 @@ def count_groups(n):
         return 0
     if n == 3:
         return 1
-    if n % 2 == 0:
-        return count_groups(n // 2) + count_groups(n // 2)
-    else:
-        return count_groups(n // 2 + 1) + count_groups(n // 2)
+    
+    memo = {}
+    
+    def dp(x):
+        if x < 3:
+            return 0
+        if x == 3:
+            return 1
+        if x in memo:
+            return memo[x]
+        
+        even = (x + 1) // 2
+        odd = x // 2
+        result = dp(even) + dp(odd)
+        memo[x] = result
+        return result
+    
+    return dp(n)
 
-n = int(input())
-print(count_groups(n))
+def main():
+    n = int(input().strip())
+    print(count_groups(n))
+
+if __name__ == '__main__':
+    main()

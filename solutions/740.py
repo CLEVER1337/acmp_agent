@@ -1,6 +1,5 @@
 
 def read_rects():
-    n, m = map(int, input().split())
     k = int(input())
     rects = []
     for _ in range(k):
@@ -11,71 +10,88 @@ def read_rects():
 def get_events(rects):
     events = []
     for x1, y1, x2, y2 in rects:
-        events.append((x1, y1, y2, 1))
-        events.append((x2, y1, y2, -1))
+        events.append((x1, 1, y1, y2))
+        events.append((x2, -1, y1, y2))
     events.sort()
     return events
 
-def process_events(events):
-    active = []
-    result = []
-    prev_x = None
-    
-    for x, y1, y2, event_type in events:
-        if prev_x is not None and x != prev_x:
-            if active:
-                active.sort()
-                merged = []
-                start, end = active[0]
-                for i in range(1, len(active)):
-                    if active[i][0] <= end:
-                        end = max(end, active[i][1])
-                    else:
-                        merged.append((start, end))
-                        start, end = active[i]
-                merged.append((start, end))
-                result.append((prev_x, x, merged))
-        
-        if event_type == 1:
-            active.append((y1, y2))
+def add_segment(segments, y1, y2):
+    new_segments = []
+    for seg in segments:
+        s1, s2 = seg
+        if s2 <= y1 or s1 >= y2:
+            new_segments.append(seg)
         else:
-            new_active = []
-            for seg in active:
-                if seg != (y1, y2):
-                    new_active.append(seg)
-            active = new_active
-        
-        prev_x = x
-    
-    return result
+            if s1 < y1:
+                new_segments.append((s1, y1))
+            if s2 > y2:
+                new_segments.append((y2, s2))
+    segments[:] = new_segments
 
-def count_holes(intervals1, intervals2):
-    total = 0
-    for x1_start, x1_end, y_segments1 in intervals1:
-        for x2_start, x2_end, y_segments2 in intervals2:
-            x_overlap_start = max(x1_start, x2_start)
-            x_overlap_end = min(x1_end, x2_end)
-            
-            if x_overlap_start < x_overlap_end:
-                for seg1 in y_segments1:
-                    for seg2 in y_segments2:
-                        y_overlap_start = max(seg1[0], seg2[0])
-                        y_overlap_end = min(seg1[1], seg2[1])
-                        if y_overlap_start < y_overlap_end:
-                            total += 1
-    return total
+def remove_segment(segments, y1, y2):
+    new_segments = []
+    i = 0
+    n = len(segments)
+    while i < n:
+        s1, s2 = segments[i]
+        if s2 <= y1 or s1 >= y2:
+            new_segments.append(segments[i])
+            i += 1
+        else:
+            if s1 < y1:
+                new_segments.append((s1, y1))
+            if s2 > y2:
+                new_segments.append((y2, s2))
+            i += 1
+    segments[:] = new_segments
+
+def count_holes(events):
+    segments = []
+    count = 0
+    prev_x = -1
+    for event in events:
+        x, op, y1, y2 = event
+        if segments and x > prev_x:
+            count += len(segments) * (x - prev_x)
+        if op == 1:
+            add_segment(segments, y1, y2)
+        else:
+            remove_segment(segments, y1, y2)
+        prev_x = x
+    return count
 
 def main():
-    rects1 = read_rects()
-    rects2 = read_rects()
+    import sys
+    data = sys.stdin.read().split()
+    if not data:
+        print(0)
+        return
+        
+    idx = 0
+    N = int(data[idx]); M = int(data[idx+1]); idx += 2
+    K1 = int(data[idx]); idx += 1
+    rects1 = []
+    for i in range(K1):
+        x1 = int(data[idx]); y1 = int(data[idx+1]); x2 = int(data[idx+2]); y2 = int(data[idx+3]); idx += 4
+        rects1.append((x1, y1, x2, y2))
+        
+    K2 = int(data[idx]); idx += 1
+    rects2 = []
+    for i in range(K2):
+        x1 = int(data[idx]); y1 = int(data[idx+1]); x2 = int(data[idx+2]); y2 = int(data[idx+3]); idx += 4
+        rects2.append((x1, y1, x2, y2))
     
     events1 = get_events(rects1)
     events2 = get_events(rects2)
     
-    intervals1 = process_events(events1)
-    intervals2 = process_events(events2)
+    total1 = count_holes(events1)
+    total2 = count_holes(events2)
     
-    result = count_holes(intervals1, intervals2)
+    combined_rects = rects1 + rects2
+    events_combined = get_events(combined_rects)
+    total_combined = count_holes(events_combined)
+    
+    result = total1 + total2 - total_combined
     print(result)
 
 if __name__ == "__main__":

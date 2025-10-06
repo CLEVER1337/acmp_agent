@@ -2,45 +2,38 @@
 def main():
     import sys
     data = sys.stdin.read().split()
-    if not data:
-        print(0)
-        return
-        
-    index = 0
-    M = int(data[index]); index += 1
+    idx = 0
+    M = int(data[idx]); idx += 1
     shadows = []
-    for i in range(M):
-        W = int(data[index]); E = int(data[index+1]); index += 2
-        shadows.append((W, E))
-        
-    N = int(data[index]); index += 1
-    coords = []
-    for i in range(N):
-        coords.append(int(data[index])); index += 1
-        
-    coords.sort()
+    for _ in range(M):
+        w = int(data[idx]); e = int(data[idx+1]); idx += 2
+        shadows.append((w, e))
+    
+    N = int(data[idx]); idx += 1
+    beds = []
+    for _ in range(N):
+        beds.append(int(data[idx])); idx += 1
     
     dp = [0] * (N + 1)
-    
     for i in range(N):
-        dp[i+1] = max(dp[i+1], dp[i])
+        max_prev = 0
+        for j in range(i):
+            if dp[j] > max_prev:
+                max_prev = dp[j]
+        dp[i] = max_prev + 1
         
-        for W, E in shadows:
-            left_bound = coords[i] - W
-            right_bound = coords[i] + E
+        for w, e in shadows:
+            left_bound = beds[i] - w
+            right_bound = beds[i] + e
             
-            j = i
-            while j < N and coords[j] < right_bound:
-                j += 1
+            k = i + 1
+            while k < N and beds[k] < right_bound:
+                if beds[k] > left_bound:
+                    dp[k] = max(dp[k], max_prev + 1)
+                k += 1
                 
-            k = i
-            while k >= 0 and coords[k] > left_bound:
-                k -= 1
-                
-            next_pos = j
-            dp[next_pos] = max(dp[next_pos], dp[k+1] + 1)
-            
-    print(dp[N])
+    result = max(dp) if N > 0 else 0
+    print(result)
 
 if __name__ == "__main__":
     main()

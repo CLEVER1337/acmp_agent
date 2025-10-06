@@ -4,29 +4,36 @@ def main():
     if n == 1:
         print("10 0")
         return
+        
+    from itertools import product
     
     count = 0
     min_num = float('inf')
     
-    def dfs(digits, pos, s, p):
-        nonlocal count, min_num
-        if pos == n:
-            if s == p:
-                num = int(''.join(map(str, digits)))
-                count += 1
-                if num < min_num:
-                    min_num = num
-            return
-        
-        start = 1 if pos == 0 else 0
-        for d in range(start, 10):
-            digits[pos] = d
-            dfs(digits, pos + 1, s + d, p * d if p != 0 else d)
+    digits = list(range(1, 10))
+    zeros = list(range(0, 10))
     
-    digits = [0] * n
-    dfs(digits, 0, 0, 1)
-    
-    print(f"{count} {min_num}")
+    for num_digits in product(digits, repeat=n):
+        total_sum = sum(num_digits)
+        product_val = 1
+        for d in num_digits:
+            product_val *= d
+            if product_val == 0:
+                break
+                
+        if product_val == 0:
+            continue
+            
+        if total_sum == product_val:
+            num = int(''.join(map(str, num_digits)))
+            count += 1
+            if num < min_num:
+                min_num = num
+                
+    if count == 0:
+        print("0 0")
+    else:
+        print(f"{count} {min_num}")
 
 if __name__ == "__main__":
     main()

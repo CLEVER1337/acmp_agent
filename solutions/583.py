@@ -6,92 +6,68 @@ def main():
     n = int(data[0])
     commands = []
     for i in range(1, n + 1):
-        parts = data[i].split()
-        if parts[0] == 'forward':
+        line = data[i].strip()
+        if line.startswith('forward'):
+            parts = line.split()
             commands.append(('forward', int(parts[1])))
-        elif parts[0] == 'left':
+        elif line.startswith('left'):
             commands.append(('left',))
-        elif parts[0] == 'right':
+        elif line.startswith('right'):
             commands.append(('right',))
     
     directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-    current_dir = 0
     x, y = 0, 0
-    points = [(0, 0)]
+    points = [(x, y)]
+    dir_index = 0
     
     for cmd in commands:
         if cmd[0] == 'forward':
             dist = cmd[1]
-            dx, dy = directions[current_dir]
+            dx, dy = directions[dir_index]
             x += dx * dist
             y += dy * dist
             points.append((x, y))
         elif cmd[0] == 'left':
-            current_dir = (current_dir - 1) % 4
+            dir_index = (dir_index - 1) % 4
         elif cmd[0] == 'right':
-            current_dir = (current_dir + 1) % 4
-    
-    if points[0] != points[-1]:
-        print("FALSE")
-        return
+            dir_index = (dir_index + 1) % 4
     
     min_x = min(p[0] for p in points)
     max_x = max(p[0] for p in points)
     min_y = min(p[1] for p in points)
     max_y = max(p[1] for p in points)
     
-    segments = []
-    for i in range(len(points) - 1):
-        p1 = points[i]
-        p2 = points[i + 1]
-        segments.append((p1, p2))
-    
-    for i in range(len(segments)):
-        for j in range(i + 1, len(segments)):
-            s1 = segments[i]
-            s2 = segments[j]
-            
-            if s1[0][0] == s1[1][0]:
-                vertical = s1
-                horizontal = s2
-                if horizontal[0][1] != horizontal[1][1]:
-                    continue
-            elif s1[0][1] == s1[1][1]:
-                horizontal = s1
-                vertical = s2
-                if vertical[0][0] != vertical[1][0]:
-                    continue
+    def is_inside(x, y):
+        if x < min_x or x > max_x or y < min_y or y > max_y:
+            return False
+        count = 0
+        for i in range(len(points) - 1):
+            x1, y1 = points[i]
+            x2, y2 = points[i + 1]
+            if y1 == y2:
+                if y == y1 and min(x1, x2) <= x <= max(x1, x2):
+                    return True
             else:
-                continue
-                
-            if horizontal[0][1] != vertical[0][1] and horizontal[0][1] != vertical[1][1]:
-                continue
-            if vertical[0][0] != horizontal[0][0] and vertical[0][0] != horizontal[1][0]:
-                continue
-            
-            hx1, hx2 = sorted([horizontal[0][0], horizontal[1][0]])
-            hy = horizontal[0][1]
-            vx = vertical[0][0]
-            vy1, vy2 = sorted([vertical[0][1], vertical[1][1]])
-            
-            if hx1 <= vx <= hx2 and vy1 <= hy <= vy2:
-                found = False
-                for seg in segments:
-                    p1, p2 = seg
-                    if p1[0] == p2[0]:
-                        seg_x = p1[0]
-                        seg_y1, seg_y2 = sorted([p1[1], p2[1]])
-                        if seg_x == vx and seg_y1 <= hy <= seg_y2:
-                            found = True
-                            break
-                    elif p1[1] == p2[1]:
-                        seg_y = p1[1]
-                        seg_x1, seg_x2 = sorted([p1[0], p2[0]])
-                        if seg_y == hy and seg_x1 <= vx <= seg_x2:
-                            found = True
-                            break
-                
-                if not found:
+                if min(y1, y2) <= y <= max(y1, y2):
+                    if x1 == x2:
+                        if x <= x1:
+                            count += 1
+                    else:
+                        if x <= x1 + (x2 - x1) * (y - y1) / (y2 - y1):
+                            count += 1
+        return count % 2 == 1
+    
+    for i in range(len(points) - 1):
+        x1, y1 = points[i]
+        x2, y2 = points[i + 1]
+        if x1 == x2:
+            for y in range(min(y1, y2) + 1, max(y1, y2)):
+                if not is_inside(x1, y):
+                    print("FALSE")
+                    return
+        elif y1 == y2:
+            for x in range(min(x1, x2) + 1, max(x1, x2)):
+                if not is_inside(x, y1):
                     print("FALSE")
                     return
     

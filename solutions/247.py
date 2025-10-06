@@ -1,48 +1,41 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        n = int(f.readline().strip())
-        costs = [int(f.readline().strip()) for _ in range(n)]
+    n = int(input().strip())
+    costs = []
+    for _ in range(n):
+        costs.append(int(input().strip()))
     
-    dp = [[float('inf')] * (n + 2) for _ in range(n + 1)]
+    dp = [[10**9] * (n + 2) for _ in range(n + 1)]
     dp[0][0] = 0
     
     for i in range(n):
         for j in range(n + 1):
-            if dp[i][j] == float('inf'):
+            if dp[i][j] == 10**9:
                 continue
-                
-            current_cost = costs[i]
-            if current_cost > 100:
+            if costs[i] > 100:
                 if j + 1 <= n:
-                    dp[i + 1][j + 1] = min(dp[i + 1][j + 1], dp[i][j] + current_cost)
+                    dp[i + 1][j + 1] = min(dp[i + 1][j + 1], dp[i][j] + costs[i])
+                if j >= 1:
+                    dp[i + 1][j - 1] = min(dp[i + 1][j - 1], dp[i][j])
             else:
-                dp[i + 1][j] = min(dp[i + 1][j], dp[i][j] + current_cost)
-                
-            if j > 0:
-                dp[i + 1][j - 1] = min(dp[i + 1][j - 1], dp[i][j])
+                dp[i + 1][j] = min(dp[i + 1][j], dp[i][j] + costs[i])
+                if j >= 1:
+                    dp[i + 1][j - 1] = min(dp[i + 1][j - 1], dp[i][j])
     
-    min_cost = float('inf')
-    min_j = 0
+    min_cost = min(dp[n])
+    max_coupons = -1
     for j in range(n + 1):
-        if dp[n][j] < min_cost:
-            min_cost = dp[n][j]
-            min_j = j
+        if dp[n][j] == min_cost:
+            max_coupons = j
     
-    coupons_left = min_j
-    coupons_used = 0
+    used = 0
+    coupons = max_coupons
+    for i in range(n - 1, -1, -1):
+        if coupons < n and dp[i][coupons + 1] + costs[i] == dp[i + 1][coupons] and costs[i] > 100:
+            used += 1
+            coupons += 1
+        elif coupons > 0 and dp[i][coupons - 1] == dp[i + 1][coupons]:
+            coupons -= 1
     
-    j = coupons_left
-    for i in range(n, 0, -1):
-        if j < n and dp[i][j] == dp[i - 1][j + 1]:
-            coupons_used += 1
-            j += 1
-        elif j > 0 and dp[i][j] == dp[i - 1][j - 1] + costs[i - 1]:
-            j -= 1
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(f"{min_cost}\n")
-        f.write(f"{coupons_left} {coupons_used}\n")
-
-if __name__ == "__main__":
-    main()
+    print(min_cost)
+    print(f"{max_coupons} {used}")

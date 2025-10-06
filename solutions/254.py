@@ -1,35 +1,42 @@
 
+import sys
+
 def main():
-    import sys
     data = sys.stdin.read().split()
-    idx = 0
-    n = int(data[idx]); idx += 1
-    current_patrons = list(map(int, data[idx:idx+n]))
-    idx += n
+    if not data:
+        return
     
-    m = int(data[idx]); idx += 1
+    n = int(data[0])
+    index = 1
+    initial_confed = []
+    for i in range(n):
+        initial_confed.append(int(data[index]))
+        index += 1
+        
+    m = int(data[index])
+    index += 1
     requests = {}
-    for _ in range(m):
-        current = int(data[idx]); idx += 1
-        desired = int(data[idx]); idx += 1
+    for i in range(m):
+        current = int(data[index])
+        desired = int(data[index+1])
+        index += 2
         requests[current] = desired
-    
-    patron_map = {}
-    for i in range(1, 201):
-        patron_map[i] = i
-    
-    for current, desired in requests.items():
-        patron_map[current] = desired
-    
-    final_patrons = []
-    for patron in current_patrons:
-        while patron != patron_map[patron]:
-            patron = patron_map[patron]
-        final_patrons.append(patron)
-    
+        
+    confed_to_priest = {}
+    for confed_id, priest in enumerate(initial_confed, 1):
+        confed_to_priest[confed_id] = priest
+        
+    result = []
+    for confed_id in range(1, n+1):
+        current_priest = confed_to_priest[confed_id]
+        visited = set()
+        while current_priest in requests and current_priest not in visited:
+            visited.add(current_priest)
+            current_priest = requests[current_priest]
+        result.append(str(current_priest))
+        
     with open('OUTPUT.TXT', 'w') as f:
-        for p in final_patrons:
-            f.write(f"{p}\n")
+        f.write('\n'.join(result))
 
 if __name__ == "__main__":
     main()

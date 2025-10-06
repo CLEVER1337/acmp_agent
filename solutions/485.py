@@ -9,7 +9,7 @@ def main():
     while True:
         total = x
         valid = True
-        for _ in range(N):
+        for i in range(N):
             if (total - K) % N != 0:
                 valid = False
                 break

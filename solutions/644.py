@@ -1,14 +1,17 @@
 
 def main():
-    n, k = map(int, input().split())
+    import sys
+    data = sys.stdin.readline().split()
+    N = int(data[0])
+    K = int(data[1])
     
-    for _ in range(k):
-        next_n = n + bin(n).count('1')
-        if next_n <= n:
+    for _ in range(K):
+        next_N = N + bin(N).count('1')
+        if next_N == N:
             break
-        n = next_n
-    
-    print(n)
+        N = next_N
+        
+    print(N)
 
 if __name__ == "__main__":
     main()

@@ -1,28 +1,30 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        SA, SB = f.read().splitlines()
-    
+    import sys
+    data = sys.stdin.read().splitlines()
+    SA = data[0].strip()
+    SB = data[1].strip()
     n = len(SA)
-    alphabet = 'abcdefghijklmnopqrstuvwxyz'
-    char_to_pos = {char: idx for idx, char in enumerate(alphabet)}
+    
+    alphabet = "abcdefghijklmnopqrstuvwxyz"
+    char_to_index = {char: idx for idx, char in enumerate(alphabet)}
+    total_chars = 26
     
     def dist(c1, c2):
-        pos1 = char_to_pos[c1]
-        pos2 = char_to_pos[c2]
-        diff = abs(pos1 - pos2)
-        return min(diff, 26 - diff)
+        idx1 = char_to_index[c1]
+        idx2 = char_to_index[c2]
+        diff = abs(idx1 - idx2)
+        return min(diff, total_chars - diff)
     
-    total = 0
-    for k in range(n):
-        shift_SA = SA[k:] + SA[:k]
+    total_sum = 0
+    for shift in range(n):
         current_sum = 0
         for i in range(n):
-            current_sum += dist(shift_SA[i], SB[i])
-        total += current_sum
+            j = (i + shift) % n
+            current_sum += dist(SA[i], SB[j])
+        total_sum += current_sum
     
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(total))
+    print(total_sum)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

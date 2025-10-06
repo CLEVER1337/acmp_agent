@@ -1,34 +1,51 @@
 
-def multiply_large_numbers(a, b):
-    if a == '0' or b == '0':
-        return '0'
+def main():
+    with open('INPUT.TXT', 'r') as f:
+        M = f.readline().strip()
+        N = f.readline().strip()
     
-    len_a, len_b = len(a), len(b)
-    result = [0] * (len_a + len_b)
+    if M == '0' or N == '0':
+        with open('OUTPUT.TXT', 'w') as f:
+            f.write('0')
+        return
     
-    for i in range(len_a - 1, -1, -1):
+    sign = 1
+    if M[0] == '-':
+        sign *= -1
+        M = M[1:]
+    if N[0] == '-':
+        sign *= -1
+        N = N[1:]
+    
+    lenM = len(M)
+    lenN = len(N)
+    result = [0] * (lenM + lenN)
+    
+    for i in range(lenM-1, -1, -1):
         carry = 0
-        digit_a = int(a[i])
-        
-        for j in range(len_b - 1, -1, -1):
-            digit_b = int(b[j])
-            temp = digit_a * digit_b + result[i + j + 1] + carry
-            result[i + j + 1] = temp % 10
+        n1 = int(M[i])
+        for j in range(lenN-1, -1, -1):
+            n2 = int(N[j])
+            temp = n1 * n2 + result[i+j+1] + carry
             carry = temp // 10
-        
+            result[i+j+1] = temp % 10
         result[i] += carry
     
     start_index = 0
-    while start_index < len(result) - 1 and result[start_index] == 0:
+    while start_index < len(result) and result[start_index] == 0:
         start_index += 1
     
-    return ''.join(map(str, result[start_index:]))
+    if start_index == len(result):
+        with open('OUTPUT.TXT', 'w') as f:
+            f.write('0')
+        return
+    
+    output = ''.join(str(x) for x in result[start_index:])
+    if sign == -1:
+        output = '-' + output
+    
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write(output)
 
-with open('INPUT.TXT', 'r') as f:
-    M = f.readline().strip()
-    N = f.readline().strip()
-
-product = multiply_large_numbers(M, N)
-
-with open('OUTPUT.TXT', 'w') as f:
-    f.write(product)
+if __name__ == "__main__":
+    main()

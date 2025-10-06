@@ -1,19 +1,21 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        n = int(f.readline().strip())
-        arr = list(map(int, f.readline().split()))
-        
-    arr.sort()
+    import sys
+    data = sys.stdin.read().split()
+    n = int(data[0])
+    a = list(map(int, data[1:1+n]))
+    a.sort()
+    
     dp = [0] * n
-    dp[0] = 0
-    dp[1] = arr[1] - arr[0]
+    dp[1] = a[1] - a[0]
     
     for i in range(2, n):
-        dp[i] = min(dp[i-1] + arr[i] - arr[i-1], dp[i-2] + arr[i] - arr[i-1])
-        
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(dp[n-1]))
+        if i % 2 == 1:
+            dp[i] = max(dp[i-2], a[i] - a[i-1])
+        else:
+            dp[i] = min(max(dp[i-2], a[i] - a[i-1]), max(dp[i-3] if i >= 3 else 0, a[i] - a[i-1]))
+    
+    print(dp[n-1])
 
 if __name__ == "__main__":
     main()

@@ -1,47 +1,75 @@
 
-import re
+import sys
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        s = f.readline().strip()
-    
-    pattern = r'^(-?\d+)([+\-*/])(-?\d+)=(-?\d+)$'
-    match = re.fullmatch(pattern, s)
-    
-    if not match:
+    s = sys.stdin.readline().strip()
+    if not s:
         print("ERROR")
         return
         
-    num1_str, op, num2_str, result_str = match.groups()
-    
+    parts = []
+    current = ""
+    for char in s:
+        if char in '+-*/=':
+            if current:
+                parts.append(current)
+                current = ""
+            parts.append(char)
+        else:
+            current += char
+    if current:
+        parts.append(current)
+        
+    if len(parts) < 5 or parts[1] not in '+-*/' or parts[3] != '=':
+        print("ERROR")
+        return
+        
     try:
-        num1 = int(num1_str)
-        num2 = int(num2_str)
-        result = int(result_str)
-    except ValueError:
-        print("ERROR")
-        return
-        
-    if op == '/' and num2 == 0:
-        print("ERROR")
-        return
-        
-    if op == '+':
-        calc_result = num1 + num2
-    elif op == '-':
-        calc_result = num1 - num2
-    elif op == '*':
-        calc_result = num1 * num2
-    elif op == '/':
-        if num2 == 0:
+        a_str, op, b_str, eq, c_str = parts[0], parts[1], parts[2], parts[3], parts[4]
+        if len(parts) > 5:
             print("ERROR")
             return
-        calc_result = num1 // num2
+            
+        if not a_str or not b_str or not c_str:
+            print("ERROR")
+            return
+            
+        if (a_str[0] == '-' and len(a_str) == 1) or (b_str[0] == '-' and len(b_str) == 1) or (c_str[0] == '-' and len(c_str) == 1):
+            print("ERROR")
+            return
+            
+        a = int(a_str)
+        b = int(b_str)
+        c = int(c_str)
         
-    if calc_result == result:
-        print("YES")
-    else:
-        print("NO")
+        if abs(a) > 30000 or abs(b) > 30000 or abs(c) > 30000:
+            print("ERROR")
+            return
+            
+        if op == '+':
+            result = a + b
+        elif op == '-':
+            result = a - b
+        elif op == '*':
+            result = a * b
+        elif op == '/':
+            if b == 0:
+                print("ERROR")
+                return
+            result = a // b
+        else:
+            print("ERROR")
+            return
+            
+        if result == c:
+            print("YES")
+        else:
+            print("NO")
+            
+    except ValueError:
+        print("ERROR")
+    except:
+        print("ERROR")
 
 if __name__ == "__main__":
     main()

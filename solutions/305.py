@@ -5,66 +5,53 @@ def main():
     if not data:
         return
     
-    n = int(data[0]); m = int(data[1]); k = int(data[2])
+    n = int(data[0])
+    m = int(data[1])
+    k = int(data[2])
+    
     ships = []
     index = 3
     for i in range(k):
-        y1 = int(data[index]); x1 = int(data[index+1])
-        y2 = int(data[index+2]); x2 = int(data[index+3])
+        r1 = int(data[index])
+        c1 = int(data[index+1])
+        r2 = int(data[index+2])
+        c2 = int(data[index+3])
         index += 4
-        ships.append((y1, x1, y2, x2))
+        ships.append((r1, c1, r2, c2))
     
-    grid = [[False] * (m+2) for _ in range(n+2)]
+    grid = [[0] * (m + 2) for _ in range(n + 2)]
     
     for ship in ships:
-        y1, x1, y2, x2 = ship
-        for i in range(y1, y2+1):
-            for j in range(x1, x2+1):
-                grid[i][j] = True
-    
-    for i in range(n+2):
-        for j in range(m+2):
-            if i == 0 or i == n+1 or j == 0 or j == m+1:
-                grid[i][j] = True
+        r1, c1, r2, c2 = ship
+        for i in range(r1, r2 + 1):
+            for j in range(c1, c2 + 1):
+                grid[i][j] = 1
+                
+        for i in range(r1 - 1, r2 + 2):
+            for j in range(c1 - 1, c2 + 2):
+                if 1 <= i <= n and 1 <= j <= m:
+                    grid[i][j] = 2
     
     max_area = 0
+    heights = [0] * (m + 2)
     
-    for top in range(1, n+1):
-        heights = [0] * (m+1)
-        for bottom in range(top, n+1):
-            for col in range(1, m+1):
-                if grid[bottom][col]:
-                    heights[col] = 0
-                else:
-                    heights[col] += 1
-            
-            stack = []
-            left = [0] * (m+2)
-            for col in range(1, m+1):
-                while stack and heights[stack[-1]] >= heights[col]:
-                    stack.pop()
-                if stack:
-                    left[col] = stack[-1]
-                else:
-                    left[col] = 0
-                stack.append(col)
-            
-            stack = []
-            right = [m+1] * (m+2)
-            for col in range(m, 0, -1):
-                while stack and heights[stack[-1]] >= heights[col]:
-                    stack.pop()
-                if stack:
-                    right[col] = stack[-1]
-                else:
-                    right[col] = m+1
-                stack.append(col)
-            
-            for col in range(1, m+1):
-                width = right[col] - left[col] - 1
-                area = (bottom - top + 1) * width
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            if grid[i][j] == 0:
+                heights[j] += 1
+            else:
+                heights[j] = 0
+        
+        stack = []
+        for j in range(1, m + 2):
+            while stack and heights[stack[-1]] > heights[j]:
+                h = heights[stack.pop()]
+                left = stack[-1] if stack else 0
+                width = j - left - 1
+                area = h * width
                 if area > max_area:
                     max_area = area
+            stack.append(j)
     
     print(max_area)
 

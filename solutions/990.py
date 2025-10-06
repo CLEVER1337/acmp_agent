@@ -6,31 +6,45 @@ def main():
     m = int(data[1])
     g = list(map(int, data[2:2+n]))
     
-    indices = sorted(range(n), key=lambda i: g[i], reverse=True)
+    indices = sorted(range(n), key=lambda i: g[i])
     sorted_g = [g[i] for i in indices]
     
-    dp = [[float('inf')] * (m + 1) for _ in range(n + 1)]
+    dp = [[10**18] * (m + 1) for _ in range(n + 1)]
     prev = [[-1] * (m + 1) for _ in range(n + 1)]
     
     dp[0][0] = 0
     
-    for i in range(1, n + 1):
+    for i in range(n):
         for j in range(i, m + 1):
-            for k in range(1, j - i + 2):
-                cost = sorted_g[i - 1] * (i - 1)
-                if dp[i - 1][j - k] + cost < dp[i][j]:
-                    dp[i][j] = dp[i - 1][j - k] + cost
-                    prev[i][j] = k
+            if dp[i][j] == 10**18:
+                continue
+            for k in range(j + 1, m + 1):
+                add = sorted_g[i] * (k - j - 1)
+                new_val = dp[i][j] + add
+                if new_val < dp[i + 1][k]:
+                    dp[i + 1][k] = new_val
+                    prev[i + 1][k] = j
     
-    result = [0] * n
-    j = m
+    min_val = 10**18
+    last = -1
+    for j in range(n, m + 1):
+        if dp[n][j] < min_val:
+            min_val = dp[n][j]
+            last = j
+    
+    res = [0] * n
+    current = last
     for i in range(n, 0, -1):
-        k = prev[i][j]
-        result[indices[i - 1]] = k
-        j -= k
+        prev_val = prev[i][current]
+        res[i-1] = current - prev_val
+        current = prev_val
     
-    print(dp[n][m])
-    print(' '.join(map(str, result)))
+    original_res = [0] * n
+    for i in range(n):
+        original_res[indices[i]] = res[i]
+    
+    print(min_val)
+    print(' '.join(map(str, original_res)))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

@@ -1,7 +1,11 @@
 
-def read_input():
-    import sys
+import sys
+
+def main():
     data = sys.stdin.read().split()
+    if not data:
+        return
+    
     idx = 0
     L = int(data[idx]); idx += 1
     M = int(data[idx]); idx += 1
@@ -9,10 +13,10 @@ def read_input():
     
     templates = {}
     for _ in range(M):
-        template_id = int(data[idx]); idx += 1
+        num = int(data[idx]); idx += 1
         heights = list(map(int, data[idx:idx+L]))
         idx += L
-        templates[template_id] = heights
+        templates[num] = heights
     
     sections = []
     for _ in range(N):
@@ -20,50 +24,31 @@ def read_input():
         idx += L
         sections.append(heights)
     
-    return L, M, N, templates, sections
-
-def normalize_section(section):
-    min_val = min(section)
-    normalized = [h - min_val for h in section]
-    return normalized
-
-def match_section(section, templates):
-    normalized_section = normalize_section(section)
-    
-    best_match_id = None
-    best_diff = float('inf')
-    
-    for template_id, template_heights in templates.items():
-        normalized_template = normalize_section(template_heights)
-        
-        diff = sum(abs(a - b) for a, b in zip(normalized_section, normalized_template))
-        
-        if diff < best_diff:
-            best_diff = diff
-            best_match_id = template_id
-    
-    return best_match_id if best_diff == 0 else '-'
-
-def main():
-    L, M, N, templates, sections = read_input()
-    
     results = []
     matched_count = 0
-    bad_count = 0
     
-    for section in sections:
-        result = match_section(section, templates)
-        results.append(str(result))
+    for sec in sections:
+        found = False
+        for t_num, t_heights in templates.items():
+            match = True
+            for i in range(L):
+                if sec[i] != t_heights[i]:
+                    match = False
+                    break
+            if match:
+                results.append(str(t_num))
+                matched_count += 1
+                found = True
+                break
         
-        if result == '-':
-            bad_count += 1
-        else:
-            matched_count += 1
+        if not found:
+            results.append('-')
     
-    with open('OUTPUT.TXT', 'w') as f:
-        for result in results:
-            f.write(result + '\n')
-        f.write(f'OK= {matched_count} BAD= {bad_count}\n')
+    for res in results:
+        print(res)
+    
+    bad_count = N - matched_count
+    print(f"OK= {matched_count} BAD= {bad_count}")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

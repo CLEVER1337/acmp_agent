@@ -1,6 +1,5 @@
 
 import sys
-import heapq
 
 def main():
     data = sys.stdin.read().split()
@@ -18,34 +17,56 @@ def main():
         ei = int(data[index+1])
         si = int(data[index+2])
         index += 3
+        if ei < B or bi > E:
+            continue
         cards.append((bi, ei, si))
     
-    cards.sort(key=lambda x: x[0])
-    
-    heap = []
-    current_end = B
-    total_cost = 0
-    i = 0
-    
-    while current_end < E:
-        while i < n and cards[i][0] <= current_end:
-            heapq.heappush(heap, (-cards[i][1], -cards[i][2]))
-            i += 1
+    if not cards:
+        print(0)
+        return
         
-        if not heap:
-            break
-            
-        max_end, cost = heapq.heappop(heap)
-        max_end = -max_end
-        cost = -cost
-        
-        if max_end <= current_end:
+    cards.sort(key=lambda x: (x[0], -x[1]))
+    
+    max_e = -1
+    filtered_cards = []
+    for bi, ei, si in cards:
+        if ei > max_e:
+            filtered_cards.append((bi, ei, si))
+            max_e = ei
+    cards = filtered_cards
+    
+    n_cards = len(cards)
+    dp = [float('inf')] * (n_cards + 1)
+    dp[0] = 0
+    
+    for i in range(1, n_cards + 1):
+        bi, ei, si = cards[i-1]
+        if ei < B:
             continue
             
-        total_cost += cost
-        current_end = max_end
+        if bi <= B:
+            dp[i] = min(dp[i], si)
+        else:
+            left = 0
+            right = i - 1
+            while left <= right:
+                mid = (left + right) // 2
+                if cards[mid][1] >= bi:
+                    right = mid - 1
+                else:
+                    left = mid + 1
+            
+            if left < i:
+                dp[i] = min(dp[i], dp[left+1] + si)
+        
+        dp[i] = min(dp[i], dp[i-1])
     
-    print(total_cost)
+    result = float('inf')
+    for i in range(n_cards + 1):
+        if cards[i-1][1] >= E if i > 0 else False:
+            result = min(result, dp[i])
+    
+    print(result)
 
 if __name__ == "__main__":
     main()

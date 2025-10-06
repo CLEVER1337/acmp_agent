@@ -1,21 +1,14 @@
 
-def main():
-    with open("INPUT.TXT", "r") as f:
-        K = int(f.read().strip())
-    
-    if K <= 2:
-        print(0)
-        return
-        
-    for L in range(2, K):
-        if K % (L + 1) == 0:
-            result = L
-            break
-    else:
-        result = 0
-        
-    with open("OUTPUT.TXT", "w") as f:
-        f.write(str(result))
+k = int(input().strip())
 
-if __name__ == "__main__":
-    main()
+if k <= 2:
+    print(0)
+else:
+    found = False
+    for l in range(2, k):
+        if k % (l + 1) == 1:
+            print(l)
+            found = True
+            break
+    if not found:
+        print(0)

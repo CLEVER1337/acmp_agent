@@ -1,6 +1,7 @@
 
+import sys
+
 def main():
-    import sys
     data = sys.stdin.read().splitlines()
     n = int(data[0])
     ingredients = []
@@ -14,29 +15,53 @@ def main():
     
     percentages = []
     for sign, amount in ingredients:
-        p = (amount / total) * 100
+        p = (amount * 100.0) / total
         percentages.append(p)
     
-    rounded = [int(p) for p in percentages]
-    remainder = 100 - sum(rounded)
-    
-    diffs = []
-    for i, (sign, p) in enumerate(zip([ing[0] for ing in ingredients], percentages)):
-        diff = p - rounded[i]
-        if sign == '+':
-            priority = diff
+    rounded = []
+    for i, (sign, amount) in enumerate(ingredients):
+        p = percentages[i]
+        floor_val = int(p)
+        if p - floor_val < 1e-9:
+            rounded_val = floor_val
         else:
-            priority = -diff
-        diffs.append((priority, i))
+            if sign == '+':
+                rounded_val = int(p + 1e-9)
+            else:
+                rounded_val = int(p)
+        rounded.append(rounded_val)
     
-    diffs.sort(reverse=True, key=lambda x: x[0])
+    current_sum = sum(rounded)
+    diff = 100 - current_sum
     
-    for i in range(remainder):
-        idx = diffs[i][1]
-        rounded[idx] += 1
+    if diff != 0:
+        candidates = []
+        for i, (sign, amount) in enumerate(ingredients):
+            p = percentages[i]
+            floor_val = int(p)
+            if p - floor_val < 1e-9:
+                continue
+            if sign == '+':
+                if rounded[i] == floor_val:
+                    candidates.append((p - floor_val, i, 1))
+            else:
+                if rounded[i] == int(p + 1e-9):
+                    candidates.append((1 - (p - floor_val), i, -1))
+        
+        candidates.sort(key=lambda x: (-x[0], x[2]))
+        
+        for _, idx, direction in candidates:
+            if diff > 0 and direction == 1:
+                rounded[idx] += 1
+                diff -= 1
+            elif diff < 0 and direction == -1:
+                rounded[idx] -= 1
+                diff += 1
+            if diff == 0:
+                break
     
-    for r in rounded:
-        print(r)
+    for val in rounded:
+        print(val)
 
 if __name__ == "__main__":
     main()

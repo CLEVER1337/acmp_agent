@@ -1,61 +1,80 @@
 
 import sys
-from itertools import combinations
 
 def main():
     data = sys.stdin.read().split()
     if not data:
+        print("0 0")
         return
-    
+        
     n = int(data[0])
     m = int(data[1])
+    graph = [0] * (n + 1)
     
-    edges = []
     index = 2
-    graph = [[] for _ in range(n+1)]
     for i in range(m):
         u = int(data[index])
-        v = int(data[index+1])
+        v = int(data[index + 1])
         index += 2
-        edges.append((u, v))
-        graph[u].append(v)
-        graph[v].append(u)
+        u -= 1
+        v -= 1
+        graph[u] |= (1 << v)
+        graph[v] |= (1 << u)
     
-    min_k = n
-    count = 0
-    best_set = None
+    total_edges_mask = (1 << n) - 1
+    dp = [0] * (1 << n)
+    cover_size = [0] * (1 << n)
     
-    for k in range(1, n+1):
-        found = False
-        for combo in combinations(range(1, n+1), k):
-            covered_edges = set()
-            for station in combo:
-                for neighbor in graph[station]:
-                    edge = tuple(sorted((station, neighbor)))
-                    covered_edges.add(edge)
+    for mask in range(1 << n):
+        cover_size[mask] = 0
+        for i in range(n):
+            if mask & (1 << i):
+                cover_size[mask] |= graph[i]
+    
+    INF = float('inf')
+    min_taken = [INF] * (1 << n)
+    ways = [0] * (1 << n)
+    
+    min_taken[0] = 0
+    ways[0] = 1
+    
+    for mask in range(1 << n):
+        if ways[mask] == 0:
+            continue
             
-            if len(covered_edges) == m:
-                if k < min_k:
-                    min_k = k
-                    count = 1
-                    best_set = combo
-                    found = True
-                elif k == min_k:
-                    count += 1
-                    if best_set is None:
-                        best_set = combo
-        
-        if found:
-            break
+        for i in range(n):
+            if mask & (1 << i):
+                continue
+                
+            new_mask = mask | (1 << i)
+            covered = cover_size[new_mask]
+            
+            if min_taken[new_mask] > min_taken[mask] + 1:
+                min_taken[new_mask] = min_taken[mask] + 1
+                ways[new_mask] = ways[mask]
+            elif min_taken[new_mask] == min_taken[mask] + 1:
+                ways[new_mask] += ways[mask]
     
-    if min_k == n and count == 0:
-        min_k = n
-        count = 1
-        best_set = tuple(range(1, n+1))
+    best_mask = None
+    min_count = INF
+    total_ways = 0
     
-    print(f"{min_k} {count}")
-    if best_set:
-        print(" ".join(map(str, best_set)))
+    for mask in range(1 << n):
+        if cover_size[mask] == total_edges_mask:
+            if min_taken[mask] < min_count:
+                min_count = min_taken[mask]
+                total_ways = ways[mask]
+                best_mask = mask
+            elif min_taken[mask] == min_count:
+                total_ways += ways[mask]
+    
+    stations = []
+    for i in range(n):
+        if best_mask & (1 << i):
+            stations.append(i + 1)
+    
+    print(f"{min_count} {total_ways}")
+    print(" ".join(map(str, sorted(stations))))
 
 if __name__ == "__main__":
     main()

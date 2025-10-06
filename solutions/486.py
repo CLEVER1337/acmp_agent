@@ -1,24 +1,23 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        N, K = map(int, f.readline().split())
+    import sys
+    data = sys.stdin.read().split()
+    N = int(data[0])
+    K = int(data[1])
     
     X = 1
     while True:
         valid = True
         current = X
         for i in range(N):
-            if (current - K) % N != 0:
+            if (current - K) % N != 0 or current < K:
                 valid = False
                 break
-            current = (current - K) // N * (N - 1)
-        
+            current = (current - K) * (N - 1) // N
         if valid:
-            break
+            print(X)
+            return
         X += 1
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(X))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

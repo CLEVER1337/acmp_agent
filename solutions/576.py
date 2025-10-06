@@ -1,21 +1,24 @@
 
-def phi(n):
+def main():
+    n = int(input().strip())
+    if n == 1:
+        print(0)
+        return
+        
     result = n
-    p = 2
-    while p * p <= n:
-        if n % p == 0:
-            while n % p == 0:
-                n //= p
-            result -= result // p
-        p += 1
-    if n > 1:
-        result -= result // n
-    return result
+    temp = n
+    i = 2
+    while i * i <= temp:
+        if temp % i == 0:
+            while temp % i == 0:
+                temp //= i
+            result -= result // i
+        i += 1
+        
+    if temp > 1:
+        result -= result // temp
+        
+    print(result)
 
-with open('INPUT.TXT', 'r') as f:
-    n = int(f.read().strip())
-    
-result = phi(n)
-
-with open('OUTPUT.TXT', 'w') as f:
-    f.write(str(result))
+if __name__ == "__main__":
+    main()

@@ -7,14 +7,17 @@ def main():
     index = 1
     results = []
     for _ in range(n):
-        A = int(data[index])
-        B = int(data[index+1])
-        C = int(data[index+2])
+        a = int(data[index])
+        b = int(data[index+1])
+        c = int(data[index+2])
         index += 3
         
-        total = A + B + C
-        max_val = max(A, B, C)
-        
+        total = a + b + c
+        if total == 0:
+            results.append("No")
+            continue
+            
+        max_val = max(a, b, c)
         if max_val > total - max_val + 1:
             results.append("No")
         else:

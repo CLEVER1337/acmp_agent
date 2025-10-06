@@ -8,61 +8,77 @@ def main():
         return
     
     n = int(data[0])
-    graph = [[] for _ in range(n + 1)]
-    dependencies = [[] for _ in range(n + 1)]
-    in_degree = [0] * (n + 1)
-    
+    graph = [[] for _ in range(n+1)]
+    in_degree = [0] * (n+1)
+    dependencies = [0] * (n+1)
+    required = [0] * (n+1)
     index = 1
-    for i in range(1, n + 1):
-        line = []
+    
+    for i in range(1, n+1):
+        nums = []
         while index < len(data) and data[index] != '0':
-            line.append(int(data[index]))
+            num = int(data[index])
+            nums.append(num)
             index += 1
         index += 1
         
-        for dep in line:
+        dependencies[i] = len(nums)
+        required[i] = (dependencies[i] + 1) // 2
+        for dep in nums:
             graph[dep].append(i)
-            dependencies[i].append(dep)
             in_degree[i] += 1
     
-    required = [False] * (n + 1)
-    required[1] = True
-    queue = deque([1])
+    q = deque()
+    for i in range(1, n+1):
+        if in_degree[i] == 0:
+            q.append(i)
     
-    while queue:
-        node = queue.popleft()
-        for dep in dependencies[node]:
-            if not required[dep]:
-                required[dep] = True
-                queue.append(dep)
+    order = []
+    proved = [False] * (n+1)
+    count_deps = [0] * (n+1)
     
-    new_graph = [[] for _ in range(n + 1)]
-    new_in_degree = [0] * (n + 1)
+    while q:
+        u = q.popleft()
+        order.append(u)
+        proved[u] = True
+        
+        for v in graph[u]:
+            count_deps[v] += 1
+            if count_deps[v] >= required[v] and not proved[v]:
+                proved[v] = True
+                q.append(v)
     
-    for i in range(1, n + 1):
-        if required[i]:
-            for dep in dependencies[i]:
-                if required[dep]:
-                    new_graph[dep].append(i)
-                    new_in_degree[i] += 1
+    main_theorem_path = []
+    visited = [False] * (n+1)
     
-    queue = deque()
-    for i in range(1, n + 1):
-        if required[i] and new_in_degree[i] == 0:
-            queue.append(i)
+    def dfs(node):
+        if visited[node]:
+            return
+        visited[node] = True
+        main_theorem_path.append(node)
+        if node == 1:
+            return
+        for dep in graph[node]:
+            if proved[dep] and not visited[dep]:
+                dfs(dep)
     
-    result = []
-    while queue:
-        node = queue.popleft()
-        result.append(node)
-        for neighbor in new_graph[node]:
-            new_in_degree[neighbor] -= 1
-            if new_in_degree[neighbor] == 0:
-                queue.append(neighbor)
+    dfs(1)
+    main_theorem_path.reverse()
     
-    print(len(result))
-    for theorem in result:
-        print(theorem)
+    result_set = set()
+    result_order = []
+    
+    for node in main_theorem_path:
+        result_set.add(node)
+        result_order.append(node)
+    
+    for node in order:
+        if node not in result_set:
+            result_order.append(node)
+    
+    print(len(result_order))
+    for node in result_order:
+        print(node)
 
 if __name__ == "__main__":
     main()

@@ -2,24 +2,31 @@
 import math
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        lines = f.readlines()
+    data = []
+    while True:
+        try:
+            line = input().split()
+            if not line:
+                continue
+            data.append(line)
+        except EOFError:
+            break
+            
+    xk, yk = map(float, data[0])
+    xc, yc, rc = map(float, data[1])
     
-    xk, yk = map(float, lines[0].split())
-    xc, yc, rc = map(float, lines[1].split())
-    
-    d = math.sqrt((xk - xc)**2 + (yk - yc)**2)
+    dx = xk - xc
+    dy = yk - yc
+    d = math.sqrt(dx*dx + dy*dy)
     
     if d >= rc:
         area = math.pi * rc * rc
     else:
         h = rc - d
-        theta = 2 * math.acos((rc - h) / rc)
-        segment_area = rc * rc * (theta - math.sin(theta)) / 2
+        segment_area = rc * rc * math.acos((rc - h) / rc) - (rc - h) * math.sqrt(2 * rc * h - h * h)
         area = math.pi * rc * rc - segment_area
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write("{:.3f}".format(area))
+        
+    print("{:.3f}".format(area))
 
 if __name__ == "__main__":
     main()

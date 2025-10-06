@@ -1,27 +1,6 @@
 
 def main():
     import sys
-    sys.setrecursionlimit(1 << 25)
-    
-    def find(x, parent):
-        if parent[x] != x:
-            parent[x] = find(parent[x], parent)
-        return parent[x]
-    
-    def union(x, y, parent, rank):
-        rx = find(x, parent)
-        ry = find(y, parent)
-        if rx == ry:
-            return False
-        if rank[rx] < rank[ry]:
-            parent[rx] = ry
-        elif rank[rx] > rank[ry]:
-            parent[ry] = rx
-        else:
-            parent[ry] = rx
-            rank[rx] += 1
-        return True
-    
     data = sys.stdin.read().split()
     if not data:
         print(0)
@@ -32,32 +11,53 @@ def main():
     edges = []
     index = 2
     for i in range(m):
-        u = int(data[index]) - 1
-        v = int(data[index + 1]) - 1
-        edges.append((u, v))
-        index += 2
+        u = int(data[index]); v = int(data[index+1]); index += 2
+        edges.append((min(u, v), max(u, v)))
+        
+    from collections import defaultdict
     
-    total = 0
-    for mask in range(1 << m):
-        parent = list(range(n))
-        rank = [0] * n
-        cnt = 0
-        for i in range(m):
-            if mask & (1 << i):
-                u, v = edges[i]
-                if union(u, v, parent, rank):
-                    cnt += 1
-        if cnt == n - 1:
-            connected = True
-            root = find(0, parent)
-            for i in range(1, n):
-                if find(i, parent) != root:
-                    connected = False
-                    break
-            if connected:
-                total += 1
+    graph = defaultdict(list)
+    for u, v in edges:
+        graph[u].append(v)
+        graph[v].append(u)
+        
+    visited = [False] * (n + 1)
+    comp_count = 0
+    comp_sizes = []
+    
+    for i in range(1, n + 1):
+        if not visited[i]:
+            comp_count += 1
+            stack = [i]
+            visited[i] = True
+            size = 0
+            while stack:
+                node = stack.pop()
+                size += 1
+                for neighbor in graph[node]:
+                    if not visited[neighbor]:
+                        visited[neighbor] = True
+                        stack.append(neighbor)
+            comp_sizes.append(size)
+            
+    if comp_count != 1:
+        print(0)
+        return
+        
+    total_edges = n * (n - 1) // 2
+    mod = 10**9 + 7
+    
+    dp = [0] * (n + 1)
+    dp[0] = 1
+    for i in range(1, n + 1):
+        for j in range(i, 0, -1):
+            dp[j] = (dp[j] + dp[j - 1] * i) % mod
                 
-    print(total)
+    result = 0
+    for k in range(n - 1, total_edges + 1):
+        result = (result + dp[k]) % mod
+        
+    print(result % mod)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

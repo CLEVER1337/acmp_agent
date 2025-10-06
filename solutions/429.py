@@ -1,61 +1,68 @@
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        n = int(f.readline().strip())
-        nodes = {}
-        children = {}
+    import sys
+    data = sys.stdin.read().splitlines()
+    n = int(data[0])
+    children = {}
+    parent_map = {}
+    values = {}
+    is_leaf = {}
+    
+    for i in range(1, n):
+        parts = data[i].split()
+        node_type = parts[0]
+        parent = int(parts[1])
+        node_id = i + 1
         
-        for i in range(2, n + 1):
-            line = f.readline().split()
-            node_type = line[0]
-            parent = int(line[1])
-            
-            if node_type == 'L':
-                value = int(line[2])
-                nodes[i] = {'type': 'leaf', 'value': value}
-            else:
-                nodes[i] = {'type': 'internal'}
-                if parent not in children:
-                    children[parent] = []
-                children[parent].append(i)
+        if node_type == 'L':
+            value = int(parts[2])
+            values[node_id] = value
+            is_leaf[node_id] = True
+        else:
+            is_leaf[node_id] = False
+        
+        if parent not in children:
+            children[parent] = []
+        children[parent].append(node_id)
+        parent_map[node_id] = parent
     
     result = {}
+    stack = [1]
+    order = []
+    while stack:
+        node = stack.pop()
+        order.append(node)
+        if node in children:
+            for child in reversed(children[node]):
+                stack.append(child)
     
-    def dfs(node):
-        if node in result:
-            return result[node]
-            
-        if nodes[node]['type'] == 'leaf':
-            result[node] = nodes[node]['value']
-            return result[node]
-            
-        if node not in children:
-            return 0
-            
-        child_values = [dfs(child) for child in children[node]]
-        
-        if node == 1:
-            result[node] = max(child_values)
+    for node in reversed(order):
+        if is_leaf.get(node, False):
+            result[node] = values[node]
         else:
-            level = 1
-            temp = node
-            while temp != 1:
-                level += 1
-                for p, kids in children.items():
-                    if temp in kids:
-                        temp = p
-                        break
-            
-            if level % 2 == 1:
-                result[node] = max(child_values)
+            child_nodes = children.get(node, [])
+            if not child_nodes:
+                result[node] = 0
             else:
-                result[node] = min(child_values)
+                if node == 1:
+                    current_player = 1
+                else:
+                    parent = parent_map[node]
+                    depth_diff = 0
+                    temp = node
+                    while temp != 1:
+                        temp = parent_map[temp]
+                        depth_diff += 1
+                    current_player = 1 if depth_diff % 2 == 0 else -1
                 
-        return result[node]
+                child_results = [result[child] for child in child_nodes]
+                if current_player == 1:
+                    res = max(child_results)
+                else:
+                    res = min(child_results)
+                result[node] = res
     
-    outcome = dfs(1)
-    with open("OUTPUT.TXT", "w") as f:
-        f.write(str(outcome))
+    print(result[1])
 
 if __name__ == "__main__":
     main()

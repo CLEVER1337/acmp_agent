@@ -7,6 +7,7 @@ def main():
     
     n = int(data[0])
     m = int(data[1])
+    
     edges = []
     index = 2
     for i in range(m):
@@ -16,12 +17,13 @@ def main():
         index += 3
         edges.append((u, v, c, i+1))
     
-    INF = float('inf')
+    INF = 10**9
     dist = [INF] * (n+1)
     dist[1] = 0
     parent_edge = [0] * (n+1)
+    used_edges = set()
     
-    for i in range(n-1):
+    for _ in range(n-1):
         updated = False
         for u, v, c, idx in edges:
             if dist[u] < INF and dist[v] > dist[u] + c:
@@ -32,22 +34,25 @@ def main():
             break
     
     total_cost = 0
-    used_edges = set()
     for i in range(2, n+1):
         if dist[i] < INF:
             total_cost += dist[i]
-            v = i
-            while v != 1:
-                edge_id = parent_edge[v]
-                used_edges.add(edge_id)
-                for u, v_target, c, idx in edges:
+    
+    selected_edges = set()
+    for i in range(2, n+1):
+        if dist[i] < INF:
+            current = i
+            while current != 1:
+                edge_id = parent_edge[current]
+                selected_edges.add(edge_id)
+                for u, v, c, idx in edges:
                     if idx == edge_id:
-                        v = u
+                        current = u
                         break
     
-    k = len(used_edges)
+    k = len(selected_edges)
     print(total_cost, k)
-    print(' '.join(map(str, sorted(used_edges))))
+    print(' '.join(map(str, sorted(selected_edges))))
 
 if __name__ == "__main__":
     main()

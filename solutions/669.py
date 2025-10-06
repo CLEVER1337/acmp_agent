@@ -1,8 +1,6 @@
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        M = int(f.readline().strip())
-    
+    M = int(input().strip())
     if M == 1:
         print("-1 -1")
         return
@@ -13,7 +11,7 @@ def main():
         while n % d == 0:
             factors.append(d)
             n //= d
-    
+            
     if n != 1:
         print("-1 -1")
         return

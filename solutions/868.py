@@ -11,27 +11,43 @@ def main():
         index += m
         matrix.append(row)
     
-    max_row = max(matrix)
-    max_val = max(max_row)
+    row_max = [max(row) for row in matrix]
+    max_val = max(row_max)
+    max_row_index = row_max.index(max_val)
     
+    max_col_index = matrix[max_row_index].index(max_val)
+    
+    candidate_rows = []
     for i in range(n):
+        if matrix[i][max_col_index] == max_val:
+            candidate_rows.append(i)
+    
+    best_row = candidate_rows[0]
+    for i in range(1, len(candidate_rows)):
+        current_row = candidate_rows[i]
         for j in range(m):
-            if matrix[i][j] == max_val:
-                target_row = i
-                target_col = j
+            if matrix[current_row][j] > matrix[best_row][j]:
+                best_row = current_row
+                break
+            elif matrix[current_row][j] < matrix[best_row][j]:
                 break
     
-    row_sorted = sorted(range(n), key=lambda i: matrix[i][target_col], reverse=True)
-    col_sorted = sorted(range(m), key=lambda j: matrix[target_row][j], reverse=True)
+    candidate_cols = []
+    for j in range(m):
+        if matrix[best_row][j] == max_val:
+            candidate_cols.append(j)
     
-    sorted_matrix = []
-    for i in row_sorted:
-        new_row = []
-        for j in col_sorted:
-            new_row.append(matrix[i][j])
-        sorted_matrix.append(new_row)
+    best_col = candidate_cols[0]
+    for j in range(1, len(candidate_cols)):
+        current_col = candidate_cols[j]
+        for i in range(n):
+            if matrix[i][current_col] > matrix[i][best_col]:
+                best_col = current_col
+                break
+            elif matrix[i][current_col] < matrix[i][best_col]:
+                break
     
-    print(sorted_matrix[-1][-1])
+    print(matrix[best_row][best_col])
 
 if __name__ == "__main__":
     main()

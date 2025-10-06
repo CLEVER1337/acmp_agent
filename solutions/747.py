@@ -1,73 +1,42 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        S = f.readline().strip()
-    
+    S = input().strip()
     n = len(S)
     dp = [0] * (n + 1)
-    parent = [(-1, -1)] * (n + 1)
-    period = [0] * (n + 1)
+    prev = [None] * (n + 1)
+    dp[0] = 0
     
-    for i in range(n + 1):
-        dp[i] = i
-        parent[i] = (-1, 1)
-        period[i] = i
+    for i in range(1, n + 1):
+        dp[i] = float('inf')
+        for j in range(i):
+            candidate = dp[j] + (i - j)
+            if candidate < dp[i]:
+                dp[i] = candidate
+                prev[i] = (j, i - j, 1)
+            
+            substr = S[j:i]
+            L = i - j
+            for rep in range(2, i // L + 1):
+                end = j + rep * L
+                if end > n:
+                    break
+                if S[j:end] != substr * rep:
+                    break
+                candidate = dp[j] + L
+                if candidate < dp[end]:
+                    dp[end] = candidate
+                    prev[end] = (j, L, rep)
     
-    for i in range(n):
-        p = [0] * (n + 1)
-        k = 0
-        for j in range(i + 1, n):
-            while k > 0 and S[j] != S[i + k]:
-                k = p[i + k - 1]
-            if S[j] == S[i + k]:
-                k += 1
-            else:
-                k = 0
-            p[j] = k
-        
-        for j in range(i, n):
-            len_sub = j - i + 1
-            per = len_sub - p[j]
-            if len_sub % per == 0:
-                period[j] = per
-            else:
-                period[j] = len_sub
-    
-    for i in range(n):
-        for j in range(i, n):
-            len_sub = j - i + 1
-            per = period[j]
-            if len_sub % per == 0:
-                cnt = len_sub // per
-                cost = per
-                if dp[i] + cost < dp[j + 1]:
-                    dp[j + 1] = dp[i] + cost
-                    parent[j + 1] = (i, cnt)
-            else:
-                cost = len_sub
-                if dp[i] + cost < dp[j + 1]:
-                    dp[j + 1] = dp[i] + cost
-                    parent[j + 1] = (i, 1)
-    
-    res = []
+    result = []
     pos = n
     while pos > 0:
-        prev, cnt = parent[pos]
-        substr = S[prev:pos]
-        if cnt > 1:
-            per = period[pos - 1]
-            actual_sub = S[prev:prev + per]
-            res.append((actual_sub, cnt))
-        else:
-            res.append((substr, 1))
-        pos = prev
+        j, L, rep = prev[pos]
+        result.append((S[j:j+L], rep))
+        pos = j
     
-    res.reverse()
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(dp[n]) + '\n')
-        for s, cnt in res:
-            f.write(f"{s} {cnt}\n")
+    print(dp[n])
+    for s, d in reversed(result):
+        print(s, d)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

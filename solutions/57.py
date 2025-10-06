@@ -2,37 +2,39 @@
 import math
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        data = f.read().split()
+    import sys
+    data = sys.stdin.read().split()
+    if not data:
+        return
     
     n = int(data[0])
     c = int(data[1])
-    p = int(data[2])
-    
-    coords = []
+    p_val = int(data[2])
     index = 3
+    
+    houses = []
     for i in range(n):
         x = int(data[index])
-        y = int(data[index + 1])
-        coords.append((x, y))
+        y = int(data[index+1])
         index += 2
-    
+        houses.append((x, y))
+        
     xnet = int(data[index])
-    ynet = int(data[index + 1])
+    ynet = int(data[index+1])
     
     total_length = 0.0
-    for x, y in coords:
-        distance = math.sqrt((x - xnet)**2 + (y - ynet)**2)
+    for x, y in houses:
+        dx = x - xnet
+        dy = y - ynet
+        distance = math.sqrt(dx*dx + dy*dy)
         total_length += distance
-    
+        
     total_cost = total_length * c
     
-    if total_cost <= p:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write('YES')
+    if total_cost <= p_val:
+        print("YES")
     else:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write('NO')
+        print("NO")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

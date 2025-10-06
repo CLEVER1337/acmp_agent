@@ -7,22 +7,21 @@ def main():
     L = int(data[1])
     
     count = 0
-    max_grid = math.floor(R / L)
+    half_L = L / 2.0
     
-    for x in range(-max_grid, max_grid + 1):
-        for y in range(-max_grid, max_grid + 1):
-            x_left = x * L
-            y_bottom = y * L
-            x_right = (x + 1) * L
-            y_top = (y + 1) * L
+    max_grid = int(math.floor(R / L)) + 1
+    
+    for i in range(max_grid):
+        x = i * L + half_L
+        if x > R:
+            continue
             
-            farthest_x = max(abs(x_left), abs(x_right))
-            farthest_y = max(abs(y_bottom), abs(y_top))
-            
-            if math.sqrt(farthest_x**2 + farthest_y**2) <= R:
-                count += 1
-                
-    print(count)
+        max_j = int(math.floor(math.sqrt(R*R - x*x) / L))
+        count += max_j + 1
+        
+    total = 4 * count
+    
+    print(total)
 
 if __name__ == "__main__":
     main()

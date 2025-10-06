@@ -1,17 +1,11 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        s = f.readline().strip()
-    
-    if not s:
-        print(-1)
-        return
-        
-    max_char = max(s)
-    if max_char.isdigit():
+    s = input().strip()
+    max_char = max(s) if s else '0'
+    if max_char in '0123456789':
         min_base = int(max_char) + 1
-    elif max_char.isalpha():
-        min_base = ord(max_char.upper()) - ord('A') + 11
+    elif 'A' <= max_char <= 'Z':
+        min_base = ord(max_char) - ord('A') + 11
     else:
         print(-1)
         return
@@ -20,14 +14,25 @@ def main():
         min_base = 2
         
     for base in range(min_base, 37):
-        try:
-            int(s, base)
+        valid = True
+        for char in s:
+            if char in '0123456789':
+                digit = int(char)
+            elif 'A' <= char <= 'Z':
+                digit = ord(char) - ord('A') + 10
+            else:
+                valid = False
+                break
+                
+            if digit >= base:
+                valid = False
+                break
+                
+        if valid:
             print(base)
             return
-        except ValueError:
-            continue
             
     print(-1)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -4,60 +4,34 @@ def main():
     data = sys.stdin.read().split()
     n = int(data[0])
     target = float(data[1])
-    caps = list(map(float, data[2:2+n]))
+    caps = list(map(int, data[2:2+n]))
     
-    from itertools import permutations
-    
-    def compute_capacitance(sequence):
-        stack = []
-        for cap in sequence:
-            stack.append([cap])
+    def solve():
+        from itertools import product
         
-        while len(stack) > 1:
-            # Try both parallel and series combinations
-            new_stack = []
-            for i in range(0, len(stack), 2):
-                if i + 1 >= len(stack):
-                    new_stack.append(stack[i])
-                    continue
-                
-                a = stack[i]
-                b = stack[i+1]
-                
-                # Try parallel combination
-                parallel_results = []
-                for val_a in a:
-                    for val_b in b:
-                        parallel_results.append(val_a + val_b)
-                
-                # Try series combination
-                series_results = []
-                for val_a in a:
-                    for val_b in b:
-                        if val_a + val_b > 0:
-                            series_results.append((val_a * val_b) / (val_a + val_b))
-                
-                combined = parallel_results + series_results
-                new_stack.append(combined)
+        if n == 0:
+            return False
             
-            stack = new_stack
+        all_schemes = [set() for _ in range(n+1)]
+        for i in range(1, n+1):
+            all_schemes[i].add(caps[i-1])
         
-        return stack[0]
+        for k in range(2, n+1):
+            for a in range(1, k):
+                b = k - a
+                for ca in all_schemes[a]:
+                    for cb in all_schemes[b]:
+                        all_schemes[k].add(ca + cb)
+                        all_schemes[k].add((ca * cb) / (ca + cb))
+        
+        for k in range(1, n+1):
+            for cap in all_schemes[k]:
+                if abs(cap - target) <= 0.01:
+                    return True
+        return False
     
-    found = False
-    for r in range(1, n + 1):
-        for perm in permutations(caps, r):
-            results = compute_capacitance(perm)
-            for result in results:
-                if abs(result - target) <= 0.01:
-                    found = True
-                    break
-            if found:
-                break
-        if found:
-            break
-    
-    print("YES" if found else "NO")
+    result = solve()
+    print("YES" if result else "NO")
 
 if __name__ == "__main__":
     main()

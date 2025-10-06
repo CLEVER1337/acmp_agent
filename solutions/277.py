@@ -1,36 +1,45 @@
 
-with open("INPUT.TXT", "r") as f:
-    a, b, c = map(int, f.read().split())
-
-terms = []
-if a != 0:
-    terms.append(str(a))
-    
-if b != 0:
-    if b == 1:
-        terms.append("x")
-    elif b == -1:
-        terms.append("-x")
+def format_term(coefficient, variable, is_first):
+    if coefficient == 0:
+        return ""
+    sign = ''
+    if coefficient > 0:
+        if not is_first:
+            sign = '+'
     else:
-        terms.append(f"{b:+}x".replace("+", "+").replace("-", "-"))
+        sign = '-'
+        coefficient = -coefficient
         
-if c != 0:
-    if c == 1:
-        terms.append("y")
-    elif c == -1:
-        terms.append("-y")
-    else:
-        terms.append(f"{c:+}y".replace("+", "+").replace("-", "-"))
-
-if not terms:
-    result = "0"
-else:
-    result = terms[0]
-    for term in terms[1:]:
-        if term.startswith("-"):
-            result += term
+    if coefficient == 1:
+        if variable:
+            return f"{sign}{variable}"
         else:
-            result += "+" + term
+            return f"{sign}1"
+    else:
+        if variable:
+            return f"{sign}{coefficient}{variable}"
+        else:
+            return f"{sign}{coefficient}"
 
-with open("OUTPUT.TXT", "w") as f:
-    f.write(result)
+def main():
+    with open("INPUT.TXT", "r") as f:
+        data = f.read().split()
+    a, b, c = map(int, data)
+    
+    parts = []
+    parts.append(format_term(a, '', True))
+    parts.append(format_term(b, 'x', len(parts) == 0))
+    parts.append(format_term(c, 'y', len(parts) == 0))
+    
+    result = ''.join(parts)
+    
+    if result == '':
+        result = '0'
+    elif result[0] == '+':
+        result = result[1:]
+        
+    with open("OUTPUT.TXT", "w") as f:
+        f.write(result)
+
+if __name__ == "__main__":
+    main()

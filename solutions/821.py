@@ -17,40 +17,29 @@ def main():
                 num += 1
         board.append(row)
     
-    empty_row = n - 1
-    empty_col = n - 1
+    empty_i, empty_j = n-1, n-1
     
-    for idx, cmd in enumerate(commands):
+    for idx, cmd in enumerate(commands, 1):
+        new_i, new_j = empty_i, empty_j
+        
         if cmd == 'U':
-            if empty_row == 0:
-                print(f"ERROR {idx + 1}")
-                return
-            board[empty_row][empty_col], board[empty_row-1][empty_col] = board[empty_row-1][empty_col], board[empty_row][empty_col]
-            empty_row -= 1
+            new_i -= 1
         elif cmd == 'D':
-            if empty_row == n - 1:
-                print(f"ERROR {idx + 1}")
-                return
-            board[empty_row][empty_col], board[empty_row+1][empty_col] = board[empty_row+1][empty_col], board[empty_row][empty_col]
-            empty_row += 1
+            new_i += 1
         elif cmd == 'L':
-            if empty_col == 0:
-                print(f"ERROR {idx + 1}")
-                return
-            board[empty_row][empty_col], board[empty_row][empty_col-1] = board[empty_row][empty_col-1], board[empty_row][empty_col]
-            empty_col -= 1
+            new_j -= 1
         elif cmd == 'R':
-            if empty_col == n - 1:
-                print(f"ERROR {idx + 1}")
-                return
-            board[empty_row][empty_col], board[empty_row][empty_col+1] = board[empty_row][empty_col+1], board[empty_row][empty_col]
-            empty_col += 1
+            new_j += 1
+        
+        if new_i < 0 or new_i >= n or new_j < 0 or new_j >= n:
+            print(f"ERROR {idx}")
+            return
+        
+        board[empty_i][empty_j], board[new_i][new_j] = board[new_i][new_j], board[empty_i][empty_j]
+        empty_i, empty_j = new_i, new_j
     
     for i in range(n):
-        line = []
-        for j in range(n):
-            line.append(str(board[i][j]))
-        print(' '.join(line))
+        print(' '.join(str(x) for x in board[i]))
 
 if __name__ == "__main__":
     main()

@@ -1,47 +1,64 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        X = f.readline().strip()
-        Y = f.readline().strip()
-    
+    X = input().strip()
+    Y = input().strip()
     n = len(X)
     m = len(Y)
     
-    def normalize(s):
+    def can_remove(s, i):
+        if i < 0 or i >= len(s):
+            return False
+        if s[i] == 'a' and i + 1 < len(s) and s[i + 1] == 'A':
+            return True
+        if s[i] == 'A' and i + 1 < len(s) and s[i + 1] == 'a':
+            return True
+        if s[i] == 'b' and i + 1 < len(s) and s[i + 1] == 'B':
+            return True
+        if s[i] == 'B' and i + 1 < len(s) and s[i + 1] == 'b':
+            return True
+        return False
+    
+    def reduce_word(s):
         stack = []
-        for c in s:
-            if stack and stack[-1].swapcase() == c:
-                stack.pop()
-            else:
-                stack.append(c)
+        for char in s:
+            stack.append(char)
+            while len(stack) >= 2:
+                a, b = stack[-2], stack[-1]
+                if (a == 'a' and b == 'A') or (a == 'A' and b == 'a') or (a == 'b' and b == 'B') or (a == 'B' and b == 'b'):
+                    stack.pop()
+                    stack.pop()
+                else:
+                    break
         return ''.join(stack)
     
-    normX = normalize(X)
-    normY = normalize(Y)
+    base = reduce_word(X)
+    redY = reduce_word(Y)
     
-    best_pos = -1
-    best_len = float('inf')
-    
-    for i in range(len(normY) + 1):
-        left = normY[:i]
-        right = normY[i:]
+    if redY == "":
+        print(base)
+        return
         
-        candidate_left = normalize(normX + left)
-        if candidate_left.endswith(left):
-            candidate = candidate_left[:-len(left)] + normY
-            if len(candidate) < best_len:
-                best_len = len(candidate)
-                best_candidate = candidate
-                
-        candidate_right = normalize(right + normX)
-        if candidate_right.startswith(right):
-            candidate = normY + candidate_right[len(right):]
-            if len(candidate) < best_len:
-                best_len = len(candidate)
-                best_candidate = candidate
+    best_len = float('inf')
+    best_word = None
     
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(best_candidate)
+    for start in range(len(base) + 1):
+        for end in range(start, len(base) + 1):
+            left = base[:start]
+            right = base[end:]
+            mid = base[start:end]
+            
+            candidate = left + Y + right
+            reduced_candidate = reduce_word(candidate)
+            
+            if reduce_word(reduced_candidate) == base and Y in reduced_candidate:
+                if len(reduced_candidate) < best_len:
+                    best_len = len(reduced_candidate)
+                    best_word = reduced_candidate
+    
+    if best_word is None:
+        best_word = base
+        
+    print(best_word)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

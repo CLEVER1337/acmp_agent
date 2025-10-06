@@ -16,41 +16,63 @@ def main():
         index += 2
         friends.append((a, b, i+1))
         
-    # Разделяем друзей на тех, у кого bi >= 0 и bi < 0
-    positive = []
-    negative = []
+    pos = []
+    neg = []
     for a, b, idx in friends:
         if b >= 0:
-            positive.append((a, b, idx))
+            pos.append((a, b, idx))
         else:
-            negative.append((a, b, idx))
+            neg.append((a, b, idx))
             
-    # Сортируем положительных по ai (по возрастанию)
-    positive.sort(key=lambda x: x[0])
+    pos.sort(key=lambda x: x[0])
+    neg.sort(key=lambda x: x[0] + x[1], reverse=True)
     
-    # Сортируем отрицательных по ai + bi (по убыванию), что эквивалентно (a + b)
-    negative.sort(key=lambda x: x[0] + x[1], reverse=True)
-    
-    selected = []
+    count = 0
+    order = []
     current_auth = auth
     
-    # Обрабатываем сначала положительных друзей
-    for a, b, idx in positive:
+    for a, b, idx in pos:
         if current_auth >= a:
+            count += 1
+            order.append(idx)
             current_auth += b
-            selected.append(idx)
+            
+    dp = [[-10**18] * (len(neg)+1) for _ in range(len(neg)+1)]
+    dp[0][0] = current_auth
+    best_count = 0
+    best_state = 0
     
-    # Обрабатываем отрицательных друзей
-    for a, b, idx in negative:
-        if current_auth >= a:
-            current_auth += b
-            selected.append(idx)
-        else:
-            break
+    for i in range(len(neg)):
+        a, b, idx = neg[i]
+        for j in range(i+1):
+            if dp[i][j] == -10**18:
+                continue
+            if dp[i][j] >= a:
+                if dp[i+1][j+1] < dp[i][j] + b:
+                    dp[i+1][j+1] = dp[i][j] + b
+            if dp[i+1][j] < dp[i][j]:
+                dp[i+1][j] = dp[i][j]
+                
+    for j in range(len(neg)+1):
+        if dp[len(neg)][j] != -10**18:
+            best_count = j
+            best_state = j
+            
+    selected = []
+    j = best_count
+    for i in range(len(neg)-1, -1, -1):
+        if j > 0 and dp[i][j-1] != -10**18 and dp[i][j-1] >= neg[i][0] and dp[i][j-1] + neg[i][1] == dp[i+1][j]:
+            selected.append(neg[i][2])
+            j -= 1
+            
+    total_count = count + best_count
+    result_order = order + selected
     
-    print(len(selected))
-    if selected:
-        print(" ".join(map(str, selected)))
+    print(total_count)
+    if total_count > 0:
+        print(" ".join(map(str, result_order)))
+    else:
+        print()
 
 if __name__ == "__main__":
     main()

@@ -1,43 +1,39 @@
 
-def matrix_mult(A, B, mod):
+def matrix_mult(a, b, mod):
     return [
-        [(A[0][0]*B[0][0] + A[0][1]*B[1][0]) % mod,
-         (A[0][0]*B[0][1] + A[0][1]*B[1][1]) % mod],
-        [(A[1][0]*B[0][0] + A[1][1]*B[1][0]) % mod,
-         (A[1][0]*B[0][1] + A[1][1]*B[1][1]) % mod]
+        [(a[0][0]*b[0][0] + a[0][1]*b[1][0]) % mod,
+         (a[0][0]*b[0][1] + a[0][1]*b[1][1]) % mod],
+        [(a[1][0]*b[0][0] + a[1][1]*b[1][0]) % mod,
+         (a[1][0]*b[0][1] + a[1][1]*b[1][1]) % mod]
     ]
 
 def matrix_pow(matrix, power, mod):
     result = [[1, 0], [0, 1]]
     base = matrix
-    
     while power:
         if power & 1:
             result = matrix_mult(result, base, mod)
         base = matrix_mult(base, base, mod)
         power //= 2
-    
     return result
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        data = f.read().split()
-        if len(data) < 2:
-            return
-        N = int(data[0])
-        M = int(data[1])
+    import sys
+    data = sys.stdin.read().split()
+    if not data:
+        return
+    n = int(data[0])
+    m = int(data[1])
     
-    if N == 0:
-        result = 0
-    elif N == 1:
-        result = 1 % M
-    else:
-        T = [[1, 1], [1, 0]]
-        T_pow = matrix_pow(T, N - 1, M)
-        result = T_pow[0][0] % M
+    if n == 0:
+        print(0)
+        return
+        
+    T = [[1, 1], [1, 0]]
+    T_n = matrix_pow(T, n, m)
     
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(result))
-
-if __name__ == '__main__':
+    s_n = T_n[0][1] % m
+    print(s_n)
+    
+if __name__ == "__main__":
     main()

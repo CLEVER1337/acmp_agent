@@ -1,6 +1,7 @@
 
+import sys
+
 def main():
-    import sys
     data = sys.stdin.read().splitlines()
     n = int(data[0])
     sheets = []
@@ -8,21 +9,48 @@ def main():
         a, b = map(float, data[i].split())
         sheets.append((a, b, i))
     
-    def time_for_order(order):
-        total_a = 0
-        total_b = 0
-        for idx in order:
-            a, b, _ = sheets[idx - 1]
-            total_a += a
-            total_b += b
-        return min(total_a, total_b)
+    def key_func(x):
+        a, b, idx = x
+        return a * b
     
-    sorted_sheets = sorted(sheets, key=lambda x: x[0] * x[1], reverse=True)
-    best_order = [sheet[2] for sheet in sorted_sheets]
-    best_time = time_for_order(best_order)
+    sorted_sheets = sorted(sheets, key=key_func)
     
-    print("{:.15f}".format(best_time))
-    print(" ".join(map(str, best_order)))
+    left = 0.0
+    right = 1e12
+    
+    for _ in range(100):
+        mid = (left + right) / 2.0
+        total = 0.0
+        possible = True
+        
+        for a, b, idx in sorted_sheets:
+            if total > mid:
+                possible = False
+                break
+            remaining = mid - total
+            if remaining * b < a:
+                possible = False
+                break
+            total += a / b
+        
+        if possible:
+            left = mid
+        else:
+            right = mid
+    
+    T = (left + right) / 2.0
+    
+    order = []
+    total_a = 0.0
+    for a, b, idx in sorted_sheets:
+        order.append((total_a / b, idx))
+        total_a += a
+    
+    order.sort(key=lambda x: x[0])
+    result_order = [str(idx) for _, idx in order]
+    
+    print("{:.15f}".format(T))
+    print(" ".join(result_order))
 
 if __name__ == "__main__":
     main()

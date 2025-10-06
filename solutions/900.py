@@ -1,38 +1,29 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        N = int(f.read().strip())
-    
-    for k in range(1, N + 1):
-        for v in range(1, N + 1):
-            p = N - k - v
-            if p <= 0:
+    n = int(input().strip())
+    for a in range(1, n + 1):
+        for b in range(1, n + 1):
+            c = n - a - b
+            if c <= 0:
                 continue
+            p1, v1, k1 = a, b, c
             
-            # Имитация процесса
-            # Шаг 1: Петя дает Васе и Коле по столько, сколько у них было
-            p1 = p - v - k
-            v1 = v + v
-            k1 = k + k
+            v1 += p1
+            k1 += p1
+            p1 -= (p1 * 2)
             
-            # Шаг 2: Коля дает Васе и Пете по столько, сколько у них стало
-            k2 = k1 - v1 - p1
-            v2 = v1 + v1
-            p2 = p1 + p1
+            p1 += k1
+            v1 += k1
+            k1 -= (k1 * 2)
             
-            # Шаг 3: Вася дает Пете и Коле по столько, сколько у них стало
-            v3 = v2 - p2 - k2
-            p3 = p2 + p2
-            k3 = k2 + k2
+            p1 += v1
+            k1 += v1
+            v1 -= (v1 * 2)
             
-            # Проверяем, что у всех поровну
-            if p3 == v3 == k3 and p3 + v3 + k3 == N:
-                with open('OUTPUT.TXT', 'w') as f:
-                    f.write(f"{p} {v} {k}")
+            if p1 == v1 == k1 and p1 > 0:
+                print(a, b, c)
                 return
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write("0 0 0")
+    print("0 0 0")
 
 if __name__ == "__main__":
     main()

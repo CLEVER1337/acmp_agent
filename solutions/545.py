@@ -2,45 +2,45 @@
 import math
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        sides = list(map(float, f.readline().split()))
+    data = input().split()
+    a, b, c = map(float, data)
+    sides = sorted([a, b, c])
     
-    a, b, c = sorted(sides)
+    def is_right_triangle(x, y, z):
+        return abs(x*x + y*y - z*z) < 1e-9
     
-    # Проверяем, является ли треугольник прямоугольным
-    if math.isclose(a**2 + b**2, c**2, rel_tol=1e-9):
-        area = 0.5 * a * b
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write(f"{area:.10f}")
+    if is_right_triangle(sides[0], sides[1], sides[2]):
+        area = 0.5 * sides[0] * sides[1]
+        print("{:.15f}".format(area))
         return
     
-    # Если треугольник остроугольный
-    if a**2 + b**2 > c**2:
-        # Максимальная площадь - когда гипотенуза совпадает с наибольшей стороной
-        # Катеты будут максимально возможными при этом условии
-        h = 2 * (a * b * c) / (a**2 + b**2 + c**2)
-        cat1 = math.sqrt(a**2 - h**2)
-        cat2 = math.sqrt(b**2 - h**2)
-        area = 0.5 * cat1 * cat2
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write(f"{area:.10f}")
-        return
+    max_area = 0.0
     
-    # Если треугольник тупоугольный
-    # Максимальная площадь достигается, когда прямой угол находится
-    # в вершине напротив наибольшей стороны
-    # Используем формулу для площади через высоту
-    p = (a + b + c) / 2
-    area_triangle = math.sqrt(p * (p - a) * (p - b) * (p - c))
-    h = 2 * area_triangle / c
+    def calculate_area(hyp, leg1, leg2):
+        if hyp <= 0 or leg1 <= 0 or leg2 <= 0:
+            return 0.0
+        if leg1 + leg2 <= hyp:
+            return 0.0
+        
+        x = (leg1 * leg1 - leg2 * leg2 + hyp * hyp) / (2 * hyp)
+        if x < 0 or x > hyp:
+            return 0.0
+        
+        if x > leg1:
+            return 0.0
+        
+        height = math.sqrt(leg1 * leg1 - x * x)
+        area = 0.5 * hyp * height
+        return area
     
-    # Катеты прямоугольного треугольника
-    cat1 = math.sqrt(a**2 - h**2)
-    cat2 = math.sqrt(b**2 - h**2)
-    area = 0.5 * cat1 * cat2
+    max_area = max(max_area, calculate_area(a, b, c))
+    max_area = max(max_area, calculate_area(a, c, b))
+    max_area = max(max_area, calculate_area(b, a, c))
+    max_area = max(max_area, calculate_area(b, c, a))
+    max_area = max(max_area, calculate_area(c, a, b))
+    max_area = max(max_area, calculate_area(c, b, a))
     
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(f"{area:.10f}")
+    print("{:.15f}".format(max_area))
 
 if __name__ == "__main__":
     main()

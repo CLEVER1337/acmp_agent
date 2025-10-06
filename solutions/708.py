@@ -2,9 +2,6 @@
 def main():
     import sys
     data = sys.stdin.read().split()
-    if not data:
-        return
-    
     n = int(data[0])
     m = int(data[1])
     grid = []
@@ -14,110 +11,90 @@ def main():
         index += m
         grid.append(row)
     
-    total_rabbits = 0
-    total_hamsters = 0
+    total_carrots = sum(sum(row) for row in grid)
+    rabbit_total = 0
+    hamster_total = 0
     turn = 0
     
-    while any(any(cell != -1 for cell in row) for row in grid):
-        if turn % 2 == 0:
-            start_col = -1
+    while total_carrots > 0:
+        if turn == 0:
+            start_col = 0
             max_val = -1
             for j in range(m):
-                if grid[0][j] > max_val and grid[0][j] != -1:
+                if grid[0][j] > max_val:
                     max_val = grid[0][j]
                     start_col = j
-                elif grid[0][j] == max_val and grid[0][j] != -1:
-                    if j > start_col:
-                        start_col = j
-            
-            if start_col == -1:
-                break
-                
-            collected = 0
-            current_col = start_col
             path = []
-            for i in range(n):
-                if grid[i][current_col] == -1:
+            carrots = 0
+            row = 0
+            col = start_col
+            while row < n:
+                if grid[row][col] > 0:
+                    carrots += grid[row][col]
+                    grid[row][col] = 0
+                path.append(col)
+                if row == n-1:
                     break
-                collected += grid[i][current_col]
-                grid[i][current_col] = -1
-                path.append(current_col)
-                
-                if i < n - 1:
-                    next_cols = []
-                    for dj in [-1, 0, 1]:
-                        nj = current_col + dj
-                        if 0 <= nj < m and grid[i+1][nj] != -1:
-                            next_cols.append((grid[i+1][nj], nj))
-                    
-                    if not next_cols:
-                        break
-                    
-                    next_cols.sort(key=lambda x: (-x[0], -x[1]))
-                    current_col = next_cols[0][1]
-            
-            total_rabbits += collected
-            
+                next_cols = []
+                if col-1 >= 0:
+                    next_cols.append((grid[row+1][col-1], col-1))
+                next_cols.append((grid[row+1][col], col))
+                if col+1 < m:
+                    next_cols.append((grid[row+1][col+1], col+1))
+                next_cols.sort(key=lambda x: (x[0], x[1]), reverse=True)
+                col = next_cols[0][1]
+                row += 1
+            rabbit_total += carrots
+            total_carrots -= carrots
         else:
-            dp = [[-1] * m for _ in range(n)]
-            path_choice = [[-1] * m for _ in range(n)]
+            dp = [[0] * m for _ in range(n)]
+            path_dp = [[[] for _ in range(m)] for _ in range(n)]
             
             for j in range(m):
-                if grid[n-1][j] != -1:
-                    dp[n-1][j] = grid[n-1][j]
-                    path_choice[n-1][j] = j
+                dp[0][j] = grid[0][j]
+                path_dp[0][j] = [j]
             
-            for i in range(n-2, -1, -1):
+            for i in range(1, n):
                 for j in range(m):
-                    if grid[i][j] == -1:
-                        continue
-                    max_next = -1
-                    best_next_col = -1
+                    best_val = -1
+                    best_path = []
                     for dj in [-1, 0, 1]:
-                        nj = j + dj
-                        if 0 <= nj < m and dp[i+1][nj] != -1:
-                            if dp[i+1][nj] > max_next:
-                                max_next = dp[i+1][nj]
-                                best_next_col = nj
-                            elif dp[i+1][nj] == max_next:
-                                if best_next_col != -1 and nj > best_next_col:
-                                    best_next_col = nj
-                    
-                    if max_next != -1:
-                        dp[i][j] = grid[i][j] + max_next
-                        path_choice[i][j] = best_next_col
-                    else:
-                        dp[i][j] = grid[i][j]
-                        path_choice[i][j] = j
+                        prev_j = j + dj
+                        if 0 <= prev_j < m:
+                            if dp[i-1][prev_j] > best_val:
+                                best_val = dp[i-1][prev_j]
+                                best_path = path_dp[i-1][prev_j][:]
+                            elif dp[i-1][prev_j] == best_val:
+                                current_path = path_dp[i-1][prev_j][:]
+                                if current_path > best_path:
+                                    best_path = current_path
+                    dp[i][j] = best_val + grid[i][j]
+                    best_path.append(j)
+                    path_dp[i][j] = best_path
             
-            max_start_val = -1
-            start_col = -1
+            max_carrots = -1
+            best_path = []
             for j in range(m):
-                if dp[0][j] > max_start_val and grid[0][j] != -1:
-                    max_start_val = dp[0][j]
-                    start_col = j
-                elif dp[0][j] == max_start_val and grid[0][j] != -1:
-                    if j > start_col:
-                        start_col = j
+                if dp[n-1][j] > max_carrots:
+                    max_carrots = dp[n-1][j]
+                    best_path = path_dp[n-1][j]
+                elif dp[n-1][j] == max_carrots:
+                    if path_dp[n-1][j] > best_path:
+                        best_path = path_dp[n-1][j]
             
-            if start_col == -1:
-                break
-                
-            collected = 0
-            current_col = start_col
-            for i in range(n):
-                if grid[i][current_col] == -1:
-                    break
-                collected += grid[i][current_col]
-                grid[i][current_col] = -1
-                if i < n - 1:
-                    current_col = path_choice[i][current_col]
+            carrots_collected = 0
+            row = 0
+            for col in best_path:
+                carrots_collected += grid[row][col]
+                grid[row][col] = 0
+                row += 1
             
-            total_hamsters += collected
-            
-        turn += 1
+            hamster_total += carrots_collected
+            total_carrots -= carrots_collected
         
-    print(f"{total_rabbits} {total_hamsters}")
+        turn = 1 - turn
+    
+    print(f"{rabbit_total} {hamster_total}")
 
 if __name__ == "__main__":
     main()

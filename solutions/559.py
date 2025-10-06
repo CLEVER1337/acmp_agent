@@ -2,53 +2,42 @@
 import math
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        d, r = map(float, f.readline().split())
-        n = int(f.readline().strip())
+    data = input().split()
+    d = float(data[0])
+    r = float(data[1])
+    n = int(input())
     
     total_area = math.pi * r * r + 2 * r * d
     
-    def area_to_x(area):
-        left = 0.0
-        right = d + 2 * r
-        for _ in range(100):
-            mid = (left + right) / 2.0
-            area_mid = 0.0
-            
-            if mid <= r:
-                theta = 2 * math.acos((r - mid) / r)
-                area_mid = r * r * (theta - math.sin(theta)) / 2
-            elif mid >= d + r:
-                theta = 2 * math.acos((mid - d - r) / r)
-                area_mid = total_area - r * r * (theta - math.sin(theta)) / 2
-            else:
-                area_left = math.pi * r * r / 2
-                if mid > r:
-                    theta = 2 * math.acos((mid - r) / r)
-                    area_left = r * r * (theta - math.sin(theta)) / 2
-                
-                area_right = math.pi * r * r / 2
-                if d + r - mid > 0:
-                    theta = 2 * math.acos((d + r - mid) / r)
-                    area_right = r * r * (theta - math.sin(theta)) / 2
-                
-                area_mid = area_left + (mid - r) * 2 * r + area_right
-        
-            if area_mid < area:
-                left = mid
-            else:
-                right = mid
-        
-        return left
+    def f(x):
+        if x <= r:
+            return math.pi * r * r / 2 - (r * r * math.acos(x / r) - x * math.sqrt(r * r - x * x))
+        elif x <= d + r:
+            return (x - r) * 2 * r
+        else:
+            segment_area = total_area - f(d + r - (x - (d + r)))
+            return total_area - segment_area
     
+    target_area = total_area / n
     results = []
-    for i in range(1, n):
-        target_area = total_area * i / n
-        x = area_to_x(target_area)
-        results.append("{:.6f}".format(x))
     
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write("\n".join(results))
+    for i in range(1, n):
+        target = target_area * i
+        low = 0.0
+        high = d + 2 * r
+        
+        for _ in range(100):
+            mid = (low + high) / 2.0
+            area = f(mid)
+            if area < target:
+                low = mid
+            else:
+                high = mid
+        
+        results.append("{:.6f}".format((low + high) / 2.0))
+    
+    for res in results:
+        print(res)
 
 if __name__ == "__main__":
     main()

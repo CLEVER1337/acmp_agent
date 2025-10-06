@@ -4,17 +4,25 @@ def main():
     data = sys.stdin.read().splitlines()
     n = int(data[0])
     juices = []
-    for i in range(1, n+1):
-        parts = data[i].split()
+    index = 1
+    for i in range(n):
+        parts = data[index].split()
+        index += 1
         k = int(parts[0])
         components = set(parts[1:1+k])
         juices.append(components)
     
-    washes = 1
-    for i in range(1, n):
-        if not juices[i].issuperset(juices[i-1]):
+    washes = 0
+    current_set = set()
+    
+    for juice in juices:
+        if not current_set.issubset(juice):
             washes += 1
+            current_set = juice.copy()
+        else:
+            current_set = juice.copy()
             
+    washes += 1
     print(washes)
 
 if __name__ == "__main__":

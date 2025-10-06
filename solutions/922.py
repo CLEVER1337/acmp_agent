@@ -24,14 +24,21 @@ def main():
             return
             
         full_cycles = (S - S1) // cycle_distance
-        remaining_distance = S - full_cycles * cycle_distance
-        
-        if remaining_distance <= S1:
-            time = full_cycles * (T1 + T2) + remaining_distance / v1
-            print("{:.2f}".format(time))
+        if (S - S1) % cycle_distance == 0:
+            total_time = full_cycles * (T1 + T2) + T1
         else:
-            remaining_distance -= cycle_distance
-            time = (full_cycles + 1) * (T1 + T2) + remaining_distance / v1
+            remaining_distance = S - full_cycles * cycle_distance - S1
+            if remaining_distance < 0:
+                time = S / v1
+                print("{:.2f}".format(time))
+                return
+                
+            if remaining_distance <= S1:
+                time = full_cycles * (T1 + T2) + T1 + remaining_distance / v1
+            else:
+                full_cycles += 1
+                remaining_distance = S - full_cycles * cycle_distance
+                time = full_cycles * (T1 + T2) + remaining_distance / v1
             print("{:.2f}".format(time))
 
 if __name__ == "__main__":

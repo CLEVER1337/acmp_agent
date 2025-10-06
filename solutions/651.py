@@ -1,39 +1,66 @@
 
 import math
-from collections import deque
 
-def min_operations(N, M):
+def sieve(n):
+    if n < 2:
+        return []
+    is_prime = [True] * (n + 1)
+    is_prime[0] = is_prime[1] = False
+    for i in range(2, int(math.isqrt(n)) + 1):
+        if is_prime[i]:
+            for j in range(i * i, n + 1, i):
+                is_prime[j] = False
+    return [i for i, prime in enumerate(is_prime) if prime]
+
+def factorize(n, primes):
+    factors = {}
+    temp = n
+    for p in primes:
+        if p * p > temp:
+            break
+        while temp % p == 0:
+            factors[p] = factors.get(p, 0) + 1
+            temp //= p
+    if temp > 1:
+        factors[temp] = factors.get(temp, 0) + 1
+    return factors
+
+def solve():
+    import sys
+    data = sys.stdin.read().split()
+    if not data:
+        print(0)
+        return
+        
+    N = int(data[0])
+    M = int(data[1])
+    
     if N == M:
-        return 0
+        print(0)
+        return
         
     if M % N != 0:
-        return -1
+        print(-1)
+        return
         
-    target = M // N
+    ratio = M // N
     
-    factors = []
-    temp = target
-    for i in range(2, int(math.isqrt(target)) + 1):
-        while temp % i == 0:
-            factors.append(i)
-            temp //= i
-    if temp > 1:
-        factors.append(temp)
+    if ratio == 1:
+        print(0)
+        return
+        
+    primes = sieve(int(math.isqrt(ratio)) + 100)
+    factors = factorize(ratio, primes)
     
-    for factor in factors:
-        if factor != 2 and factor != 3:
-            return -1
+    for p in factors:
+        if p not in [2, 3]:
+            print(-1)
+            return
             
-    return len(factors)
-
-def main():
-    with open('INPUT.TXT', 'r') as f:
-        N, M = map(int, f.readline().split())
+    count_2 = factors.get(2, 0)
+    count_3 = factors.get(3, 0)
     
-    result = min_operations(N, M)
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(result))
+    print(count_2 + count_3)
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    solve()

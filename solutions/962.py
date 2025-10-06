@@ -13,34 +13,29 @@ def main():
         index += 3
         squares.append((x, y, l))
     
-    count = 0
+    diff_shapes = {}
     
-    for a in range(n):
-        for b in range(n):
-            if a == b:
+    for i in range(n):
+        x1, y1, l1 = squares[i]
+        for j in range(n):
+            if i == j:
                 continue
-            ax, ay, al = squares[a]
-            bx, by, bl = squares[b]
-            
-            dx1 = bx - ax
-            dy1 = by - ay
-            dl1 = bl - al
-            
-            for c in range(n):
-                if c == a or c == b:
-                    continue
-                for d in range(n):
-                    if d == a or d == b or d == c:
-                        continue
-                    cx, cy, cl = squares[c]
-                    dx, dy, dl = squares[d]
-                    
-                    dx2 = dx - cx
-                    dy2 = dy - cy
-                    dl2 = dl - cl
-                    
-                    if dx1 == dx2 and dy1 == dy2 and dl1 == dl2:
-                        count += 1
+            x2, y2, l2 = squares[j]
+            if x1 <= x2 and y1 <= y2 and x1 + l1 >= x2 + l2 and y1 + l1 >= y2 + l2:
+                dx1 = x2 - x1
+                dx2 = (x1 + l1) - (x2 + l2)
+                dy1 = y2 - y1
+                dy2 = (y1 + l1) - (y2 + l2)
+                key = (dx1, dx2, dy1, dy2)
+                if key not in diff_shapes:
+                    diff_shapes[key] = []
+                diff_shapes[key].append((i, j))
+    
+    count = 0
+    for key, pairs in diff_shapes.items():
+        k = len(pairs)
+        if k >= 2:
+            count += k * (k - 1)
     
     print(count)
 

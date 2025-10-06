@@ -1,73 +1,62 @@
 
 def main():
     import sys
-    sys.setrecursionlimit(10000)
+    from collections import deque
     
     data = sys.stdin.read().splitlines()
     if not data:
+        print("")
         return
-    
+        
     n, m = map(int, data[0].split())
     grid = []
     for i in range(1, 1 + n):
-        grid.append(list(data[i]))
+        grid.append(list(data[i].strip()))
     
     words = []
     for i in range(1 + n, 1 + n + m):
-        words.append(data[i])
+        words.append(data[i].strip())
+    
+    total_letters = sum(len(word) for word in words)
+    found_count = 0
+    marked = [[False] * n for _ in range(n)]
     
     directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
     
-    def dfs(x, y, word, index, visited):
-        if index == len(word):
-            return True
-        
-        if x < 0 or x >= n or y < 0 or y >= n:
-            return False
-        
-        if visited[x][y] or grid[x][y] != word[index]:
-            return False
-        
-        visited[x][y] = True
-        for dx, dy in directions:
-            if dfs(x + dx, y + dy, word, index + 1, visited):
-                return True
-        visited[x][y] = False
-        return False
-    
-    def find_word(word):
-        visited = [[False] * n for _ in range(n)]
-        for i in range(n):
-            for j in range(n):
-                if grid[i][j] == word[0]:
-                    if dfs(i, j, word, 0, visited):
-                        return True
-        return False
-    
-    def remove_word(word):
-        visited = [[False] * n for _ in range(n)]
-        for i in range(n):
-            for j in range(n):
-                if grid[i][j] == word[0]:
-                    if dfs(i, j, word, 0, visited):
-                        for x in range(n):
-                            for y in range(n):
-                                if visited[x][y]:
-                                    grid[x][y] = '.'
-                        return True
-        return False
-    
     for word in words:
-        remove_word(word)
+        found = False
+        for i in range(n):
+            for j in range(n):
+                if grid[i][j] == word[0] and not marked[i][j]:
+                    stack = deque()
+                    stack.append((i, j, 0, []))
+                    while stack and not found:
+                        x, y, idx, path = stack.pop()
+                        if idx == len(word) - 1:
+                            if grid[x][y] == word[idx]:
+                                for px, py in path:
+                                    marked[px][py] = True
+                                marked[x][y] = True
+                                found = True
+                                break
+                            continue
+                        
+                        if grid[x][y] != word[idx]:
+                            continue
+                            
+                        for dx, dy in directions:
+                            nx, ny = x + dx, y + dy
+                            if 0 <= nx < n and 0 <= ny < n and not marked[nx][ny]:
+                                stack.append((nx, ny, idx + 1, path + [(x, y)]))
     
     result = []
     for i in range(n):
         for j in range(n):
-            if grid[i][j] != '.':
+            if not marked[i][j]:
                 result.append(grid[i][j])
-    
+                
     result.sort()
     print(''.join(result))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

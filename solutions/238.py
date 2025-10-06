@@ -8,56 +8,55 @@ def main():
         print("Impossible")
         return
         
-    index = 0
-    n = int(data[index]); m = int(data[index+1]); index += 2
-    xa = int(data[index]); ya = int(data[index+1]); index += 2
+    idx = 0
+    n = int(data[idx]); m = int(data[idx+1]); idx += 2
+    xa = int(data[idx]); ya = int(data[idx+1]); idx += 2
     
     grid = []
     for i in range(n):
-        row = list(map(int, data[index:index+m]))
-        index += m
+        row = list(map(int, data[idx:idx+m]))
+        idx += m
         grid.append(row)
         
-    h = int(data[index]); index += 1
+    h = int(data[idx]); idx += 1
     tunnels = {}
     for i in range(h):
-        x1 = int(data[index]); y1 = int(data[index+1]); x2 = int(data[index+2]); y2 = int(data[index+3]); index += 4
+        x1 = int(data[idx]); y1 = int(data[idx+1]); x2 = int(data[idx+2]); y2 = int(data[idx+3]); idx += 4
         tunnels[(x1-1, y1-1)] = (x2-1, y2-1)
         
-    k = int(data[index]); index += 1
+    k = int(data[idx]); idx += 1
     exits = set()
     for i in range(k):
-        x = int(data[index]); y = int(data[index+1]); index += 2
+        x = int(data[idx]); y = int(data[idx+1]); idx += 2
         exits.add((x-1, y-1))
         
-    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+    dist = [[-1] * m for _ in range(n)]
+    q = deque()
+    start_x = xa - 1
+    start_y = ya - 1
+    dist[start_x][start_y] = 0
+    q.append((start_x, start_y))
     
-    visited = [[-1] * m for _ in range(n)]
-    queue = deque()
-    start_x, start_y = xa-1, ya-1
-    visited[start_x][start_y] = 0
-    queue.append((start_x, start_y))
+    directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
     
-    while queue:
-        x, y = queue.popleft()
-        
+    while q:
+        x, y = q.popleft()
         if (x, y) in exits:
-            print(visited[x][y])
+            print(dist[x][y])
             return
             
         if (x, y) in tunnels:
             nx, ny = tunnels[(x, y)]
-            if visited[nx][ny] == -1 or visited[nx][ny] > visited[x][y]:
-                visited[nx][ny] = visited[x][y]
-                queue.appendleft((nx, ny))
+            if dist[nx][ny] == -1:
+                dist[nx][ny] = dist[x][y] + 1
+                q.append((nx, ny))
                 
         for dx, dy in directions:
             nx, ny = x + dx, y + dy
-            if 0 <= nx < n and 0 <= ny < m:
-                if grid[nx][ny] == 0 and visited[nx][ny] == -1:
-                    visited[nx][ny] = visited[x][y] + 1
-                    queue.append((nx, ny))
-                    
+            if 0 <= nx < n and 0 <= ny < m and grid[nx][ny] == 0 and dist[nx][ny] == -1:
+                dist[nx][ny] = dist[x][y] + 1
+                q.append((nx, ny))
+                
     print("Impossible")
 
 if __name__ == "__main__":

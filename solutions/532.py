@@ -1,50 +1,56 @@
 
 import sys
+import heapq
 
 def main():
     data = sys.stdin.read().split()
     if not data:
+        print(0)
         return
-    
+        
     n = int(data[0])
     m = int(data[1])
     p = int(data[2])
     
     events = []
-    total = 0
+    base_sum = 0
     
     for i in range(n):
         idx = 3 + i * 4
         a = int(data[idx])
-        b = int(data[idx + 1])
-        c = int(data[idx + 2])
-        d = int(data[idx + 3])
+        b = int(data[idx+1])
+        c = int(data[idx+2])
+        d = int(data[idx+3])
         
-        total += b * (d - c)
-        diff = a - b
-        events.append((c, diff, 1))
-        events.append((d, -diff, 0))
+        base_sum += b
+        delta = a - b
+        events.append((c, delta, d))
+        events.append((d, -delta, c))
     
-    events.sort()
+    events.sort(key=lambda x: (x[0], x[2]))
     
-    diffs = []
-    current_diff = 0
-    prev_stop = 1
+    heap = []
+    current_sum = 0
+    result = base_sum
     
-    for stop, diff, typ in events:
-        if stop > prev_stop:
-            diffs.append(current_diff)
-            prev_stop = stop
-        
-        current_diff += diff
+    for event in events:
+        stop, delta, other_stop = event
+        if delta > 0:
+            heapq.heappush(heap, (delta, other_stop))
+            current_sum += delta
+            if len(heap) > m:
+                min_delta, min_stop = heapq.heappop(heap)
+                current_sum -= min_delta
+        elif delta < 0:
+            abs_delta = -delta
+            if heap and heap[0][0] < abs_delta:
+                min_delta, min_stop = heapq.heappop(heap)
+                current_sum -= min_delta
+                heapq.heappush(heap, (abs_delta, other_stop))
+                current_sum += abs_delta
+        result = max(result, base_sum + current_sum)
     
-    diffs.sort(reverse=True)
-    
-    for i in range(min(m, len(diffs))):
-        if diffs[i] > 0:
-            total += diffs[i]
-    
-    print(total)
+    print(result)
 
 if __name__ == "__main__":
     main()

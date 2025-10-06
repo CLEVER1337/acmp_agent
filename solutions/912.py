@@ -1,26 +1,29 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        n = int(f.readline().strip())
-        colors = list(map(int, f.readline().split()))
+    n = int(input().strip())
+    arr = list(map(int, input().split()))
     
     count = {}
-    for color in colors:
-        count[color] = count.get(color, 0) + 1
+    for num in arr:
+        count[num] = count.get(num, 0) + 1
+        
+    max_count = 0
+    candidates = []
     
-    max_count = max(count.values())
-    candidates = [color for color, cnt in count.items() if cnt == max_count]
-    
+    for color, cnt in count.items():
+        if cnt > max_count:
+            max_count = cnt
+            candidates = [color]
+        elif cnt == max_count:
+            candidates.append(color)
+            
     if len(candidates) == 1:
-        result = candidates[0]
+        print(candidates[0])
     else:
         if 0 in candidates:
-            result = 0
+            print(0)
         else:
-            result = min(candidates)
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(result))
+            print(min(candidates))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

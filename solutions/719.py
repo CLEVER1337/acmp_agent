@@ -2,15 +2,26 @@
 import math
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        F = int(f.readline().strip())
-    
-    n = 1
-    while math.factorial(n) <= F:
-        n += 1
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(n - 1))
+    F_str = input().strip()
+    if F_str == '0':
+        print(0)
+        return
+        
+    F = int(F_str)
+    if F == 1:
+        print(1)
+        return
+        
+    low, high = 1, 2 * 10**6
+    while low < high:
+        mid = (low + high) // 2
+        factorial_mid = math.factorial(mid)
+        if factorial_mid < F:
+            low = mid + 1
+        else:
+            high = mid
+            
+    print(low)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

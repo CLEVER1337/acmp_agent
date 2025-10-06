@@ -5,33 +5,68 @@ def main():
     n = int(data[0])
     words = data[1:1+2*n]
     
-    from collections import defaultdict
-    from itertools import permutations, combinations
-    
-    def is_valid_square(square):
+    def is_valid_square(grid):
         for i in range(n):
-            col_word = ''.join(square[j][i] for j in range(n))
-            if col_word not in word_set:
+            vertical_word = ''.join(grid[j][i] for j in range(n))
+            if vertical_word not in word_set:
                 return False
         return True
     
+    def backtrack(grid, used, row):
+        if row == n:
+            return grid[:]
+            
+        for word in words:
+            if used[word] >= count[word]:
+                continue
+                
+            valid = True
+            for col in range(n):
+                if grid[col][row] != word[col]:
+                    valid = False
+                    break
+                    
+            if valid:
+                used[word] += 1
+                grid[row] = word
+                result = backtrack(grid, used, row + 1)
+                if result:
+                    return result
+                used[word] -= 1
+                grid[row] = None
+                
+        return None
+    
+    from collections import defaultdict
+    count = defaultdict(int)
+    for word in words:
+        count[word] += 1
+        
     word_set = set(words)
     
-    for group1 in combinations(words, n):
-        group2 = [w for w in words if w not in group1]
-        
-        for perm1 in permutations(group1):
-            if is_valid_square(perm1):
-                for perm2 in permutations(group2):
-                    if is_valid_square(perm2):
-                        square1 = '\n'.join(''.join(row) for row in perm1)
-                        square2 = '\n'.join(''.join(row) for row in perm2)
-                        print(square1)
-                        print()
-                        print(square2)
-                        return
+    grid1 = [None] * n
+    used = defaultdict(int)
+    square1 = backtrack(grid1, used, 0)
     
-    print("No solution found")
+    remaining_words = []
+    for word in words:
+        if used[word] < count[word]:
+            remaining_words.append(word)
+            
+    count2 = defaultdict(int)
+    for word in remaining_words:
+        count2[word] += 1
+        
+    word_set2 = set(remaining_words)
+    grid2 = [None] * n
+    used2 = defaultdict(int)
+    square2 = backtrack(grid2, used2, 0)
+    
+    for row in square1:
+        print(row)
+    print()
+    for row in square2:
+        print(row)
 
 if __name__ == "__main__":
     main()

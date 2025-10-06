@@ -1,24 +1,13 @@
 
-def is_palindrome(time_str):
-    return time_str == time_str[::-1]
+s = input().strip()
+h, m = map(int, s.split(':'))
+total_minutes = h * 60 + m
 
-def main():
-    with open('INPUT.TXT', 'r') as f:
-        time_input = f.readline().strip()
-    
-    hh, mm = map(int, time_input.split(':'))
-    current_minutes = hh * 60 + mm
-    
-    for delta in range(0, 1440):
-        total_minutes = (current_minutes + delta) % 1440
-        h = total_minutes // 60
-        m = total_minutes % 60
-        
-        time_str = f"{h:02d}:{m:02d}"
-        if is_palindrome(time_str.replace(':', '')):
-            with open('OUTPUT.TXT', 'w') as f:
-                f.write(time_str)
-            return
-
-if __name__ == "__main__":
-    main()
+for i in range(total_minutes + 1, total_minutes + 24 * 60):
+    time = i % (24 * 60)
+    hours = time // 60
+    minutes = time % 60
+    time_str = f"{hours:02d}:{minutes:02d}"
+    if time_str == time_str[::-1]:
+        print(time_str)
+        break

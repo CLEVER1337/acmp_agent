@@ -1,68 +1,57 @@
 
-def circular_distance(a, b):
-    a_lower = a.lower()
-    b_lower = b.lower()
-    if a_lower == b_lower:
-        return 0
-    pos_a = ord(a_lower) - ord('a')
-    pos_b = ord(b_lower) - ord('a')
-    diff = abs(pos_a - pos_b)
+def char_dist(c1, c2):
+    base1 = ord('a') if c1.islower() else ord('A')
+    base2 = ord('a') if c2.islower() else ord('A')
+    idx1 = ord(c1) - base1
+    idx2 = ord(c2) - base2
+    diff = abs(idx1 - idx2)
     return min(diff, 26 - diff)
 
-def string_distance(s1, s2):
-    return sum(circular_distance(s1[i], s2[i]) for i in range(len(s1)))
+def word_dist(w1, w2):
+    return sum(char_dist(a, b) for a, b in zip(w1, w2))
 
 def main():
     import sys
     data = sys.stdin.read().splitlines()
-    if not data:
-        print(-1)
-        return
-        
     n = int(data[0])
-    dictionary = []
-    for i in range(1, 1 + n):
-        dictionary.append(data[i].strip())
+    dictionary = data[1:1+n]
+    text = data[1+n].strip()
     
-    text = data[1 + n].strip()
+    words = [w.lower() for w in dictionary]
+    text_lower = text.lower()
+    L = len(text)
     
-    if not dictionary or not text:
-        print(-1)
-        return
-        
-    dp = [float('inf')] * (len(text) + 1)
+    INF = float('inf')
+    dp = [INF] * (L + 1)
     dp[0] = 0
-    path = [None] * (len(text) + 1)
+    parent = [None] * (L + 1)
     
-    for i in range(len(text) + 1):
-        if dp[i] == float('inf'):
+    for i in range(L + 1):
+        if dp[i] == INF:
             continue
-            
-        for word in dictionary:
-            j = i + len(word)
-            if j > len(text):
+        for idx, word in enumerate(dictionary):
+            w_lower = words[idx]
+            w_len = len(w_lower)
+            if i + w_len > L:
                 continue
-                
-            segment = text[i:j]
-            dist = string_distance(segment, word)
-            if dp[j] > dp[i] + dist:
-                dp[j] = dp[i] + dist
-                path[j] = (i, word)
+            segment = text_lower[i:i+w_len]
+            dist_val = word_dist(word, text[i:i+w_len])
+            if dp[i + w_len] > dp[i] + dist_val:
+                dp[i + w_len] = dp[i] + dist_val
+                parent[i + w_len] = (i, word)
     
-    if dp[len(text)] == float('inf'):
+    if dp[L] == INF:
         print(-1)
         return
         
-    result = []
-    pos = len(text)
+    res = []
+    pos = L
     while pos > 0:
-        prev, word = path[pos]
-        result.append(word)
+        prev, word = parent[pos]
+        res.append(word)
         pos = prev
-        
-    result.reverse()
-    output = ''.join(result)
-    print(output)
+    res.reverse()
+    print(''.join(res))
 
 if __name__ == "__main__":
     main()

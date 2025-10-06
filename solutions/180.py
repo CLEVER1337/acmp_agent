@@ -1,33 +1,54 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        data = f.read().split()
-        N = int(data[0])
-        K = int(data[1])
+    import sys
+    data = sys.stdin.read().split()
+    N = int(data[0])
+    K = int(data[1])
     
     if K == 0:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write('YES')
+        print("YES")
         return
-    
-    def digit_product(n):
-        product = 1
-        while n > 0:
-            digit = n % 10
+        
+    def digit_product(x):
+        res = 1
+        while x > 0:
+            digit = x % 10
             if digit == 0:
                 return 0
-            product *= digit
-            n //= 10
-        return product
-    
-    for num in range(1, min(N + 1, 1000000)):
-        if digit_product(num) == K:
-            with open('OUTPUT.TXT', 'w') as f:
-                f.write('YES')
-            return
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write('NO')
+            res *= digit
+            x //= 10
+        return res
 
-if __name__ == '__main__':
+    def check():
+        if K == 1:
+            return True
+            
+        k_temp = K
+        factors = []
+        while k_temp > 1:
+            found = False
+            for d in range(9, 1, -1):
+                if k_temp % d == 0:
+                    factors.append(d)
+                    k_temp //= d
+                    found = True
+                    break
+            if not found:
+                return False
+                
+        factors.sort()
+        num = 0
+        for d in factors:
+            num = num * 10 + d
+            if num > N:
+                return False
+                
+        return num <= N and num > 0
+        
+    if check():
+        print("YES")
+    else:
+        print("NO")
+
+if __name__ == "__main__":
     main()

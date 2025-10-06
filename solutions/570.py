@@ -4,51 +4,57 @@ def main():
     data = sys.stdin.read().splitlines()
     n, m = map(int, data[0].split())
     grid = []
-    for i in range(1, n+1):
+    for i in range(1, 1 + n):
         grid.append(data[i].strip())
     
-    min_i, max_i = n, -1
-    min_j, max_j = m, -1
+    min_i = n
+    max_i = -1
+    min_j = m
+    max_j = -1
     black_count = 0
     
     for i in range(n):
         for j in range(m):
             if grid[i][j] == '*':
                 black_count += 1
-                min_i = min(min_i, i)
-                max_i = max(max_i, i)
-                min_j = min(min_j, j)
-                max_j = max(max_j, j)
+                if i < min_i:
+                    min_i = i
+                if i > max_i:
+                    max_i = i
+                if j < min_j:
+                    min_j = j
+                if j > max_j:
+                    max_j = j
     
-    if black_count == 0:
-        print("CIRCLE")
+    if min_i == n:
+        print("SQUARE")
         return
         
     height = max_i - min_i + 1
     width = max_j - min_j + 1
     
-    if height != width:
+    if height < 3 or width < 3:
         print("CIRCLE")
         return
         
-    k = height
+    expected_black = height * width - (height - 2) * (width - 2)
     
-    if k < 3:
-        print("SQUARE")
+    if black_count > expected_black:
+        print("CIRCLE")
         return
         
-    expected_black = k * k - (k - 2) * (k - 2)
-    
-    actual_black = 0
-    for i in range(min_i, max_i+1):
-        for j in range(min_j, max_j+1):
-            if grid[i][j] == '*':
-                actual_black += 1
-    
-    if abs(actual_black - expected_black) <= k * 2:
-        print("SQUARE")
-    else:
-        print("CIRCLE")
+    for i in range(min_i, max_i + 1):
+        for j in range(min_j, max_j + 1):
+            if i == min_i or i == max_i or j == min_j or j == max_j:
+                if grid[i][j] != '*':
+                    print("CIRCLE")
+                    return
+            else:
+                if grid[i][j] == '*':
+                    print("CIRCLE")
+                    return
+                    
+    print("SQUARE")
 
 if __name__ == "__main__":
     main()

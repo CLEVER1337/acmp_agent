@@ -1,13 +1,21 @@
 
-p, q = map(int, input().split())
-n = 2
-result = []
-while p > 0:
-    p *= n
-    a = p // q
-    result.append(a)
-    p -= a * q
-    n += 1
-print(n - 2)
-for a in result:
-    print(a)
+def main():
+    p, q = map(int, input().split())
+    n = 1
+    a = []
+    i = 2
+    while p > 0:
+        n += 1
+        a_i = (p * i) // q
+        a.append(a_i)
+        p = p * i - a_i * q
+        if p == 0:
+            break
+        i += 1
+        
+    print(n)
+    for num in a:
+        print(num)
+
+if __name__ == "__main__":
+    main()

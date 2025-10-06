@@ -2,21 +2,21 @@
 import math
 
 def main():
-    k = int(input().strip())
+    K = int(input().strip())
     best_h = 1
-    best_w = k
-    best_score = float('inf')
+    best_w = K
+    min_beauty = float('inf')
     
-    for h in range(1, int(math.isqrt(k)) + 1):
-        if k % h == 0:
-            w = k // h
-            unused = k - h * w
-            diff = abs(h - w)
-            score = unused + diff
-            if score < best_score or (score == best_score and h <= best_h):
-                best_score = score
-                best_h = h
-                best_w = w
+    for h in range(1, int(math.isqrt(K)) + 1):
+        if K % h == 0:
+            w = K // h
+            beauty = abs(h - w) + (h + w - 2)
+            if beauty < min_beauty:
+                min_beauty = beauty
+                best_h, best_w = h, w
+            elif beauty == min_beauty:
+                if h < best_h:
+                    best_h, best_w = h, w
     
     print(f"{best_h} {best_w}")
 

@@ -1,142 +1,117 @@
 
-def evaluate(expr):
-    tokens = []
-    i = 0
-    n = len(expr)
-    while i < n:
-        if expr[i] in '+-*':
-            tokens.append(expr[i])
-            i += 1
-        elif expr[i] == '(':
-            j = i + 1
-            balance = 1
-            while j < n and balance > 0:
-                if expr[j] == '(':
-                    balance += 1
-                elif expr[j] == ')':
-                    balance -= 1
-                j += 1
-            sub_expr = expr[i+1:j-1]
-            tokens.append(evaluate(sub_expr))
-            i = j
+def evaluate_expression(tokens):
+    stack = []
+    for token in tokens:
+        if token == ')':
+            inner_tokens = []
+            while stack and stack[-1] != '(':
+                inner_tokens.append(stack.pop())
+            stack.pop()
+            inner_tokens.reverse()
+            result = evaluate_no_parentheses(inner_tokens)
+            stack.append(result)
         else:
-            num_str = ''
-            while i < n and expr[i].isdigit():
-                num_str += expr[i]
-                i += 1
-            tokens.append(int(num_str))
-    
+            stack.append(token)
+    return evaluate_no_parentheses(stack)
+
+def evaluate_no_parentheses(tokens):
     if not tokens:
         return 0
-    
-    result = tokens[0]
+    result = int(tokens[0])
     for i in range(1, len(tokens), 2):
         op = tokens[i]
-        num = tokens[i+1]
+        num = int(tokens[i+1])
         if op == '+':
             result += num
         elif op == '-':
             result -= num
         elif op == '*':
             result *= num
-    
     return result
 
 def solve():
-    with open('input.txt', 'r') as f:
-        data = f.read().strip()
-    
-    if not data:
-        print(-1)
-        return
-    
+    data = input().strip()
     parts = data.split('=')
     if len(parts) < 2:
         print(-1)
         return
-    
+        
     target = int(parts[0].strip())
-    expr_part = parts[1].strip()
+    expr_str = parts[1].strip()
     
-    numbers = []
-    current = ''
-    in_paren = 0
-    for char in expr_part:
-        if char == '(':
-            in_paren += 1
-            if current.strip():
-                numbers.append(current.strip())
-                current = ''
-            current += char
-        elif char == ')':
-            in_paren -= 1
-            current += char
-            if in_paren == 0:
-                numbers.append(current)
-                current = ''
-        elif char == ' ' and in_paren == 0:
-            if current.strip():
-                numbers.append(current.strip())
-                current = ''
+    tokens = []
+    i = 0
+    n = len(expr_str)
+    
+    while i < n:
+        if expr_str[i] == ' ':
+            i += 1
+            continue
+        if expr_str[i] == '(':
+            tokens.append('(')
+            i += 1
+        elif expr_str[i] == ')':
+            tokens.append(')')
+            i += 1
         else:
-            current += char
+            j = i
+            while j < n and expr_str[j].isdigit():
+                j += 1
+            num = expr_str[i:j]
+            tokens.append(num)
+            i = j
     
-    if current.strip():
-        numbers.append(current.strip())
+    numbers = [token for token in tokens if token not in ['(', ')']]
+    num_count = len(numbers)
+    ops_count = num_count - 1
     
-    n = len(numbers)
-    
-    def backtrack(index, current_expr, current_value, last_op=None):
-        if index == n:
-            if current_value == target:
-                return current_expr
-            return None
-        
-        current_num = numbers[index]
-        if current_num.startswith('('):
-            sub_expr = current_num[1:-1]
-            sub_result = evaluate(sub_expr)
-            if sub_result is None:
-                return None
-            num_value = sub_result
-            num_str = current_num
+    if ops_count == 0:
+        if int(numbers[0]) == target:
+            print(f"{target}={numbers[0]}")
         else:
-            num_value = int(current_num)
-            num_str = current_num
-        
-        for op in ['+', '-', '*']:
-            new_value = current_value
-            if op == '+':
-                new_value += num_value
-            elif op == '-':
-                new_value -= num_value
-            elif op == '*':
-                new_value *= num_value
-            
-            new_expr = current_expr + op + num_str
-            result = backtrack(index + 1, new_expr, new_value, op)
-            if result is not None:
-                return result
-        
-        return None
-    
-    first_num = numbers[0]
-    if first_num.startswith('('):
-        sub_expr = first_num[1:-1]
-        first_value = evaluate(sub_expr)
-        if first_value is None:
             print(-1)
-            return
-        first_str = first_num
-    else:
-        first_value = int(first_num)
-        first_str = first_num
+        return
     
-    result = backtrack(1, first_str, first_value)
-    if result is not None:
-        print(f"{target}={result}")
+    operators = ['+', '-', '*']
+    total_combinations = 3 ** ops_count
+    
+    found_solution = None
+    
+    for comb in range(total_combinations):
+        temp_comb = comb
+        ops_list = []
+        for _ in range(ops_count):
+            ops_list.append(operators[temp_comb % 3])
+            temp_comb //= 3
+        
+        expression_tokens = []
+        idx = 0
+        for token in tokens:
+            if token == '(' or token == ')':
+                expression_tokens.append(token)
+            else:
+                expression_tokens.append(token)
+                if idx < len(ops_list):
+                    expression_tokens.append(ops_list[idx])
+                    idx += 1
+        
+        try:
+            result = evaluate_expression(expression_tokens)
+            if result == target:
+                output_expr = f"{target}="
+                for token in expression_tokens:
+                    if token in ['+', '-', '*', '(', ')']:
+                        output_expr += token
+                    else:
+                        output_expr += str(token)
+                found_solution = output_expr
+                break
+        except:
+            continue
+    
+    if found_solution:
+        print(found_solution)
     else:
         print(-1)
 
-if __name__ == '__main__':
-    solve()
+solve()

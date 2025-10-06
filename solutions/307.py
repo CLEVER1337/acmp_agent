@@ -2,10 +2,6 @@
 def main():
     import sys
     data = sys.stdin.read().split()
-    if not data:
-        print(0)
-        return
-        
     n = int(data[0])
     m = int(data[1])
     p = int(data[2])
@@ -14,7 +10,7 @@ def main():
     index = 3
     for i in range(p):
         athlete = int(data[index])
-        exercise = int(data[index + 1])
+        exercise = int(data[index+1])
         index += 2
         performances.append((athlete, exercise))
     

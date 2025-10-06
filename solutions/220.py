@@ -1,10 +1,8 @@
 
+import sys
+
 def main():
-    import sys
     data = sys.stdin.read().split()
-    if not data:
-        return
-    
     idx = 0
     U = int(data[idx]); idx += 1
     H = int(data[idx]); idx += 1
@@ -13,43 +11,52 @@ def main():
     N = int(data[idx]); idx += 1
     X = list(map(int, data[idx:idx+N]))
     
-    if X[N-1] < U:
+    if L < U:
         print(0)
         return
         
-    total_scroll_steps = (X[N-1] - U + T) // T
-    if (X[N-1] - U) % T != 0:
-        total_scroll_steps += 1
-        
-    events = []
-    for line in X:
-        events.append((line, 1))
-        events.append((line + H, -1))
-        
-    events.sort()
+    lines = []
+    for i in range(N):
+        lines.append(X[i])
     
-    best_count = float('inf')
-    for start_pos in range(0, U - H + 1):
-        count = 0
-        for event_pos, event_type in events:
-            scroll_pos = event_pos - start_pos
-            if scroll_pos < 0:
-                continue
-            if scroll_pos > total_scroll_steps * T:
-                continue
-                
-            first_step = (scroll_pos + T - 1) // T
-            if first_step < 0:
-                first_step = 0
-                
-            if event_type == 1:
-                count += first_step
-            else:
-                count -= first_step
-                
-        best_count = min(best_count, count)
+    total_scroll_steps = (L - U + T - 1) // T
+    if total_scroll_steps < 0:
+        total_scroll_steps = 0
+    
+    events = []
+    for x in lines:
+        start_pos = x
+        end_pos = x - U + 1
+        if end_pos > total_scroll_steps * T:
+            continue
+        if start_pos < 0:
+            start_pos = 0
+        first_step = (start_pos + T - 1) // T
+        last_step = end_pos // T
+        if last_step < 0:
+            last_step = -1
+        if first_step <= last_step:
+            events.append((first_step, 1))
+            events.append((last_step + 1, -1))
+    
+    events.sort(key=lambda x: (x[0], x[1]))
+    
+    min_crossings = float('inf')
+    current = 0
+    event_index = 0
+    total_events = len(events)
+    
+    for step in range(total_scroll_steps + 1):
+        while event_index < total_events and events[event_index][0] == step:
+            current += events[event_index][1]
+            event_index += 1
+        if current < min_crossings:
+            min_crossings = current
+            
+    if min_crossings == float('inf'):
+        min_crossings = 0
         
-    print(best_count)
+    print(min_crossings)
 
 if __name__ == "__main__":
     main()

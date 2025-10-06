@@ -15,90 +15,67 @@ def main():
         index += n
         grid.append(row)
     
-    colors_count = [0] * (k + 1)
+    from collections import defaultdict
+    
+    row_counts = [defaultdict(int) for _ in range(n)]
+    col_counts = [defaultdict(int) for _ in range(n)]
+    
     for i in range(n):
         for j in range(n):
             color = grid[i][j]
-            if color <= k:
-                colors_count[color] += 1
+            row_counts[i][color] += 1
+            col_counts[j][color] += 1
     
-    min_ops = float('inf')
-    best_color = 0
+    best_color = -1
+    min_dips = float('inf')
     
-    for candidate in range(1, k + 1):
-        if colors_count[candidate] < 2:
-            continue
-            
-        ops = 0
-        temp_grid = [row[:] for row in grid]
+    for candidate_color in range(1, k+1):
+        total_dips = 0
+        possible = True
         
-        for i in range(n):
-            row_colors = {}
-            for j in range(n):
-                color = temp_grid[i][j]
-                row_colors[color] = row_colors.get(color, 0) + 1
-                
-            if candidate in row_colors and row_colors[candidate] >= 2:
-                for j in range(n):
-                    temp_grid[i][j] = candidate
-                ops += 1
-            else:
-                found_valid = False
-                for color, count in row_colors.items():
-                    if count >= 2:
-                        for j in range(n):
-                            temp_grid[i][j] = color
-                        ops += 1
-                        found_valid = True
-                        break
-                if not found_valid:
-                    break
+        temp_row_counts = [row_counts[i].copy() for i in range(n)]
+        temp_col_counts = [col_counts[j].copy() for j in range(n)]
         
-        if not found_valid:
-            continue
+        rows_done = [False] * n
+        cols_done = [False] * n
+        
+        changed = True
+        while changed:
+            changed = False
             
-        for j in range(n):
-            col_colors = {}
             for i in range(n):
-                color = temp_grid[i][j]
-                col_colors[color] = col_colors.get(color, 0) + 1
-                
-            if candidate in col_colors and col_colors[candidate] >= 2:
-                for i in range(n):
-                    temp_grid[i][j] = candidate
-                ops += 1
-            else:
-                found_valid = False
-                for color, count in col_colors.items():
-                    if count >= 2:
-                        for i in range(n):
-                            temp_grid[i][j] = color
-                        ops += 1
-                        found_valid = True
-                        break
-                if not found_valid:
-                    break
-        
-        if not found_valid:
-            continue
+                if not rows_done[i]:
+                    if temp_row_counts[i][candidate_color] >= 2:
+                        rows_done[i] = True
+                        total_dips += 1
+                        changed = True
+                        for j in range(n):
+                            if not cols_done[j]:
+                                old_color = grid[i][j]
+                                temp_col_counts[j][old_color] -= 1
+                                temp_col_counts[j][candidate_color] += 1
             
-        all_same = True
-        for i in range(n):
             for j in range(n):
-                if temp_grid[i][j] != candidate:
-                    all_same = False
-                    break
-            if not all_same:
-                break
-                
-        if all_same and ops < min_ops:
-            min_ops = ops
-            best_color = candidate
+                if not cols_done[j]:
+                    if temp_col_counts[j][candidate_color] >= 2:
+                        cols_done[j] = True
+                        total_dips += 1
+                        changed = True
+                        for i in range(n):
+                            if not rows_done[i]:
+                                old_color = grid[i][j]
+                                temp_row_counts[i][old_color] -= 1
+                                temp_row_counts[i][candidate_color] += 1
+        
+        if all(rows_done) and all(cols_done):
+            if total_dips < min_dips:
+                min_dips = total_dips
+                best_color = candidate_color
     
-    if min_ops != float('inf'):
-        print(f"{min_ops} {best_color}")
-    else:
+    if best_color == -1:
         print("0 0")
+    else:
+        print(f"{min_dips} {best_color}")
 
 if __name__ == "__main__":
     main()

@@ -7,22 +7,26 @@ def main():
     A = int(data[1+n])
     
     total = sum(money)
-    dp = [False] * (total + 1)
+    target = total + A
+    
+    dp = [False] * (target + 1)
     dp[0] = True
     
     for m in money:
-        for j in range(total, m - 1, -1):
+        for j in range(target, m - 1, -1):
             if dp[j - m]:
                 dp[j] = True
     
-    max_money = 0
-    for s in range(total + 1):
+    max_gorgona = 0
+    for s in range(target, -1, -1):
         if dp[s]:
-            current = A + total - s
-            if current > max_money:
-                max_money = current
+            half = s / 2.0
+            remaining = target - s
+            gorgona_total = A + remaining + half
+            if gorgona_total > max_gorgona:
+                max_gorgona = gorgona_total
     
-    print("{:.6f}".format(max_money / 2.0))
+    print("{:.6f}".format(max_gorgona))
 
 if __name__ == "__main__":
     main()

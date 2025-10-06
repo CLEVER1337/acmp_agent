@@ -9,35 +9,45 @@ def main():
     k = int(data[3+n])
     
     max_win = 0
+    total_sectors = n
     
     if k == 0:
-        max_win = max(sectors)
-    else:
-        max_steps = (b + k - 1) // k
-        min_steps = (a + k - 1) // k
+        print(max(sectors))
+        return
         
-        for steps in [min_steps, max_steps]:
-            if steps == 0:
-                idx = 0
-            else:
-                idx = steps % (2 * n)
-                if idx >= n:
-                    idx = 2 * n - idx
-                else:
-                    idx = idx % n
+    for speed in [a, b]:
+        if speed < k:
+            rotations = 0
+        else:
+            rotations = (speed - 1) // k
             
-            max_win = max(max_win, sectors[idx])
+        steps = rotations % total_sectors
+        forward_index = steps
+        backward_index = (total_sectors - steps) % total_sectors
+        
+        candidate1 = sectors[forward_index]
+        candidate2 = sectors[backward_index]
+        current_max = max(candidate1, candidate2)
+        if current_max > max_win:
+            max_win = current_max
             
-        for steps in [min_steps - 1, max_steps - 1]:
-            if steps < 0:
-                continue
-            idx = steps % (2 * n)
-            if idx >= n:
-                idx = 2 * n - idx
-            else:
-                idx = idx % n
-            max_win = max(max_win, sectors[idx])
-    
+    mid_speed = (a + b) // 2
+    if a <= mid_speed <= b:
+        if mid_speed < k:
+            rotations = 0
+        else:
+            rotations = (mid_speed - 1) // k
+            
+        steps = rotations % total_sectors
+        forward_index = steps
+        backward_index = (total_sectors - steps) % total_sectors
+        
+        candidate1 = sectors[forward_index]
+        candidate2 = sectors[backward_index]
+        current_max = max(candidate1, candidate2)
+        if current_max > max_win:
+            max_win = current_max
+            
     print(max_win)
 
 if __name__ == "__main__":

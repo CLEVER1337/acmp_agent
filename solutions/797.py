@@ -12,30 +12,49 @@ def main():
         index += 2
         objects.append((x, y))
     
-    if k == 0:
+    if k >= 50:
         print(0)
         return
         
-    objects.sort(key=lambda obj: (obj[1], obj[0]))
+    max_y = max(obj[1] for obj in objects)
+    min_y = min(obj[1] for obj in objects)
     
-    min_days = 0
-    current_y = 0
-    current_x = 1
-    
+    columns = {}
     for obj in objects:
         x, y = obj
+        if x not in columns:
+            columns[x] = []
+        columns[x].append(y)
+    
+    for x in columns:
+        columns[x].sort()
+    
+    x_coords = sorted(columns.keys())
+    min_days = float('inf')
+    
+    for start_x in range(1, 51 - k + 1):
+        end_x = start_x + k - 1
+        days = 0
+        current_y = 1
         
-        if y > current_y:
-            min_days += y - current_y
-            current_y = y
-            current_x = 1
+        while current_y <= 50:
+            found_in_row = False
+            for x in x_coords:
+                if start_x <= x <= end_x:
+                    for y in columns[x]:
+                        if current_y <= y < current_y + k:
+                            found_in_row = True
+                            break
+                    if found_in_row:
+                        break
+            
+            if found_in_row:
+                days += 1
+                current_y += k
+            else:
+                current_y += 1
         
-        if x < current_x:
-            min_days += (current_x - x) * 2
-            current_x = x
-        elif x >= current_x + k:
-            min_days += (x - (current_x + k - 1)) * 2
-            current_x = x - k + 1
+        min_days = min(min_days, days - 1 + (end_x - start_x))
     
     print(min_days)
 

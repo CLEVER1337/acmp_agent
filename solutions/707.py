@@ -1,68 +1,61 @@
 
 def main():
     with open('INPUT.TXT', 'r') as f:
-        initial = f.readline().strip()
+        s = f.readline().strip()
     
     from collections import deque
-    import heapq
-
-    def remove_groups(state):
+    import sys
+    sys.setrecursionlimit(10000)
+    
+    n = len(s)
+    colors = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    
+    def simulate(state, shot_color, shot_pos):
+        if shot_pos == 0:
+            new_state = shot_color + state
+        else:
+            new_state = state[:shot_pos] + shot_color + state[shot_pos:]
         changed = True
-        while changed:
+        while changed and new_state:
             changed = False
-            n = len(state)
-            if n < 3:
-                break
             i = 0
-            while i < n:
+            while i < len(new_state):
                 j = i
-                while j < n and state[j] == state[i]:
+                while j < len(new_state) and new_state[j] == new_state[i]:
                     j += 1
                 if j - i >= 3:
-                    state = state[:i] + state[j:]
+                    new_state = new_state[:i] + new_state[j:]
                     changed = True
                     break
                 i = j
-        return state
-
-    visited = set()
-    heap = []
-    heapq.heappush(heap, (len(initial), 0, initial, []))
-    best_moves = None
-    best_len = float('inf')
+        return new_state
     
-    while heap:
-        cost, shots, state, moves = heapq.heappop(heap)
-        if state == "":
-            if len(moves) < best_len:
-                best_len = len(moves)
-                best_moves = moves
-            continue
-        
-        if len(moves) >= 10:
-            continue
-            
-        state_str = state
-        if state_str in visited:
-            continue
-        visited.add(state_str)
-        
-        n = len(state)
-        for pos in range(0, n+1):
-            for color in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-                new_state = state[:pos] + color + state[pos:]
-                new_state = remove_groups(new_state)
-                new_moves = moves + [(color, pos)]
-                heapq.heappush(heap, (len(new_state), len(new_moves), new_state, new_moves))
+    memo = {}
     
-    if best_moves is None:
-        print("0")
-    else:
-        result = str(len(best_moves))
-        for move in best_moves:
-            result += f" {move[0]}{move[1]}"
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write(result)
+    def dfs(state):
+        if not state:
+            return 0, []
+        if state in memo:
+            return memo[state]
+        best_shots = float('inf')
+        best_path = []
+        for pos in range(len(state)+1):
+            for color in colors:
+                new_state = simulate(state, color, pos)
+                shots, path = dfs(new_state)
+                if shots + 1 < best_shots:
+                    best_shots = shots + 1
+                    best_path = [(color, pos)] + path
+        memo[state] = (best_shots, best_path)
+        return best_shots, best_path
+    
+    total_shots, path = dfs(s)
+    output = str(total_shots)
+    for color, pos in path:
+        output += ' ' + color + str(pos)
+    
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write(output)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

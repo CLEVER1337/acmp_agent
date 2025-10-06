@@ -7,48 +7,37 @@ def main():
     p = int(data[2])
     moves = list(map(int, data[3:3+p]))
     
+    winning_positions = set()
+    for i in range(1, n+1):
+        if i <= k:
+            winning_positions.add(i)
+        else:
+            found = False
+            for j in range(1, k+1):
+                if i - j not in winning_positions:
+                    found = True
+                    break
+            if found:
+                winning_positions.add(i)
+    
     results = []
     current_n = n
-    
     for move in moves:
-        if current_n == 0:
-            results.append('F')
-            continue
-            
-        if move > current_n:
-            results.append('F')
-            continue
-            
-        remaining = current_n - move
-        
-        if remaining == 0:
-            results.append('T')
-            current_n = 0
-            continue
-            
-        win_positions = set()
-        win_positions.add(0)
-        
-        for i in range(1, remaining + 1):
-            can_win = False
-            for take in range(1, k + 1):
-                if take > i:
-                    break
-                if (i - take) not in win_positions:
-                    can_win = True
-                    break
-            if not can_win:
-                win_positions.add(i)
-                
-        if remaining in win_positions:
-            results.append('F')
+        if current_n <= k:
+            if current_n == move:
+                results.append('T')
+            else:
+                results.append('F')
+            current_n -= move
         else:
-            results.append('T')
-            
-        current_n = remaining
-        
-    for result in results:
-        print(result)
+            if current_n - move in winning_positions:
+                results.append('F')
+            else:
+                results.append('T')
+            current_n -= move
+    
+    for res in results:
+        print(res)
 
 if __name__ == "__main__":
     main()

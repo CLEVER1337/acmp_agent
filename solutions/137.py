@@ -21,24 +21,24 @@ def main():
     for k in range(n):
         for i in range(n):
             for j in range(n):
-                if dist[i][k] != float('inf') and dist[k][j] != float('inf'):
+                if dist[i][k] < float('inf') and dist[k][j] < float('inf'):
                     if dist[i][j] > dist[i][k] + dist[k][j]:
                         dist[i][j] = dist[i][k] + dist[k][j]
+    
+    reachable = [[False] * n for _ in range(n)]
+    for k in range(n):
+        for i in range(n):
+            for j in range(n):
+                if dist[i][k] < float('inf') and dist[k][j] < float('inf'):
+                    reachable[i][j] = reachable[i][j] or (reachable[i][k] and reachable[k][j])
+                if i == j:
+                    reachable[i][j] = True
     
     negative_cycle = [[False] * n for _ in range(n)]
     for k in range(n):
         for i in range(n):
             for j in range(n):
-                if dist[i][k] != float('inf') and dist[k][j] != float('inf'):
-                    if dist[i][j] > dist[i][k] + dist[k][j]:
-                        negative_cycle[i][j] = True
-    
-    for k in range(n):
-        for i in range(n):
-            for j in range(n):
-                if negative_cycle[i][k] and dist[k][j] != float('inf'):
-                    negative_cycle[i][j] = True
-                if dist[i][k] != float('inf') and negative_cycle[k][j]:
+                if dist[i][k] < float('inf') and dist[k][j] < float('inf') and dist[k][k] < 0:
                     negative_cycle[i][j] = True
     
     result = [[0] * n for _ in range(n)]
@@ -46,13 +46,14 @@ def main():
         for j in range(n):
             if dist[i][j] == float('inf'):
                 result[i][j] = 0
-            elif negative_cycle[i][j]:
-                result[i][j] = 2
             else:
-                result[i][j] = 1
+                if negative_cycle[i][j]:
+                    result[i][j] = 2
+                else:
+                    result[i][j] = 1
     
     for i in range(n):
         print(' '.join(map(str, result[i])))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

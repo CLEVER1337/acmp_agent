@@ -1,47 +1,44 @@
 
+import sys
 from collections import deque
 
 def main():
-    import sys
     data = sys.stdin.read().split()
     if not data:
         return
     
-    idx = 0
-    n = int(data[idx]); m = int(data[idx+1]); k = int(data[idx+2]); idx += 3
+    it = iter(data)
+    n = int(next(it)); m = int(next(it)); k = int(next(it))
     
     graph = [[] for _ in range(n+1)]
-    for i in range(m):
-        u = int(data[idx]); v = int(data[idx+1]); c = int(data[idx+2]); idx += 3
+    for _ in range(m):
+        u = int(next(it)); v = int(next(it)); c = int(next(it))
         graph[u].append((v, c))
     
-    L = int(data[idx]); idx += 1
-    program = list(map(int, data[idx:idx+L]))
-    idx += L
-    s = int(data[idx]); idx += 1
+    L = int(next(it))
+    program = [int(next(it)) for _ in range(L)]
+    s = int(next(it))
     
-    dp = [[False] * (L+1) for _ in range(n+1)]
-    dp[s][0] = True
+    dp = [[False] * (n+1) for _ in range(L+1)]
+    dp[0][s] = True
     
     for step in range(L):
         color_needed = program[step]
-        for u in range(1, n+1):
-            if dp[u][step]:
-                for (v, c) in graph[u]:
-                    if c == color_needed:
-                        dp[v][step+1] = True
+        for room in range(1, n+1):
+            if dp[step][room]:
+                for neighbor, color in graph[room]:
+                    if color == color_needed:
+                        dp[step+1][neighbor] = True
     
-    final_rooms = []
-    for room in range(1, n+1):
-        if dp[room][L]:
-            final_rooms.append(room)
-    
-    if not final_rooms:
+    if not any(dp[L]):
         print("Hangs")
-    else:
-        print("OK")
-        print(len(final_rooms))
-        print(" ".join(map(str, sorted(final_rooms))))
+        return
+    
+    reachable = [i for i in range(1, n+1) if dp[L][i]]
+    reachable.sort()
+    print("OK")
+    print(len(reachable))
+    print(" ".join(map(str, reachable)))
 
 if __name__ == "__main__":
     main()

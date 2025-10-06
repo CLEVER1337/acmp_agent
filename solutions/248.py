@@ -1,74 +1,100 @@
 
-import re
-
-def process_year1(word):
-    word = re.sub(r'ck', '', word)
-    word = re.sub(r'ci', 'si', word)
-    word = re.sub(r'ce', 'se', word)
-    word = re.sub(r'c', 'k', word)
-    return word
-
-def process_year2(word):
-    while True:
-        original = word
-        word = re.sub(r'ee', 'i', word)
-        word = re.sub(r'oo', 'u', word)
-        word = re.sub(r'([a-z])\1', r'\1', word)
-        if word == original:
-            break
-    return word
-
-def process_year3(word):
-    if len(word) > 1 and word.endswith('e'):
-        word = word[:-1]
-    return word
-
-def process_year4(text):
-    words = text.split()
-    result = []
-    i = 0
-    while i < len(words):
-        if words[i] in ['a', 'an', 'the']:
-            i += 1
-        else:
-            result.append(words[i])
-            i += 1
-    return ' '.join(result)
-
-def process_word(word):
-    if not word.isalpha():
-        return word
-    
-    original_case = word[0].isupper()
-    lower_word = word.lower()
-    
-    processed = process_year1(lower_word)
-    processed = process_year2(processed)
-    processed = process_year3(processed)
-    
-    if original_case and processed:
-        processed = processed[0].upper() + processed[1:]
-    
-    return processed
+import sys
 
 def main():
-    with open('INPUT.TXT', 'r', encoding='utf-8') as f:
-        text = f.read().strip()
+    data = sys.stdin.read().splitlines()
+    if not data:
+        return
+    text = data[0]
     
-    words_and_punct = re.findall(r'\w+|[^\w\s]|\s+', text)
+    words = []
+    current_word = []
+    in_word = False
     
-    processed_parts = []
-    for part in words_and_punct:
-        if part.isspace() or not part.isalnum():
-            processed_parts.append(part)
+    for char in text:
+        if char.isalpha():
+            if not in_word:
+                in_word = True
+                current_word = []
+            current_word.append(char)
         else:
-            processed_parts.append(process_word(part))
+            if in_word:
+                words.append((''.join(current_word), False))
+                in_word = False
+            words.append((char, True))
     
-    intermediate_text = ''.join(processed_parts)
-    final_text = process_year4(intermediate_text)
+    if in_word:
+        words.append((''.join(current_word), False))
     
-    with open('OUTPUT.TXT', 'w', encoding='utf-8') as f:
-        f.write(final_text)
+    def process_word(word):
+        if not word:
+            return word
+            
+        original_word = word
+        word = word.lower()
+        
+        if word in ['a', 'an', 'the']:
+            return ''
+            
+        chars = list(word)
+        n = len(chars)
+        
+        i = 0
+        while i < n:
+            if chars[i] == 'c':
+                if i + 1 < n and chars[i+1] == 'i':
+                    chars[i] = 's'
+                    del chars[i+1]
+                    n -= 1
+                elif i + 1 < n and chars[i+1] == 'e':
+                    chars[i] = 's'
+                    del chars[i+1]
+                    n -= 1
+                elif i + 1 < n and chars[i+1] == 'k':
+                    del chars[i]
+                    n -= 1
+                    i -= 1
+                else:
+                    chars[i] = 'k'
+            i += 1
+        
+        i = 0
+        while i < n - 1:
+            if chars[i] == chars[i+1]:
+                if chars[i] == 'e':
+                    chars[i] = 'i'
+                    del chars[i+1]
+                    n -= 1
+                elif chars[i] == 'o':
+                    chars[i] = 'u'
+                    del chars[i+1]
+                    n -= 1
+                else:
+                    del chars[i+1]
+                    n -= 1
+                continue
+            i += 1
+        
+        if n > 1 and chars[-1] == 'e':
+            chars.pop()
+            n -= 1
+        
+        result = ''.join(chars)
+        if original_word[0].isupper() and result:
+            result = result[0].upper() + result[1:]
+        return result
+    
+    output = []
+    for item, is_punct in words:
+        if is_punct:
+            output.append(item)
+        else:
+            processed = process_word(item)
+            if processed:
+                output.append(processed)
+    
+    result_text = ''.join(output)
+    print(result_text)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

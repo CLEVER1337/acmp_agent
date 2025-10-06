@@ -8,79 +8,120 @@ def main():
     n, m = map(int, data[0].split())
     grid = []
     start = None
-    for i in range(1, n+1):
-        line = list(data[i].strip())
-        grid.append(line)
+    for i in range(1, 1 + n):
+        line = data[i].strip()
+        grid.append(list(line))
         if 'X' in line:
-            start = (i-1, line.index('X'))
+            j = line.index('X')
+            start = (i - 1, j)
     
-    directions = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+    if start is None:
+        for line in grid:
+            print(''.join(line))
+        return
+        
+    directions = [(-1, -1), (-1, 1), (1, 1), (1, -1)]
     visited = [[set() for _ in range(m)] for _ in range(n)]
     
-    def trace(r, c, dr, dc):
-        while True:
-            if not (0 <= r < n and 0 <= c < m):
-                break
-                
-            if (dr, dc) in visited[r][c]:
-                break
-            visited[r][c].add((dr, dc))
-            
-            if grid[r][c] == '*':
-                break
-                
-            if grid[r][c] == '.':
-                if dr == -1 and dc == -1:
-                    grid[r][c] = '/'
-                elif dr == -1 and dc == 1:
-                    grid[r][c] = '\\'
-                elif dr == 1 and dc == -1:
-                    grid[r][c] = '\\'
-                elif dr == 1 and dc == 1:
-                    grid[r][c] = '/'
-            elif grid[r][c] == '/':
-                if (dr, dc) == (-1, -1):
-                    dr, dc = 1, 1
-                elif (dr, dc) == (-1, 1):
-                    dr, dc = 1, -1
-                elif (dr, dc) == (1, -1):
-                    dr, dc = -1, 1
-                elif (dr, dc) == (1, 1):
-                    dr, dc = -1, -1
-            elif grid[r][c] == '\\':
-                if (dr, dc) == (-1, -1):
-                    dr, dc = -1, -1
-                elif (dr, dc) == (-1, 1):
-                    dr, dc = 1, 1
-                elif (dr, dc) == (1, -1):
-                    dr, dc = -1, -1
-                elif (dr, dc) == (1, 1):
-                    dr, dc = 1, 1
-            elif grid[r][c] == 'X':
-                pass
-            
-            r += dr
-            c += dc
+    from collections import deque
+    q = deque()
+    for idx, (dx, dy) in enumerate(directions):
+        q.append((start[0], start[1], idx))
+        visited[start[0]][start[1]].add(idx)
     
-    for dr, dc in directions:
-        trace(start[0], start[1], dr, dc)
+    while q:
+        x, y, d = q.popleft()
+        dx, dy = directions[d]
+        nx, ny = x + dx, y + dy
+        
+        if nx < 0 or nx >= n or ny < 0 or ny >= m:
+            continue
+            
+        if grid[nx][ny] == '*':
+            continue
+            
+        if d in visited[nx][ny]:
+            continue
+            
+        visited[nx][ny].add(d)
+        
+        if grid[nx][ny] == '.':
+            if d == 0 or d == 2:
+                grid[nx][ny] = '\\'
+            else:
+                grid[nx][ny] = '/'
+        elif grid[nx][ny] == '/':
+            if d == 0 or d == 2:
+                grid[nx][ny] = 'X'
+            else:
+                pass
+        elif grid[nx][ny] == '\\':
+            if d == 1 or d == 3:
+                grid[nx][ny] = 'X'
+            else:
+                pass
+        elif grid[nx][ny] == 'X':
+            pass
+        
+        if grid[nx][ny] == 'X':
+            new_dirs = []
+            if d == 0:
+                new_dirs = [3]
+            elif d == 1:
+                new_dirs = [2]
+            elif d == 2:
+                new_dirs = [1]
+            elif d == 3:
+                new_dirs = [0]
+            for nd in new_dirs:
+                if nd not in visited[nx][ny]:
+                    q.append((nx, ny, nd))
+                    visited[nx][ny].add(nd)
+        elif grid[nx][ny] == '/':
+            new_dirs = []
+            if d == 0:
+                new_dirs = [1]
+            elif d == 1:
+                new_dirs = [0]
+            elif d == 2:
+                new_dirs = [3]
+            elif d == 3:
+                new_dirs = [2]
+            for nd in new_dirs:
+                if nd not in visited[nx][ny]:
+                    q.append((nx, ny, nd))
+                    visited[nx][ny].add(nd)
+        elif grid[nx][ny] == '\\':
+            new_dirs = []
+            if d == 0:
+                new_dirs = [3]
+            elif d == 1:
+                new_dirs = [2]
+            elif d == 2:
+                new_dirs = [1]
+            elif d == 3:
+                new_dirs = [0]
+            for nd in new_dirs:
+                if nd not in visited[nx][ny]:
+                    q.append((nx, ny, nd))
+                    visited[nx][ny].add(nd)
+        else:
+            q.append((nx, ny, d))
     
     for i in range(n):
         for j in range(m):
-            if grid[i][j] == 'X':
-                if len(visited[i][j]) > 1:
+            if grid[i][j] == 'X' and (i, j) != start:
+                if len(visited[i][j]) == 2:
                     grid[i][j] = 'X'
-                elif visited[i][j]:
-                    if (-1, -1) in visited[i][j] or (1, 1) in visited[i][j]:
-                        grid[i][j] = '/'
-                    else:
+                elif len(visited[i][j]) == 1:
+                    d = next(iter(visited[i][j]))
+                    if d == 0 or d == 2:
                         grid[i][j] = '\\'
-            elif grid[i][j] != '*' and grid[i][j] != '.':
-                if len(visited[i][j]) > 1:
-                    grid[i][j] = 'X'
+                    else:
+                        grid[i][j] = '/'
     
-    for i in range(n):
-        print(''.join(grid[i]))
+    for line in grid:
+        print(''.join(line))
 
 if __name__ == "__main__":
     main()

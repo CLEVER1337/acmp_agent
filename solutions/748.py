@@ -7,24 +7,25 @@ def main():
     n = int(data[0])
     parents = list(map(int, data[1:1+n-1]))
     
-    children = [[] for _ in range(n+1)]
+    graph = [[] for _ in range(n+1)]
     for i in range(2, n+1):
-        parent = parents[i-2]
-        children[parent].append(i)
+        p = parents[i-2]
+        graph[p].append(i)
     
     depth = [0] * (n+1)
     q = deque([1])
     while q:
-        node = q.popleft()
-        for child in children[node]:
-            depth[child] = depth[node] + 1
-            q.append(child)
+        u = q.popleft()
+        for v in graph[u]:
+            depth[v] = depth[u] + 1
+            q.append(v)
     
     max_depth = max(depth)
     colors = [0] * (n+1)
+    colors[1] = 1
     
-    for node in range(1, n+1):
-        colors[node] = (depth[node] % max_depth) + 1
+    for u in range(2, n+1):
+        colors[u] = depth[u] % max_depth + 1
     
     print(max_depth)
     print(' '.join(str(colors[i]) for i in range(1, n+1)))

@@ -1,33 +1,33 @@
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        F, P = map(int, f.readline().split())
+    F, P = map(int, input().split())
+    low, high = 1, 2 * 10**9
+    result = high
     
-    left, right = 0, 2 * 10**9
-    result = right
-    
-    def check(initial):
-        bottles = initial // F
-        change = initial % F
-        for day in range(4):
-            if bottles == 0:
-                return False
-            returned = bottles * P
-            total = returned + change
-            bottles = total // F
-            change = total % F
-        return bottles == 1 and change == 0
-    
-    while left <= right:
-        mid = (left + right) // 2
-        if check(mid):
+    while low <= high:
+        mid = (low + high) // 2
+        total = mid
+        bottles = 0
+        for day in range(5):
+            if day == 4:
+                if total < F:
+                    bottles = 0
+                else:
+                    bottles = total // F
+                    total = total % F + bottles * P
+            else:
+                bottles = total // F
+                total = total % F + bottles * P
+        
+        if bottles == 1 and total == 0:
             result = mid
-            right = mid - 1
+            high = mid - 1
+        elif bottles < 1:
+            low = mid + 1
         else:
-            left = mid + 1
+            high = mid - 1
             
-    with open("OUTPUT.TXT", "w") as f:
-        f.write(str(result))
+    print(result)
 
 if __name__ == "__main__":
     main()

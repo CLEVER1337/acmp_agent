@@ -17,7 +17,8 @@ def main():
     count = 0
     
     def is_valid(pos):
-        for u, v in edges:
+        for edge in edges:
+            u, v = edge
             if u < pos and v < pos:
                 if colors[u] == colors[v]:
                     return False
@@ -31,8 +32,8 @@ def main():
         
         for color in range(k):
             colors[pos] = color
-            if is_valid(pos):
-                backtrack(pos + 1)
+            if is_valid(pos+1):
+                backtrack(pos+1)
     
     backtrack(0)
     print(count)

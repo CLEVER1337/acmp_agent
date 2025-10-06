@@ -1,31 +1,31 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        K = int(f.read().strip())
+    k = int(input().strip())
     
-    days_of_week = ['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Monday']
-    months = [
-        (31, 'January'), (29, 'February'), (31, 'March'), (30, 'April'), 
-        (31, 'May'), (30, 'June'), (31, 'July'), (31, 'August'), 
-        (30, 'September'), (31, 'October'), (30, 'November'), (31, 'December')
-    ]
+    days_in_month = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    month_names = ["January", "February", "March", "April", "May", "June", 
+                  "July", "August", "September", "October", "November", "December"]
+    weekdays = ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Monday"]
     
-    total_days = K
-    day_of_week = days_of_week[total_days % 7]
+    total_days = k
+    weekday_index = total_days % 7
+    weekday = weekdays[weekday_index]
     
-    day = 1
-    month_index = 0
+    day_count = total_days
+    month = 0
+    day = 0
     
-    while total_days >= months[month_index][0]:
-        total_days -= months[month_index][0]
-        month_index += 1
-        day = 1
+    for i in range(12):
+        if day_count < days_in_month[i]:
+            month = i
+            day = day_count + 1
+            break
+        day_count -= days_in_month[i]
     
-    day += total_days
-    month = months[month_index][1]
+    month_name = month_names[month]
     
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(f"{day_of_week}, {day} {month}")
+    with open("OUTPUT.TXT", "w") as f:
+        f.write(f"{weekday}, {day} {month_name}")
 
 if __name__ == "__main__":
     main()

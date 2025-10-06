@@ -5,21 +5,27 @@ for i in range(n):
     row = list(map(int, input().split()))
     a.append(row)
 
-best = [0] * n
-for i in range(n):
-    best[i] = max(range(n), key=lambda j: a[i][j])
+max_vals = [0] * n
+max_indices = [0] * n
+for j in range(n):
+    max_val = -1
+    max_idx = -1
+    for i in range(n):
+        if a[i][j] > max_val:
+            max_val = a[i][j]
+            max_idx = i
+    max_vals[j] = max_val
+    max_indices[j] = max_idx
 
 result = [0] * n
 used = [False] * n
+for i in range(n):
+    best_j = -1
+    for j in range(n):
+        if not used[j] and (best_j == -1 or a[i][j] > a[i][best_j]):
+            best_j = j
+    result[i] = best_j + 1
+    used[best_j] = True
 
 for i in range(n):
-    max_val = -1
-    candidate = -1
-    for j in range(n):
-        if not used[j] and a[j][best[j]] > max_val:
-            max_val = a[j][best[j]]
-            candidate = j
-    result[candidate] = best[candidate] + 1
-    used[best[candidate]] = True
-
-print(' '.join(map(str, result)))
+    print(result[i], end=' ')

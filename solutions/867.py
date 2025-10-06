@@ -1,25 +1,44 @@
 
+import sys
+
 def main():
-    import sys
     data = sys.stdin.read().split()
     n = int(data[0])
-    d = int(data[1])
+    D = int(data[1])
     coords = list(map(int, data[2:2+n]))
     
     students = sorted([(coords[i], i) for i in range(n)])
-    result = [0] * n
-    color = 1
-    left_ptr = 0
     
-    for i in range(n):
-        pos, idx = students[i]
-        while left_ptr < i and pos - students[left_ptr][0] > d:
-            left_ptr += 1
-        result[idx] = color
-        color = (color % 2) + 1
+    tickets = [0] * n
+    colors = []
+    left = 0
+    color_count = 0
     
-    print(2)
-    print(' '.join(map(str, result)))
+    for right in range(n):
+        while students[right][0] - students[left][0] > D:
+            left += 1
+        
+        if not colors or len(colors) == 0:
+            color_count += 1
+            colors.append(color_count)
+            tickets[students[right][1]] = color_count
+        else:
+            available = set(range(1, color_count + 1))
+            for i in range(left, right):
+                if students[right][0] - students[i][0] <= D:
+                    if tickets[students[i][1]] in available:
+                        available.remove(tickets[students[i][1]])
+            
+            if available:
+                chosen = min(available)
+                tickets[students[right][1]] = chosen
+            else:
+                color_count += 1
+                tickets[students[right][1]] = color_count
+                colors.append(color_count)
+    
+    print(color_count)
+    print(" ".join(map(str, tickets)))
 
 if __name__ == "__main__":
     main()

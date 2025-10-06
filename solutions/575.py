@@ -1,39 +1,34 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        data = f.read().split()
-    
+    import sys
+    data = sys.stdin.read().split()
     n = int(data[0])
     m = int(data[1])
     grid = []
     index = 2
-    
     for i in range(n):
         row = list(map(int, data[index:index+m]))
-        grid.append(row)
         index += m
+        grid.append(row)
     
     total_length = 0.0
+    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
     
-    # Проверяем соседей по горизонтали
     for i in range(n):
-        for j in range(m - 1):
-            if grid[i][j] != grid[i][j + 1]:
-                total_length += 1
-    
-    # Проверяем соседей по вертикали
-    for i in range(n - 1):
         for j in range(m):
-            if grid[i][j] != grid[i + 1][j]:
-                total_length += 1
+            current_room = grid[i][j]
+            for dx, dy in directions:
+                ni, nj = i + dx, j + dy
+                if 0 <= ni < n and 0 <= nj < m:
+                    if grid[ni][nj] != current_room:
+                        total_length += 1
+                else:
+                    total_length += 1
     
-    wall_thickness = 0.2  # 20 см
-    wall_height = 3.0     # 3 метра
-    
+    wall_thickness = 0.2
+    wall_height = 3.0
     volume = total_length * wall_thickness * wall_height
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write("{:.3f}".format(volume))
+    print("{:.3f}".format(volume))
 
 if __name__ == "__main__":
     main()

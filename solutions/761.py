@@ -1,7 +1,8 @@
 
+import sys
+sys.setrecursionlimit(1000000)
+
 def main():
-    import sys
-    sys.setrecursionlimit(1000000)
     data = sys.stdin.read().split()
     if not data:
         print(0)
@@ -10,10 +11,6 @@ def main():
     n = int(data[0])
     m = int(data[1])
     
-    if m == 0:
-        print(0)
-        return
-        
     graph = [[] for _ in range(n + 1)]
     index = 2
     for i in range(m):
@@ -28,22 +25,27 @@ def main():
     disc = [0] * (n + 1)
     low = [0] * (n + 1)
     time = 0
-    bridges = []
+    articulation_points = set()
     
     def dfs(u):
         nonlocal time
+        children = 0
         visited[u] = True
-        disc[u] = low[u] = time
+        disc[u] = time
+        low[u] = time
         time += 1
         
         for v in graph[u]:
             if not visited[v]:
+                children += 1
                 parent[v] = u
                 dfs(v)
                 low[u] = min(low[u], low[v])
                 
-                if low[v] > disc[u]:
-                    bridges.append((u, v))
+                if parent[u] == 0 and children > 1:
+                    articulation_points.add(u)
+                elif parent[u] != 0 and low[v] >= disc[u]:
+                    articulation_points.add(u)
             elif v != parent[u]:
                 low[u] = min(low[u], disc[v])
     
@@ -51,42 +53,59 @@ def main():
         if not visited[i]:
             dfs(i)
     
+    visited = [False] * (n + 1)
     components = []
-    visited_comp = [False] * (n + 1)
     
-    def dfs_components(u, comp):
-        visited_comp[u] = True
+    def dfs_component(u, comp):
+        visited[u] = True
         comp.append(u)
         for v in graph[u]:
-            if not visited_comp[v]:
-                dfs_components(v, comp)
+            if not visited[v] and v not in articulation_points:
+                dfs_component(v, comp)
     
     for i in range(1, n + 1):
-        if not visited_comp[i]:
+        if not visited[i] and i not in articulation_points:
             comp = []
-            dfs_components(i, comp)
+            dfs_component(i, comp)
             components.append(comp)
     
-    comp_id = [0] * (n + 1)
-    for idx, comp in enumerate(components):
-        for node in comp:
-            comp_id[node] = idx
-    
-    comp_graph = [[] for _ in range(len(components))]
-    for u in range(1, n + 1):
-        for v in graph[u]:
-            if comp_id[u] != comp_id[v]:
-                comp_graph[comp_id[u]].append(comp_id[v])
-    
-    leaves = 0
-    for i in range(len(components)):
-        if len(comp_graph[i]) == 1:
-            leaves += 1
-    
-    if leaves == 0:
+    if n == 1:
         print(0)
-    else:
-        print((leaves + 1) // 2)
+        return
+        
+    if m == 0:
+        print(0)
+        return
+        
+    if not articulation_points:
+        if len(components) == 1:
+            print(1)
+        else:
+            print(0)
+        return
+    
+    count = 0
+    for comp in components:
+        connections = 0
+        for node in comp:
+            for neighbor in graph[node]:
+                if neighbor in articulation_points:
+                    connections += 1
+        if connections == 1:
+            count += 1
+            
+    isolated_aps = 0
+    for ap in articulation_points:
+        has_connection = False
+        for neighbor in graph[ap]:
+            if neighbor not in articulation_points:
+                has_connection = True
+                break
+        if not has_connection:
+            isolated_aps += 1
+            
+    result = (count + 1) // 2 + isolated_aps
+    print(result)
 
 if __name__ == "__main__":
     main()

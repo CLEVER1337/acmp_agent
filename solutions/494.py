@@ -2,47 +2,36 @@
 import math
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        x1, y1, x2, y2 = map(int, f.read().split())
+    x1, y1, x2, y2 = map(int, input().split())
     
-    def distance_to_origin(x, y):
-        return math.sqrt(x*x + y*y)
-    
-    d1 = distance_to_origin(x1, y1)
-    d2 = distance_to_origin(x2, y2)
-    
-    min_d = min(d1, d2)
-    max_d = max(d1, d2)
-    
-    count = 0
-    
-    k = math.floor(max_d)
-    while k >= math.ceil(min_d):
-        if k == 0:
-            k -= 1
-            continue
-            
-        r = k
-        A = y2 - y1
-        B = x1 - x2
-        C = x2 * y1 - x1 * y2
+    def cross_circle(r):
+        a = (x2 - x1)**2 + (y2 - y1)**2
+        b = 2 * (x1 * (x2 - x1) + y1 * (y2 - y1))
+        c = x1**2 + y1**2 - r**2
+        disc = b**2 - 4 * a * c
         
-        distance = abs(C) / math.sqrt(A*A + B*B)
-        
-        if distance <= r:
-            d1_to_line = abs(A*x1 + B*y1 + C) / math.sqrt(A*A + B*B)
-            d2_to_line = abs(A*x2 + B*y2 + C) / math.sqrt(A*A + B*B)
+        if disc < 0:
+            return 0
             
-            if d1_to_line <= r and d2_to_line <= r:
-                count += 1
-            else:
-                dot1 = x1*x1 + y1*y1
-                dot2 = x2*x2 + y2*y2
-                if (dot1 <= r*r and dot2 >= r*r) or (dot1 >= r*r and dot2 <= r*r):
-                    count += 1
-        k -= 1
+        t1 = (-b - math.sqrt(disc)) / (2 * a)
+        t2 = (-b + math.sqrt(disc)) / (2 * a)
+        
+        count = 0
+        if 0 <= t1 <= 1:
+            count += 1
+        if 0 <= t2 <= 1 and abs(t1 - t2) > 1e-9:
+            count += 1
+            
+        return count
     
-    print(count)
+    max_r = max(math.ceil(math.sqrt(x1*x1 + y1*y1)), math.ceil(math.sqrt(x2*x2 + y2*y2)))
+    max_r = max(max_r, math.ceil(math.sqrt(max(x1*x1, x2*x2) + max(y1*y1, y2*y2))))
+    
+    total = 0
+    for r in range(1, max_r + 100):
+        total += cross_circle(r)
+        
+    print(total)
 
 if __name__ == "__main__":
     main()

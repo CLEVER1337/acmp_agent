@@ -1,6 +1,6 @@
 
 import sys
-from collections import defaultdict, deque
+from collections import deque
 
 def main():
     data = sys.stdin.read().split()
@@ -9,18 +9,18 @@ def main():
     
     n = int(data[0])
     m = int(data[1])
-    graph = defaultdict(list)
+    graph = [[] for _ in range(n + 1)]
     degrees = [0] * (n + 1)
     
     index = 2
     for i in range(m):
-        a = int(data[index])
-        b = int(data[index + 1])
+        u = int(data[index])
+        v = int(data[index + 1])
         index += 2
-        graph[a].append(b)
-        graph[b].append(a)
-        degrees[a] += 1
-        degrees[b] += 1
+        graph[u].append(v)
+        graph[v].append(u)
+        degrees[u] += 1
+        degrees[v] += 1
     
     odd_vertices = []
     for i in range(1, n + 1):
@@ -34,7 +34,6 @@ def main():
     
     stack = [start]
     path = []
-    
     while stack:
         u = stack[-1]
         if graph[u]:
@@ -44,7 +43,7 @@ def main():
         else:
             path.append(stack.pop())
     
-    print(str(len(path) - 1))
+    print(len(path) - 1)
     print(" ".join(map(str, path)))
 
 if __name__ == "__main__":

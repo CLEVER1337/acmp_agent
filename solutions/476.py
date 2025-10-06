@@ -1,19 +1,20 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        m, n = map(int, f.read().split())
+    import sys
+    data = sys.stdin.read().split()
+    M = int(data[0])
+    N = int(data[1])
     
-    if m == n:
-        if (m - 1) % 2 == 0:
-            print(2)
-        else:
-            print(1)
+    k = 0
+    while M > 1 and N > 1:
+        k += 1
+        M -= 1
+        N -= 1
+        
+    if k % 2 == 0:
+        print(1)
     else:
-        min_val = min(m, n)
-        if min_val % 2 == 1:
-            print(1)
-        else:
-            print(2)
+        print(2)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

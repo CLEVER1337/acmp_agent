@@ -1,6 +1,7 @@
 
+import sys
+
 def main():
-    import sys
     data = sys.stdin.read().splitlines()
     if not data:
         print('-')
@@ -8,61 +9,53 @@ def main():
         
     n, k, p = map(int, data[0].split())
     w = data[1].strip()
-    morphisms = []
-    for i in range(2, 2 + n):
-        morphisms.append(data[i].strip())
+    mappings = {}
+    letters = 'ABCDEFGHIJ'[:n]
     
-    def get_char(pos, k_level, char):
-        if k_level == 0:
-            if pos < len(char):
-                return char[pos]
-            return '-'
-        
-        if char not in 'ABCDEFGHIJ'[:n]:
-            return '-'
+    for i, letter in enumerate(letters):
+        if i + 2 < len(data):
+            mappings[letter] = data[i + 2].strip()
+        else:
+            mappings[letter] = ""
             
-        idx = ord(char) - ord('A')
-        expansion = morphisms[idx]
-        
-        for c in expansion:
-            if pos < len_expansion(c, k_level - 1):
-                return get_char(pos, k_level - 1, c)
-            pos -= len_expansion(c, k_level - 1)
-        
-        return '-'
-    
-    memo = {}
-    def len_expansion(char, k_level):
-        if k_level == 0:
+    def get_length(level, char):
+        if level == 0:
             return 1
-            
-        key = (char, k_level)
-        if key in memo:
-            return memo[key]
-            
-        if char not in 'ABCDEFGHIJ'[:n]:
-            memo[key] = 0
+        if char not in mappings:
             return 0
             
-        idx = ord(char) - ord('A')
-        expansion = morphisms[idx]
         total = 0
-        for c in expansion:
-            total += len_expansion(c, k_level - 1)
-            
-        memo[key] = total
+        for c in mappings[char]:
+            total += get_length(level - 1, c)
+            if total > p:
+                break
         return total
-    
-    pos = p - 1
+
+    def find_char(level, char, pos):
+        if level == 0:
+            return char if pos == 1 else None
+            
+        if char not in mappings:
+            return None
+            
+        current_pos = 1
+        for c in mappings[char]:
+            length = get_length(level - 1, c)
+            if pos >= current_pos and pos < current_pos + length:
+                return find_char(level - 1, c, pos - current_pos + 1)
+            current_pos += length
+        return None
+
+    result = None
+    current_pos = 1
     for char in w:
-        char_len = len_expansion(char, k)
-        if pos < char_len:
-            result = get_char(pos, k, char)
-            print(result)
-            return
-        pos -= char_len
+        length = get_length(k, char)
+        if p >= current_pos and p < current_pos + length:
+            result = find_char(k, char, p - current_pos + 1)
+            break
+        current_pos += length
         
-    print('-')
+    print(result if result is not None else '-')
 
 if __name__ == "__main__":
     main()

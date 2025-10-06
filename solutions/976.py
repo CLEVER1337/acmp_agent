@@ -1,32 +1,34 @@
 
 def main():
-    import sys
-    N = int(sys.stdin.readline().strip())
-    
-    if N == 2:
+    n = int(input().strip())
+    if n == 2:
         print(1)
         return
         
     count = 0
-    for k in range(2, N + 1):
+    for k in range(2, n + 1):
+        total = n + k
         product = k
-        sum_val = k
-        numbers = [1] * (N - k) + [k]
+        numbers = [1] * (n - 1)
+        numbers.append(k)
         
-        if len(numbers) != N:
-            continue
-            
-        for i in range(N - k - 1, -1, -1):
-            while numbers[i] < numbers[i + 1]:
-                if sum_val + 1 <= product * (numbers[i] + 1) / numbers[i]:
-                    sum_val += 1
-                    product = product * (numbers[i] + 1) // numbers[i]
-                    numbers[i] += 1
-                else:
-                    break
-                    
-        if sum_val == product:
-            count += 1
+        idx = n - 2
+        while idx >= 0:
+            while numbers[idx] < numbers[idx + 1] and product * numbers[idx] <= total + (numbers[idx] - 1):
+                product = product // numbers[idx] * (numbers[idx] + 1)
+                total += 1
+                numbers[idx] += 1
+                
+            if product == total:
+                count += 1
+                
+            if idx == 0:
+                break
+                
+            product = product // numbers[idx] * numbers[idx - 1]
+            total = total - numbers[idx] + numbers[idx - 1]
+            numbers[idx] = numbers[idx - 1]
+            idx -= 1
             
     print(count)
 

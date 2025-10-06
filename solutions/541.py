@@ -1,34 +1,36 @@
 
-def get_valid_numbers(s):
-    n = len(s)
-    valid = []
-    for i in range(n):
-        shifted = s[i:] + s[:i]
-        if shifted[0] != '0':
-            valid.append(int(shifted))
-    return valid
-
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        s = f.readline().strip()
-        t = f.readline().strip()
+    s = input().strip()
+    t = input().strip()
     
-    s_nums = get_valid_numbers(s)
-    t_nums = get_valid_numbers(t)
+    def get_valid_shifts(string):
+        n = len(string)
+        shifts = []
+        for i in range(n):
+            shift = string[i:] + string[:i]
+            if shift[0] != '0':
+                shifts.append(shift)
+        return shifts
     
-    if not s_nums or not t_nums:
-        result = 0
-    else:
-        max_diff = -10**18
-        for x in s_nums:
-            for y in t_nums:
-                diff = x - y
-                if diff > max_diff:
-                    max_diff = diff
-        result = max_diff
+    s_shifts = get_valid_shifts(s)
+    t_shifts = get_valid_shifts(t)
     
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(result))
+    if not s_shifts:
+        s_shifts = [s]
+    if not t_shifts:
+        t_shifts = [t]
+    
+    s_nums = [int(x) for x in s_shifts]
+    t_nums = [int(x) for x in t_shifts]
+    
+    max_diff = -10**18
+    for x in s_nums:
+        for y in t_nums:
+            diff = x - y
+            if diff > max_diff:
+                max_diff = diff
+                
+    print(str(max_diff))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

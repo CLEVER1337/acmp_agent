@@ -1,7 +1,7 @@
 
 import sys
 
-def solve():
+def main():
     data = sys.stdin.read().split()
     if not data:
         return
@@ -12,48 +12,38 @@ def solve():
     
     for _ in range(k):
         n = int(data[index]); index += 1
-        T = list(map(int, data[index:index+n]))
+        T_list = list(map(int, data[index:index+n]))
         index += n
         
-        if n < 3:
-            results.append("ERROR")
-            continue
+        total_time = sum(T_list)
+        T_val = total_time / ((n + 1) // 2)
+        
+        signal = ['1']
+        for i in range(1, n-1, 2):
+            t1 = T_list[i]
+            t2 = T_list[i+1]
             
-        total_time = sum(T)
-        segments = n
-        expected_T = total_time / segments
-        
-        bits = []
-        valid = True
-        
-        for i in range(n):
-            if i % 2 == 0:
-                if T[i] < expected_T * 0.9 or T[i] > expected_T * 1.1:
-                    valid = False
-                    break
-            else:
-                if T[i] < expected_T * 0.9 or T[i] > expected_T * 1.1:
-                    valid = False
-                    break
-        
-        if not valid:
-            results.append("ERROR")
-            continue
+            expected_half = T_val / 2
+            lower_bound1 = expected_half * 0.9
+            upper_bound1 = expected_half * 1.1
             
-        bits = []
-        for i in range(0, n-2, 2):
-            if T[i] + T[i+2] > T[i+1] * 1.1:
-                bits.append('1')
+            if lower_bound1 <= t1 <= upper_bound1:
+                signal.append('0')
             else:
-                bits.append('0')
+                signal.append('1')
+                
+            if i + 2 < n:
+                signal.append('1')
         
-        if len(bits) == 0:
+        signal.append('0')
+        
+        if len(signal) != (n + 1) // 2:
             results.append("ERROR")
         else:
-            results.append('1' + ''.join(bits) + '0')
+            results.append(''.join(signal))
     
     for res in results:
         print(res)
 
 if __name__ == "__main__":
-    solve()
+    main()

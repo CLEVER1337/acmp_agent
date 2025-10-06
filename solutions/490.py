@@ -5,20 +5,19 @@ def days_in_month(month):
 
 def date_to_days(date_str):
     day, month, year = map(int, date_str.split('.'))
-    days = 0
+    total_days = 0
     
-    # Добавляем дни из предыдущих месяцев
-    for m in range(1, month):
-        days += days_in_month(m)
+    if year == 93:
+        for m in range(1, month):
+            total_days += days_in_month(m)
+        total_days += day
+    else:
+        total_days += 365
+        for m in range(1, month):
+            total_days += days_in_month(m)
+        total_days += day
     
-    # Добавляем дни текущего месяца
-    days += day
-    
-    # Добавляем дни за предыдущие годы
-    if year == 94:  # 1994 год
-        days += 365  # полный 1993 год
-    
-    return days
+    return total_days
 
 with open('INPUT.TXT', 'r') as f:
     petya_date = f.readline().strip()

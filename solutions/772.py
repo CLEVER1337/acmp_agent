@@ -6,42 +6,47 @@ def main():
     m = int(data[1])
     bends = data[2:2+m]
     
-    layers = []
-    for i in range(n + 1):
-        layers.append((i, 'F'))
+    segments = [(i, 'F') for i in range(n+1)]
     
-    for bend in bends:
-        idx = int(bend[:-1])
-        direction = bend[-1]
+    for bend_str in bends:
+        bend_point = int(bend_str[:-1])
+        direction = bend_str[-1]
         
-        if idx > len(layers) - 1:
+        if bend_point > len(segments) - 1:
             print("SCRUFFY")
             return
             
-        left_part = layers[:idx]
-        right_part = layers[idx:]
+        left = segments[:bend_point]
+        right = segments[bend_point:]
         
         if direction == 'F':
-            right_part = [(num, 'R' if side == 'F' else 'F') for num, side in reversed(right_part)]
+            right = [(seg[0], 'R' if seg[1] == 'F' else 'F') for seg in reversed(right)]
         else:
-            right_part = [(num, 'F' if side == 'R' else 'R') for num, side in reversed(right_part)]
+            right = [(seg[0], 'F' if seg[1] == 'R' else 'R') for seg in reversed(right)]
             
-        layers = left_part + right_part
+        segments = left + right
         
-        if len(layers) != n + 1:
-            print("SCRUFFY")
-            return
-            
-    result_F = []
-    result_R = []
+    visible_f = []
+    visible_r = []
+    seen = set()
     
-    for num, side in layers:
-        if side == 'F':
-            result_F.append(f"P{num}F")
-        else:
-            result_R.append(f"P{num}R")
-            
-    result = result_F + result_R
+    for seg in segments:
+        if seg[0] not in seen:
+            seen.add(seg[0])
+            if seg[1] == 'F':
+                visible_f.append(seg[0])
+            else:
+                visible_r.append(seg[0])
+                
+    visible_f.sort()
+    visible_r.sort()
+    
+    result = []
+    for seg in visible_f:
+        result.append(f"P{seg}F")
+    for seg in visible_r:
+        result.append(f"P{seg}R")
+        
     print(" ".join(result))
 
 if __name__ == "__main__":

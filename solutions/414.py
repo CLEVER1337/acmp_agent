@@ -5,42 +5,42 @@ from collections import deque
 def main():
     data = sys.stdin.read().split()
     n = int(data[0])
-    target1 = int(data[1])
-    target2 = int(data[2])
-    parents = [0] * (n + 1)
+    a = int(data[1])
+    b = int(data[2])
+    parents = list(map(int, data[3:3+n-1]))
     
-    for i in range(3, len(data)):
-        parents[i - 2] = int(data[i])
+    graph = [[] for _ in range(n+1)]
+    for i in range(2, n+1):
+        p = parents[i-2]
+        graph[p].append(i)
+        graph[i].append(p)
     
-    parents[1] = 0
+    def bfs(start):
+        dist = [-1] * (n+1)
+        q = deque()
+        dist[start] = 0
+        q.append(start)
+        while q:
+            u = q.popleft()
+            for v in graph[u]:
+                if dist[v] == -1:
+                    dist[v] = dist[u] + 1
+                    q.append(v)
+        return dist
     
-    def get_path(start):
-        path = []
-        current = start
-        while current != 0:
-            path.append(current)
-            current = parents[current]
-        return path
+    dist_a = bfs(a)
+    dist_b = bfs(b)
     
-    path1 = get_path(target1)
-    path2 = get_path(target2)
+    min_max_dist = float('inf')
+    best_node = -1
     
-    i = len(path1) - 1
-    j = len(path2) - 1
+    for node in range(1, n+1):
+        max_dist = max(dist_a[node], dist_b[node])
+        if max_dist < min_max_dist:
+            min_max_dist = max_dist
+            best_node = node
     
-    while i >= 0 and j >= 0 and path1[i] == path2[j]:
-        i -= 1
-        j -= 1
-    
-    lca = path1[i + 1]
-    
-    dist1 = len(path1) - (i + 2)
-    dist2 = len(path2) - (j + 2)
-    
-    if dist1 <= dist2:
-        print(target1)
-    else:
-        print(target2)
+    print(best_node)
 
 if __name__ == "__main__":
     main()

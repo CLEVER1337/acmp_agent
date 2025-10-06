@@ -1,40 +1,51 @@
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        m, n = map(int, f.readline().split())
+    import sys
+    data = sys.stdin.read().split()
+    m = int(data[0])
+    n = int(data[1])
     
-    def find_decomposition(current_m, current_n, start, path):
-        if current_m == 0:
+    def dfs(target, start, path):
+        if target == 0:
             return path
-        if current_n * current_m < start * current_m:
+        if start > 100000:
             return None
-        
-        for i in range(start, 2 * current_n * current_n + 1):
-            if i < start:
+            
+        for d in range(start, 100000):
+            if target * d < 1:
                 continue
-            if current_m * i < current_n:
+            if d <= path[-1] if path else 0:
                 continue
-            new_m = current_m * i - current_n
-            new_n = current_n * i
-            if new_m < 0:
+                
+            num = 1
+            denom = d
+            new_target_num = target[0] * denom - target[1] * num
+            new_target_denom = target[1] * denom
+            if new_target_num < 0:
                 continue
-            gcd_val = gcd(new_m, new_n)
-            if gcd_val > 1:
-                new_m //= gcd_val
-                new_n //= gcd_val
-            result = find_decomposition(new_m, new_n, i + 1, path + [i])
-            if result is not None:
-                return result
+            if new_target_num == 0:
+                new_path = path + [d]
+                return new_path
+            g = gcd(new_target_num, new_target_denom)
+            new_target_num //= g
+            new_target_denom //= g
+            if new_target_denom > 100000 * new_target_num:
+                continue
+            res = dfs((new_target_num, new_target_denom), d + 1, path + [d])
+            if res is not None:
+                return res
         return None
-    
+        
     def gcd(a, b):
         while b:
             a, b = b, a % b
         return a
-    
-    result = find_decomposition(m, n, 2, [])
-    with open("OUTPUT.TXT", "w") as f:
-        f.write(" ".join(map(str, result)))
+        
+    result = dfs((m, n), 2, [])
+    if result:
+        print(' '.join(map(str, result)))
+    else:
+        print("")
 
 if __name__ == "__main__":
     main()

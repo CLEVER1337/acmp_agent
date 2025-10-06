@@ -10,19 +10,18 @@ def main():
         
     n = int(data[0])
     d = int(data[1])
-    graph = [[] for _ in range(n + 1)]
+    graph = [[] for _ in range(n+1)]
     
     index = 2
-    for i in range(n - 1):
-        u = int(data[index])
-        v = int(data[index + 1])
-        index += 2
+    for i in range(n-1):
+        u = int(data[index]); v = int(data[index+1]); index += 2
         graph[u].append(v)
         graph[v].append(u)
     
     def bfs(start):
-        dist = [-1] * (n + 1)
-        q = deque([start])
+        dist = [-1] * (n+1)
+        q = deque()
+        q.append(start)
         dist[start] = 0
         while q:
             u = q.popleft()
@@ -33,58 +32,46 @@ def main():
         return dist
     
     dist1 = bfs(1)
-    u = max(range(1, n + 1), key=lambda x: dist1[x])
-    dist_u = bfs(u)
-    v = max(range(1, n + 1), key=lambda x: dist_u[x])
-    dist_v = bfs(v)
+    max_node = dist1.index(max(dist1))
+    dist2 = bfs(max_node)
+    diameter = max(dist2)
     
-    diameter = dist_u[v]
-    if d > diameter:
+    if diameter < d:
         print(0)
         return
         
-    center = None
-    for i in range(1, n + 1):
-        if dist_u[i] + dist_v[i] == diameter and abs(dist_u[i] - dist_v[i]) <= 1:
+    center = max_node
+    for i in range(1, n+1):
+        if dist2[i] == diameter:
             center = i
             break
             
-    if center is None:
-        print(0)
-        return
-        
     dist_center = bfs(center)
-    
-    count = [0] * (n + 1)
-    for i in range(1, n + 1):
-        if dist_center[i] <= n:
-            count[dist_center[i]] += 1
+    cnt = [0] * (diameter + 2)
+    for i in range(1, n+1):
+        if dist_center[i] <= diameter:
+            cnt[dist_center[i]] += 1
             
     if d % 2 == 0:
-        r = d // 2
-        if r >= len(count):
+        c = d // 2
+        center_count = cnt[c]
+        if center_count < 3:
             print(0)
             return
             
-        total = 0
-        for dist in range(r + 1, min(n + 1, r + d + 1)):
-            if dist < len(count):
-                total += count[dist]
-                
-        result = count[r] * (total * (total - 1) // 2)
-        print(result)
+        total = center_count * (center_count - 1) * (center_count - 2) // 6
+        print(total)
     else:
-        r1 = d // 2
-        r2 = r1 + 1
-        if r1 >= len(count) or r2 >= len(count):
+        c1 = d // 2
+        c2 = d // 2 + 1
+        count1 = cnt[c1]
+        count2 = cnt[c2]
+        if count1 == 0 or count2 == 0:
             print(0)
             return
             
-        total1 = count[r1]
-        total2 = count[r2]
-        
-        result = total1 * total2 * (total1 + total2 - 2) // 2
-        print(result)
+        total = count1 * count2 * (count1 + count2 - 2) // 2
+        print(total)
 
 if __name__ == "__main__":
     main()

@@ -5,35 +5,33 @@ from collections import deque
 def main():
     data = sys.stdin.read().splitlines()
     K = int(data[0].strip())
-    s = data[1].strip()
-    n = len(s)
+    S = data[1].strip()
+    n = len(S)
     
-    freq = [0] * 26
-    last_occurrence = [-1] * 26
-    required = set()
-    
+    last_occurrence = {}
+    for idx, char in enumerate(S):
+        last_occurrence[char] = idx
+        
+    freq = {}
     dq = deque()
+    required_chars = set()
     
     for i in range(n):
-        c = s[i]
-        idx = ord(c) - ord('A')
-        last_occurrence[idx] = i
-        
-        while dq and dq[-1][0] > idx:
+        while dq and dq[0] < i - K + 1:
+            dq.popleft()
+            
+        char = S[i]
+        while dq and S[dq[-1]] >= char:
             dq.pop()
-        dq.append((idx, i))
+        dq.append(i)
         
         if i >= K - 1:
-            while dq and dq[0][1] <= i - K:
-                dq.popleft()
-            if dq:
-                min_char_idx = dq[0][0]
-                required.add(min_char_idx)
-    
-    result_chars = sorted(chr(ord('A') + idx) for idx in required)
-    
-    print(len(result_chars))
-    for char in result_chars:
+            min_char = S[dq[0]]
+            required_chars.add(min_char)
+            
+    required_chars = sorted(required_chars)
+    print(len(required_chars))
+    for char in required_chars:
         print(char)
 
 if __name__ == "__main__":

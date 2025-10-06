@@ -3,8 +3,6 @@ def main():
     import sys
     sys.setrecursionlimit(10000)
     data = sys.stdin.read().split()
-    if not data:
-        return
     N = int(data[0])
     K = int(data[1])
     
@@ -12,30 +10,51 @@ def main():
         print(1)
         return
         
-    board = [[0] * N for _ in range(N)]
+    board = [[False] * N for _ in range(N)]
     count = 0
-    
-    knight_moves = [(2, 1), (2, -1), (-2, 1), (-2, -1),
-                   (1, 2), (1, -2), (-1, 2), (-1, -2)]
     
     def is_safe(row, col):
         for i in range(N):
-            if board[row][i] == 1:
-                return False
-            if board[i][col] == 1:
-                return False
-            if row - i >= 0 and col - i >= 0 and board[row-i][col-i] == 1:
-                return False
-            if row - i >= 0 and col + i < N and board[row-i][col+i] == 1:
-                return False
-            if row + i < N and col - i >= 0 and board[row+i][col-i] == 1:
-                return False
-            if row + i < N and col + i < N and board[row+i][col+i] == 1:
+            if board[i][col]:
                 return False
                 
+        for j in range(N):
+            if board[row][j]:
+                return False
+                
+        i, j = row, col
+        while i >= 0 and j >= 0:
+            if board[i][j]:
+                return False
+            i -= 1
+            j -= 1
+            
+        i, j = row, col
+        while i < N and j < N:
+            if board[i][j]:
+                return False
+            i += 1
+            j += 1
+            
+        i, j = row, col
+        while i >= 0 and j < N:
+            if board[i][j]:
+                return False
+            i -= 1
+            j += 1
+            
+        i, j = row, col
+        while i < N and j >= 0:
+            if board[i][j]:
+                return False
+            i += 1
+            j -= 1
+            
+        knight_moves = [(-2, -1), (-2, 1), (-1, -2), (-1, 2),
+                       (1, -2), (1, 2), (2, -1), (2, 1)]
         for dr, dc in knight_moves:
             r, c = row + dr, col + dc
-            if 0 <= r < N and 0 <= c < N and board[r][c] == 1:
+            if 0 <= r < N and 0 <= c < N and board[r][c]:
                 return False
                 
         return True
@@ -49,9 +68,9 @@ def main():
         for i in range(start_row, N):
             for j in range(N):
                 if is_safe(i, j):
-                    board[i][j] = 1
+                    board[i][j] = True
                     backtrack(i + 1, placed + 1)
-                    board[i][j] = 0
+                    board[i][j] = False
                     
     backtrack(0, 0)
     print(count)

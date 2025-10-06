@@ -2,55 +2,82 @@
 import sys
 import math
 
-def point_to_segment_distance(px, py, x1, y1, x2, y2):
-    line_length_sq = (x2 - x1)**2 + (y2 - y1)**2
-    if line_length_sq == 0:
-        return math.sqrt((px - x1)**2 + (py - y1)**2)
-    
-    t = max(0, min(1, ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / line_length_sq))
-    proj_x = x1 + t * (x2 - x1)
-    proj_y = y1 + t * (y2 - y1)
-    return math.sqrt((px - proj_x)**2 + (py - proj_y)**2)
+def readints():
+    return list(map(int, sys.stdin.readline().split()))
 
-def solve_segment(x11, y11, x12, y12, x21, y21, x22, y22):
-    if (x11, y11, x12, y12) == (0, 0, 0, 0) and (x21, y21, x22, y22) == (0, 0, 0, 0):
-        return None
+def dot(v, w):
+    return v[0]*w[0] + v[1]*w[1]
+
+def length(v):
+    return math.sqrt(v[0]**2 + v[1]**2)
+
+def normalize(v):
+    l = length(v)
+    return (v[0]/l, v[1]/l)
+
+def dist_point_to_segment(p, a, b):
+    ab = (b[0]-a[0], b[1]-a[1])
+    ap = (p[0]-a[0], p[1]-a[1])
+    if dot(ab, ap) <= 0:
+        return length(ap)
+    bp = (p[0]-b[0], p[1]-b[1])
+    if dot(ab, bp) >= 0:
+        return length(bp)
+    n_ab = normalize(ab)
+    projection = dot(ap, n_ab)
+    closest = (a[0] + n_ab[0]*projection, a[1] + n_ab[1]*projection)
+    return math.sqrt((p[0]-closest[0])**2 + (p[1]-closest[1])**2)
+
+def find_circle_for_segments(a1, a2, b1, b2):
+    left = -1e5
+    right = 1e5
+    for _ in range(100):
+        mid1 = left + (right - left) / 3
+        mid2 = right - (right - left) / 3
+        
+        p1 = (mid1, 0)
+        d1a = dist_point_to_segment(p1, a1, a2)
+        d1b = dist_point_to_segment(p1, b1, b2)
+        f1 = abs(d1a - d1b)
+        
+        p2 = (mid2, 0)
+        d2a = dist_point_to_segment(p2, a1, a2)
+        d2b = dist_point_to_segment(p2, b1, b2)
+        f2 = abs(d2a - d2b)
+        
+        if f1 < f2:
+            right = mid2
+        else:
+            left = mid1
     
-    mid1_x = (x11 + x12) / 2.0
-    mid1_y = (y11 + y12) / 2.0
-    mid2_x = (x21 + x22) / 2.0
-    mid2_y = (y21 + y22) / 2.0
-    
-    center_x = (mid1_x + mid2_x) / 2.0
-    center_y = (mid1_y + mid2_y) / 2.0
-    
-    dist1 = point_to_segment_distance(center_x, center_y, x11, y11, x12, y12)
-    dist2 = point_to_segment_distance(center_x, center_y, x21, y21, x22, y22)
-    
-    radius = max(dist1, dist2) * 1.0001
-    
-    return center_x, center_y, radius
+    best_x = (left + right) / 2
+    center = (best_x, 0)
+    r1 = dist_point_to_segment(center, a1, a2)
+    r2 = dist_point_to_segment(center, b1, b2)
+    radius = (r1 + r2) / 2
+    return center[0], center[1], radius
 
 def main():
-    data = sys.stdin.read().split()
+    data = sys.stdin.read().splitlines()
     index = 0
-    results = []
-    
-    while index < len(data):
-        x11 = int(data[index]); y11 = int(data[index+1]); x12 = int(data[index+2]); y12 = int(data[index+3])
-        index += 4
-        x21 = int(data[index]); y21 = int(data[index+1]); x22 = int(data[index+2]); y22 = int(data[index+3])
-        index += 4
-        
-        if x11 == 0 and y11 == 0 and x12 == 0 and y12 == 0 and x21 == 0 and y21 == 0 and x22 == 0 and y22 == 0:
+    output_lines = []
+    while True:
+        line1 = data[index].strip()
+        line2 = data[index+1].strip()
+        if line1 == '0 0 0 0' and line2 == '0 0 0 0':
             break
-            
-        result = solve_segment(x11, y11, x12, y12, x21, y21, x22, y22)
-        if result:
-            results.append(result)
+        coords1 = list(map(int, line1.split()))
+        coords2 = list(map(int, line2.split()))
+        a1 = (coords1[0], coords1[1])
+        a2 = (coords1[2], coords1[3])
+        b1 = (coords2[0], coords2[1])
+        b2 = (coords2[2], coords2[3])
+        
+        cx, cy, r = find_circle_for_segments(a1, a2, b1, b2)
+        output_lines.append(f"{cx:.6f} {cy:.6f} {r:.6f}")
+        index += 2
     
-    for center_x, center_y, radius in results:
-        print(f"{center_x:.6f} {center_y:.6f} {radius:.6f}")
+    print("\n".join(output_lines))
 
 if __name__ == "__main__":
     main()

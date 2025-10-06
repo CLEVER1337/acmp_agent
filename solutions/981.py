@@ -1,197 +1,157 @@
 
 import sys
 
-def parse_expr(s):
+def parse_expression(s):
+    s = s.replace(' ', '')
     tokens = []
     i = 0
     n = len(s)
     while i < n:
-        if s[i] == ' ':
-            i += 1
-            continue
         if s[i] in '()&|!':
             tokens.append(s[i])
             i += 1
-        else:
+        elif s[i].isalpha():
             j = i
             while j < n and s[j].isalpha():
                 j += 1
             tokens.append(s[i:j])
             i = j
+        else:
+            i += 1
     return tokens
 
 def shunting_yard(tokens):
     output = []
     stack = []
     precedence = {'!': 3, '&': 2, '|': 1}
+    
     for token in tokens:
-        if token == '(':
+        if token.isalpha():
+            output.append(token)
+        elif token == '(':
             stack.append(token)
         elif token == ')':
             while stack and stack[-1] != '(':
                 output.append(stack.pop())
             stack.pop()
-        elif token in precedence:
-            while stack and stack[-1] != '(' and precedence.get(stack[-1], 0) >= precedence[token]:
+        else:
+            while stack and stack[-1] != '(' and precedence.get(stack[-1], 0) >= precedence.get(token, 0):
                 output.append(stack.pop())
             stack.append(token)
-        else:
-            output.append(token)
+    
     while stack:
         output.append(stack.pop())
+    
     return output
 
-def build_ast(rpn):
+def evaluate_rpn(rpn, var_values):
     stack = []
+    variables = set()
     for token in rpn:
-        if token == '!':
-            operand = stack.pop()
-            stack.append(('NOT', operand))
+        if token.isalpha():
+            variables.add(token)
+    
+    var_map = {var: var_values.get(var, 0) for var in variables}
+    
+    for token in rpn:
+        if token.isalpha():
+            stack.append(var_map[token])
+        elif token == '!':
+            a = stack.pop()
+            stack.append(1 - a)
         elif token == '&':
-            right = stack.pop()
-            left = stack.pop()
-            stack.append(('AND', left, right))
+            b = stack.pop()
+            a = stack.pop()
+            stack.append(a & b)
         elif token == '|':
-            right = stack.pop()
-            left = stack.pop()
-            stack.append(('OR', left, right))
-        else:
-            stack.append(('VAR', token))
+            b = stack.pop()
+            a = stack.pop()
+            stack.append(a | b)
     return stack[0]
 
-def eval_ast(ast, values):
-    if ast[0] == 'VAR':
-        return values.get(ast[1], 0)
-    elif ast[0] == 'NOT':
-        return 1 - eval_ast(ast[1], values)
-    elif ast[0] == 'AND':
-        return eval_ast(ast[1], values) & eval_ast(ast[2], values)
-    elif ast[0] == 'OR':
-        return eval_ast(ast[1], values) | eval_ast(ast[2], values)
-
-def get_variables(ast):
-    vars_set = set()
-    def traverse(node):
-        if node[0] == 'VAR':
-            vars_set.add(node[1])
-        elif node[0] == 'NOT':
-            traverse(node[1])
-        else:
-            traverse(node[1])
-            traverse(node[2])
-    traverse(ast)
-    return sorted(vars_set)
-
-def is_self_dual(ast, vars_list):
-    n = len(vars_list)
+def get_truth_table(formula):
+    tokens = parse_expression(formula)
+    rpn = shunting_yard(tokens)
+    
+    variables = set()
+    for token in rpn:
+        if token.isalpha():
+            variables.add(token)
+    variables = sorted(variables)
+    n = len(variables)
+    
+    truth_table = {}
     for i in range(1 << n):
         values = {}
-        for j, var in enumerate(vars_list):
-            values[var] = (i >> j) & 1
-        dual_values = {var: 1 - values[var] for var in vars_list}
-        if eval_ast(ast, values) != eval_ast(ast, dual_values):
+        for j, var in enumerate(variables):
+            values[var] = (i >> (n - 1 - j)) & 1
+        result = evaluate_rpn(rpn, values)
+        truth_table[tuple(values[var] for var in variables)] = result
+    return truth_table, variables
+
+def is_self_dual(truth_table, variables):
+    n = len(variables)
+    for inputs, output in truth_table.items():
+        complemented_inputs = tuple(1 - x for x in inputs)
+        complemented_output = truth_table.get(complemented_inputs)
+        if complemented_output is None or complemented_output != 1 - output:
             return False
     return True
 
-def is_monotonic(ast, vars_list):
-    n = len(vars_list)
-    for i in range(1 << n):
-        for j in range(n):
-            if not (i & (1 << j)):
-                continue
-            smaller = i & ~(1 << j)
-            values_i = {}
-            values_smaller = {}
-            for k, var in enumerate(vars_list):
-                values_i[var] = (i >> k) & 1
-                values_smaller[var] = (smaller >> k) & 1
-            if eval_ast(ast, values_smaller) > eval_ast(ast, values_i):
+def is_monotonic(truth_table, variables):
+    n = len(variables)
+    for inputs1, output1 in truth_table.items():
+        for inputs2, output2 in truth_table.items():
+            if all(x <= y for x, y in zip(inputs1, inputs2)) and output1 > output2:
                 return False
     return True
 
-def median_repr(ast, vars_list):
-    n = len(vars_list)
+def median(x, y, z):
+    return (x & y) | (y & z) | (z & x)
+
+def build_median_circuit(truth_table, variables):
+    n = len(variables)
     if n == 0:
-        return "0" if eval_ast(ast, {}) == 0 else "1"
+        return "0" if truth_table[()] == 0 else "1"
     
-    truth_table = []
-    for i in range(1 << n):
-        values = {}
-        for j, var in enumerate(vars_list):
-            values[var] = (i >> j) & 1
-        truth_table.append(eval_ast(ast, values))
-    
-    def build_median_expr(mask):
-        if all(truth_table[i] == 0 for i in mask):
-            return "0"
-        if all(truth_table[i] == 1 for i in mask):
-            return "1"
+    def recursive_construction(sub_vars, assignment):
+        if len(sub_vars) == 0:
+            key = tuple(assignment[var] for var in variables)
+            return str(truth_table[key])
         
-        min_terms = []
-        max_terms = []
-        for i in mask:
-            if truth_table[i] == 1:
-                min_terms.append(i)
-            else:
-                max_terms.append(i)
+        var = sub_vars[0]
+        rest_vars = sub_vars[1:]
         
-        if len(min_terms) >= len(max_terms):
-            if len(min_terms) == 1:
-                i = min_terms[0]
-                terms = []
-                for j, var in enumerate(vars_list):
-                    if (i >> j) & 1:
-                        terms.append(var)
-                    else:
-                        terms.append(f"!{var}")
-                if len(terms) == 1:
-                    return terms[0]
-                return f"<{'<'.join(terms)}>"
-            else:
-                parts = []
-                for i in min_terms:
-                    sub_mask = [idx for idx in mask if idx != i]
-                    parts.append(build_median_expr(sub_mask))
-                return f"<{'<'.join(parts)}>"
-        else:
-            if len(max_terms) == 1:
-                i = max_terms[0]
-                terms = []
-                for j, var in enumerate(vars_list):
-                    if (i >> j) & 1:
-                        terms.append(f"!{var}")
-                    else:
-                        terms.append(var)
-                if len(terms) == 1:
-                    return terms[0]
-                return f"<{'<'.join(terms)}>"
-            else:
-                parts = []
-                for i in max_terms:
-                    sub_mask = [idx for idx in mask if idx != i]
-                    parts.append(build_median_expr(sub_mask))
-                return f"<{'<'.join(parts)}>"
+        assignment0 = assignment.copy()
+        assignment0[var] = 0
+        expr0 = recursive_construction(rest_vars, assignment0)
+        
+        assignment1 = assignment.copy()
+        assignment1[var] = 1
+        expr1 = recursive_construction(rest_vars, assignment1)
+        
+        if expr0 == expr1:
+            return expr0
+        
+        return f"<{var}{expr0}{expr1}>"
     
-    full_mask = list(range(1 << n))
-    return build_median_expr(full_mask)
+    return recursive_construction(variables, {})
 
 def main():
     with open('INPUT.TXT', 'r') as f:
         formula = f.read().strip()
     
-    tokens = parse_expr(formula)
-    rpn = shunting_yard(tokens)
-    ast = build_ast(rpn)
-    vars_list = get_variables(ast)
+    truth_table, variables = get_truth_table(formula)
     
-    if not is_self_dual(ast, vars_list) or not is_monotonic(ast, vars_list):
+    if not is_self_dual(truth_table, variables) or not is_monotonic(truth_table, variables):
         with open('OUTPUT.TXT', 'w') as f:
-            f.write("0")
+            f.write("")
         return
     
-    median_expr = median_repr(ast, vars_list)
+    result = build_median_circuit(truth_table, variables)
+    
     with open('OUTPUT.TXT', 'w') as f:
-        f.write(median_expr)
+        f.write(result)
 
 if __name__ == '__main__':
     main()

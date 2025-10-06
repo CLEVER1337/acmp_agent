@@ -1,50 +1,28 @@
 
 def main():
-    import sys
-    data = sys.stdin.read().splitlines()
-    n = int(data[0])
-    s = data[1].strip()
+    n = int(input().strip())
+    s = input().strip()
+    total_len = len(s)
     
-    if n == 0:
-        print("")
-        return
-        
-    length = len(s)
-    if length != (1 << n) - 1:
-        print("NO")
-        return
-        
-    def dfs(l, r, fold_type):
-        if l == r:
-            return ""
-            
-        mid = (l + r) // 2
-        
-        left_str = dfs(l, mid, 'P')
-        if left_str is None:
+    def solve(pos, left, right, fold_seq):
+        if left == right:
+            return fold_seq
+        mid = (left + right) // 2
+        if s[mid] == 'O':
             return None
-            
-        right_str = dfs(mid + 1, r, 'Z')
-        if right_str is None:
-            return None
-            
-        if fold_type == 'P':
-            if s[mid] != 'O':
-                return None
-        else:
-            if s[mid] != 'K':
-                return None
-                
-        return left_str + fold_type + right_str
         
-    result = dfs(0, length - 1, 'P')
-    if result is None:
-        result = dfs(0, length - 1, 'Z')
+        left_res = solve(2*pos, left, mid, fold_seq + 'P')
+        if left_res is not None:
+            return left_res
         
+        right_res = solve(2*pos+1, mid+1, right, fold_seq + 'Z')
+        return right_res
+
+    result = solve(1, 0, total_len-1, "")
     if result is None:
         print("NO")
     else:
         print(result)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

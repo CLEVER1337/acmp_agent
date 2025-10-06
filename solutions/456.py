@@ -1,17 +1,19 @@
 
 def main():
     with open('INPUT.TXT', 'r') as f:
-        X, Y = map(int, f.read().split())
+        x, y = map(int, f.read().split())
     
-    for a in range(1, Y + 1):
-        for b in range(1, Y + 1):
-            years = [a, b]
-            for i in range(2, X):
-                years.append(years[i-1] + years[i-2])
-            if years[X-1] == Y:
-                with open('OUTPUT.TXT', 'w') as f_out:
-                    f_out.write(f"{a} {b}")
-                return
-
+    a = [0] * (x + 1)
+    a[x] = y
+    
+    for i in range(x - 1, 1, -1):
+        a[i] = a[i + 2] - a[i + 1]
+    
+    for i in range(2, 0, -1):
+        a[i] = a[i + 2] - a[i + 1]
+    
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write(f"{a[1]} {a[2]}")
+        
 if __name__ == "__main__":
     main()

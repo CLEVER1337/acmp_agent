@@ -4,25 +4,23 @@ import sys
 def main():
     data = sys.stdin.read().splitlines()
     if not data:
+        print(0)
         return
-    
+        
     n, m, k = map(int, data[0].split())
     A = list(map(int, data[1].split()))
-    
-    bets = []
+    numbers = []
     for i in range(2, 2 + n):
-        line = data[i].strip()
-        if line:
-            bets.append(line)
+        numbers.append(data[i].strip())
     
     trie = {}
-    for bet in bets:
+    for num in numbers:
         node = trie
-        for char in bet:
-            digit = int(char)
-            if digit not in node:
-                node[digit] = {'count': 0}
-            node = node[digit]
+        for digit in num:
+            d = int(digit)
+            if d not in node:
+                node[d] = {'count': 0}
+            node = node[d]
             node['count'] = node.get('count', 0) + 1
     
     min_total = float('inf')
@@ -36,15 +34,13 @@ def main():
             return
         
         for digit in range(k):
-            if digit in node:
-                count = node[digit]['count']
-                win = A[depth] * count
-                new_sum = current_sum + win
-                dfs(node[digit], depth + 1, new_sum)
-            else:
-                total = current_sum
-                if total < min_total:
-                    min_total = total
+            if digit not in node:
+                continue
+                
+            child_node = node[digit]
+            count = child_node['count']
+            cost = A[depth] * count
+            dfs(child_node, depth + 1, current_sum + cost)
     
     dfs(trie, 0, 0)
     print(min_total)

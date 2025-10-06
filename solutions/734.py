@@ -10,18 +10,26 @@ def main():
     dp = [0] * (N + 1)
     dp[0] = 1
     for i in range(1, N + 1):
-        dp[i] = dp[i - 1] * K % MOD
-        if i >= 2:
-            dp[i] = (dp[i] + dp[i - 2] * K * (K - 1)) % MOD
+        dp[i] = dp[i-1] * K % MOD
+        
+    total = sum(dp) % MOD
     
-    total_strings = dp[N]
+    ans_count = total
+    ans_sets = 1
     
-    count_sets = 1
     for i in range(1, N + 1):
-        count_sets = count_sets * (total_strings - dp[i - 1]) % MOD
-    
-    print(total_strings)
-    print(count_sets)
+        if i * 2 <= N:
+            continue
+        cnt = dp[i]
+        sets = pow(K, i, MOD)
+        if cnt > ans_count:
+            ans_count = cnt
+            ans_sets = sets
+        elif cnt == ans_count:
+            ans_sets = (ans_sets + sets) % MOD
+            
+    print(ans_count)
+    print(ans_sets % MOD)
 
 if __name__ == "__main__":
     main()

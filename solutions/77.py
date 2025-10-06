@@ -1,39 +1,46 @@
 
-def count_numbers(N, K):
-    if K < 0:
-        return 0
-        
-    s = bin(N)[2:]
-    n = len(s)
-    
-    dp = [[[0] * (K + 2) for _ in range(2)] for __ in range(n + 1)]
-    dp[0][0][0] = 1
-    
-    for i in range(n):
-        for tight in range(2):
-            for zeros in range(K + 1):
-                if dp[i][tight][zeros] == 0:
-                    continue
-                    
-                limit = int(s[i]) if tight else 1
-                for d in range(limit + 1):
-                    new_tight = tight and (d == limit)
-                    new_zeros = zeros + (1 if d == 0 else 0)
-                    if new_zeros <= K:
-                        dp[i + 1][new_tight][new_zeros] += dp[i][tight][zeros]
-    
-    return dp[n][0][K] + dp[n][1][K] - (1 if K == 0 else 0)
-
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        data = f.read().split()
-        N = int(data[0])
-        K = int(data[1])
+    import sys
+    data = sys.stdin.read().split()
+    N = int(data[0])
+    K = int(data[1])
     
-    result = count_numbers(N, K)
+    if K < 0:
+        print(0)
+        return
+        
+    def count_numbers_with_k_zeros(n, k):
+        from math import comb
+        
+        def count_up_to(x, k):
+            s = bin(x)[2:]
+            n_bits = len(s)
+            total = 0
+            
+            for length in range(1, n_bits):
+                if length - 1 >= k:
+                    total += comb(length - 1, k)
+            
+            ones_so_far = 0
+            for i, bit in enumerate(s):
+                remaining_bits = n_bits - i - 1
+                if bit == '1':
+                    if remaining_bits > 0:
+                        needed_zeros = k - ones_so_far
+                        if needed_zeros >= 0 and needed_zeros <= remaining_bits:
+                            total += comb(remaining_bits, needed_zeros)
+                    ones_so_far += 1
+                else:
+                    if ones_so_far > k:
+                        break
+            if bin(x).count('0') == k:
+                total += 1
+            return total
+        
+        return count_up_to(n, k)
     
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(result))
+    result = count_numbers_with_k_zeros(N, K)
+    print(result)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

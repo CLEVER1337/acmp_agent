@@ -2,23 +2,26 @@
 import math
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        r, l, d = map(int, f.readline().split())
+    r, l, d = map(int, input().split())
     
-    R = r * l / (l - r)
-    h = math.sqrt(l * l - r * r)
-    H = math.sqrt(R * R - r * r)
-    
-    if H <= d:
-        length = 2 * R
+    if l <= d:
+        h = math.sqrt(l * l - r * r)
+        result = h + r
     else:
-        angle = 2 * math.asin(r / R)
-        if angle <= math.pi:
-            length = 2 * R * math.sin(angle / 2)
+        h = math.sqrt(l * l - r * r)
+        if r + h <= d:
+            result = h + r
         else:
-            length = 2 * R
+            theta = math.acos(d / l)
+            phi = math.asin(r / l)
+            alpha = math.pi - theta - phi
+            if alpha <= 0:
+                result = h + r
+            else:
+                arc_length = alpha * r
+                result = h + arc_length
     
-    print("{:.6f}".format(length))
+    print("{:.6f}".format(result))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

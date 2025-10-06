@@ -1,30 +1,29 @@
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        s = f.readline().strip()
-        t = f.readline().strip()
-    
-    n = len(s)
-    m = len(t)
+    S = input().strip()
+    T = input().strip()
+    n = len(S)
+    m = len(T)
     
     if m == 0:
         print("YES")
         return
         
-    if n == 0:
-        print("NO")
-        return
-        
     for start in range(n):
-        pos = 0
-        for i in range(start, start + m):
-            if s[i % n] != t[pos]:
+        pos = start
+        valid = True
+        for char in T:
+            if pos >= n:
+                pos = 0
+            if char != S[pos]:
+                valid = False
                 break
             pos += 1
-            if pos == m:
-                print("YES")
-                return
-                
+            
+        if valid:
+            print("YES")
+            return
+            
     print("NO")
 
 if __name__ == "__main__":

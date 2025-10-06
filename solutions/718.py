@@ -1,12 +1,14 @@
 
+import sys
+from collections import deque
+
 def main():
-    import sys
     data = sys.stdin.read().splitlines()
     if not data:
         print(-1)
         return
         
-    n, L = map(int, data[0].split())
+    n, l = map(int, data[0].split())
     blocks = []
     for i in range(1, 1 + n):
         blocks.append(data[i].strip())
@@ -14,45 +16,43 @@ def main():
     
     len_s = len(s)
     INF = 10**9
-    
     dp = [INF] * (len_s + 1)
-    prev = [(-1, -1)] * (len_s + 1)
+    prev_block = [-1] * (len_s + 1)
+    prev_pos = [-1] * (len_s + 1)
     dp[0] = 0
     
     for pos in range(len_s + 1):
         if dp[pos] == INF:
             continue
-            
-        for block_idx, block in enumerate(blocks):
-            for start_col in range(L):
-                match_len = 0
-                for col in range(start_col, L):
-                    if pos + match_len >= len_s:
-                        break
-                    if block[col] != s[pos + match_len]:
-                        break
-                    match_len += 1
-                
-                if match_len > 0:
-                    new_pos = pos + match_len
-                    if dp[new_pos] > dp[pos] + 1:
-                        dp[new_pos] = dp[pos] + 1
-                        prev[new_pos] = (pos, block_idx)
-    
+        for idx, block in enumerate(blocks):
+            block_len = len(block)
+            if pos + block_len > len_s:
+                continue
+            match = True
+            for i in range(block_len):
+                if s[pos + i] != block[i]:
+                    match = False
+                    break
+            if match:
+                if dp[pos] + 1 < dp[pos + block_len]:
+                    dp[pos + block_len] = dp[pos] + 1
+                    prev_block[pos + block_len] = idx
+                    prev_pos[pos + block_len] = pos
+                    
     if dp[len_s] == INF:
         print(-1)
-    else:
-        k = dp[len_s]
-        result_blocks = []
-        pos = len_s
-        while pos > 0:
-            prev_pos, block_idx = prev[pos]
-            result_blocks.append(block_idx + 1)
-            pos = prev_pos
-            
-        result_blocks.reverse()
-        print(k)
-        print(' '.join(map(str, result_blocks)))
+        return
+        
+    k = dp[len_s]
+    result = []
+    current = len_s
+    while current > 0:
+        result.append(prev_block[current] + 1)
+        current = prev_pos[current]
+        
+    result.reverse()
+    print(k)
+    print(' '.join(map(str, result)))
 
 if __name__ == "__main__":
     main()

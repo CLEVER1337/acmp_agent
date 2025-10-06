@@ -1,45 +1,43 @@
 
 def main():
     with open("INPUT.TXT", "r") as f:
-        N, A, B = map(int, f.read().split())
+        data = f.read().split()
+        N = int(data[0])
+        A = int(data[1])
+        B = int(data[2])
     
-    result = 0
-    for red_in_boxes in range(min(A, N) + 1):
-        for blue_in_boxes in range(min(B, N) + 1):
-            if red_in_boxes + blue_in_boxes <= N:
-                ways_red = comb(A, red_in_boxes)
-                ways_blue = comb(B, blue_in_boxes)
-                ways_distribute_red = stirling(red_in_boxes, N - blue_in_boxes)
-                ways_distribute_blue = stirling(blue_in_boxes, N - red_in_boxes)
-                result += ways_red * ways_blue * ways_distribute_red * ways_distribute_blue
+    dp = [[[[0 for _ in range(B+1)] for _ in range(A+1)] for _ in range(B+1)] for _ in range(A+1)]
+    dp[0][0][0][0] = 1
+    
+    for box in range(N):
+        new_dp = [[[[0 for _ in range(B+1)] for _ in range(A+1)] for _ in range(B+1)] for _ in range(A+1)]
+        for a_used in range(A+1):
+            for b_used in range(B+1):
+                for a_left in range(A+1 - a_used):
+                    for b_left in range(B+1 - b_used):
+                        if dp[a_used][b_used][a_left][b_left] == 0:
+                            continue
+                        current = dp[a_used][b_used][a_left][b_left]
+                        
+                        for red in range(0, min(a_left, A - a_used) + 1):
+                            for blue in range(0, min(b_left, B - b_used) + 1):
+                                new_a_used = a_used + red
+                                new_b_used = b_used + blue
+                                new_a_left = a_left - red
+                                new_b_left = b_left - blue
+                                new_dp[new_a_used][new_b_used][new_a_left][new_b_left] += current
+        
+        dp = new_dp
+    
+    total = 0
+    for a_used in range(A+1):
+        for b_used in range(B+1):
+            for a_left in range(A+1 - a_used):
+                for b_left in range(B+1 - b_used):
+                    total += dp[a_used][b_used][a_left][b_left]
     
     with open("OUTPUT.TXT", "w") as f:
-        f.write(str(result))
-
-def comb(n, k):
-    if k < 0 or k > n:
-        return 0
-    result = 1
-    for i in range(1, k + 1):
-        result = result * (n - k + i) // i
-    return result
-
-def stirling(k, n):
-    if k == 0:
-        return 1 if n >= 0 else 0
-    total = 0
-    for j in range(k + 1):
-        sign = 1 if j % 2 == 0 else -1
-        total += sign * comb(k, j) * (k - j) ** n
-    return total // factorial(k)
-
-def factorial(n):
-    if n == 0:
-        return 1
-    result = 1
-    for i in range(1, n + 1):
-        result *= i
-    return result
+        f.write(str(total))
 
 if __name__ == "__main__":
     main()

@@ -3,81 +3,65 @@ import sys
 
 def main():
     data = sys.stdin.read().split()
-    k = int(data[0])
-    m = list(map(int, data[1:1+k]))
-    
-    n = sum(m)
-    if n == 0:
+    if not data:
         print(0)
         return
         
-    result = []
-    stack = []
-    i = 0
-    while i < k:
-        count = 1
-        while i + 1 < k and m[i] == m[i+1]:
-            count += 1
-            i += 1
-        stack.append((m[i], count))
-        i += 1
-        
-    def dfs(pos, current_len, current_count, path):
-        if pos == len(stack):
-            if current_count > 0:
-                path.append((current_len, current_count))
-            if path:
-                res = []
-                for l, cnt in path:
-                    res.extend([l] * cnt)
-                result.append(res)
-            else:
-                result.append([])
-            return
-            
-        l, cnt = stack[pos]
-        if current_count == 0:
-            for take in range(cnt + 1):
-                rem = cnt - take
-                if rem == 0:
-                    dfs(pos + 1, 0, 0, path + [(l, take)])
-                else:
-                    if take > 0:
-                        dfs(pos + 1, l, rem, path + [(l, take - 1)])
-                    else:
-                        dfs(pos + 1, l, rem, path)
-        else:
-            if l < current_len:
-                return
-            min_take = max(0, cnt - (current_len - l if current_len > l else 0))
-            for take in range(min_take, cnt + 1):
-                rem = cnt - take
-                if rem == 0:
-                    if l == current_len:
-                        dfs(pos + 1, 0, 0, path + [(current_len, current_count + take)])
-                    else:
-                        dfs(pos + 1, 0, 0, path + [(current_len, current_count), (l, take)])
-                else:
-                    if l == current_len:
-                        dfs(pos + 1, l, current_count + rem, path + [(current_len, take)])
-                    else:
-                        dfs(pos + 1, l, rem, path + [(current_len, current_count), (l, take)])
-                        
-    dfs(0, 0, 0, [])
+    k = int(data[0])
+    m = list(map(int, data[1:1+k]))
     
-    result = sorted(result, key=lambda x: (-len(x), x))
-    unique_result = []
-    for i, res in enumerate(result):
-        if i == 0 or res != result[i-1]:
-            unique_result.append(res)
+    total = sum(m)
+    if total == 0:
+        print(1)
+        print(0)
+        return
+        
+    n = len(m)
+    res = []
+    
+    for i in range(n):
+        if i == n - 1 or m[i] > m[i+1]:
+            if m[i] > 1:
+                new_m = m.copy()
+                new_m[i] -= 1
+                if i == n - 1 or new_m[i] >= new_m[i+1]:
+                    res.append(new_m)
+                else:
+                    j = i + 1
+                    while j < n and new_m[i] < new_m[j]:
+                        j += 1
+                    temp = new_m[i]
+                    new_m = new_m[:i+1] + [temp] + new_m[i+1:j] + new_m[j+1:]
+                    res.append(new_m)
+            else:
+                new_m = m[:i] + m[i+1:]
+                res.append(new_m)
+                
+        if i < n - 1 and m[i] == m[i+1]:
+            if i == 0 or m[i-1] > m[i]:
+                new_m = m.copy()
+                new_m[i] -= 1
+                new_m[i+1] -= 1
+                if new_m[i] == 0:
+                    new_m = new_m[:i] + new_m[i+2:]
+                elif new_m[i+1] == 0:
+                    new_m = new_m[:i+1] + new_m[i+2:]
+                res.append(new_m)
+                
+    unique_res = []
+    seen = set()
+    for diagram in res:
+        key = tuple(diagram)
+        if key not in seen:
+            seen.add(key)
+            unique_res.append(diagram)
             
-    print(len(unique_result))
-    for res in unique_result:
-        if not res:
-            print(0)
-        else:
-            print(len(res), end=' ')
-            print(' '.join(map(str, res)))
-            
-if __name__ == '__main__':
+    unique_res.sort(key=lambda x: (-len(x), x))
+    
+    print(len(unique_res))
+    for diagram in unique_res:
+        print(len(diagram), end=' ')
+        print(' '.join(map(str, diagram)))
+        
+if __name__ == "__main__":
     main()

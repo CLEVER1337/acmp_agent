@@ -1,6 +1,10 @@
 
-def read_image(f, n, m):
-    return [f.readline().strip() for _ in range(n)]
+def read_image():
+    n, m = map(int, input().split())
+    image = []
+    for _ in range(n):
+        image.append(input().strip())
+    return image
 
 def rotate_90(image):
     return [''.join(image[i][j] for i in range(len(image)-1, -1, -1)) for j in range(len(image[0]))]
@@ -18,19 +22,13 @@ def generate_variants(image):
     return variants
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        n1, m1 = map(int, f.readline().split())
-        img1 = read_image(f, n1, m1)
-        n2, m2 = map(int, f.readline().split())
-        img2 = read_image(f, n2, m2)
+    image1 = read_image()
+    image2 = read_image()
     
-    if n1 != n2 or m1 != m2:
-        print("No")
-        return
+    variants1 = generate_variants(image1)
     
-    variants = generate_variants(img1)
-    for variant in variants:
-        if variant == img2:
+    for variant in variants1:
+        if variant == image2:
             print("Yes")
             return
     

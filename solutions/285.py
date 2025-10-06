@@ -6,26 +6,15 @@ def main():
     m = int(data[1])
     a = list(map(int, data[2:2+n]))
     
-    total_burn = sum(a)
-    max_burn = total_burn + n - 1
+    total = sum(a)
+    min_time = total - (n - 1)
+    max_time = total
     
-    if m < min(a) or m > max_burn:
+    if m < min_time or m > max_time:
         print("no")
         return
         
-    min_time = 0
-    max_time = 0
-    for i in range(n):
-        min_time += a[i]
-        max_time += a[i] + 1
-    
-    min_time -= 1
-    max_time -= 1
-    
-    if min_time <= m <= max_time:
-        print("yes")
-    else:
-        print("no")
+    print("yes")
 
 if __name__ == "__main__":
     main()

@@ -1,14 +1,19 @@
 
-n = int(input().strip())
+def main():
+    n = int(input().strip())
+    if n <= 0:
+        print("0 0")
+        return
+        
+    min_val = (n + 5) // 6
+    max_val = n * 6
+    
+    if n % 6 != 0:
+        min_val = (n // 6) * 2 + (7 - (n % 6))
+    else:
+        min_val = n // 6 * 2
+        
+    print(f"{min_val} {max_val}")
 
-if n <= 0:
-    print("0 0")
-else:
-    min_second = (n + 5) // 6 * 2
-    max_second = (n + 1) // 2 * 7
-    
-    if n % 2 == 1:
-        min_second = max(min_second, 7)
-        max_second = max_second - 1
-    
-    print(f"{min_second} {max_second}")
+if __name__ == "__main__":
+    main()

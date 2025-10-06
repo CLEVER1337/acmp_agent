@@ -1,6 +1,5 @@
 
 import sys
-from collections import deque
 
 def main():
     data = sys.stdin.read().split()
@@ -9,35 +8,40 @@ def main():
     
     n = int(data[0])
     m = int(data[1])
-    graph = [[] for _ in range(n)]
+    graph = [[0] * n for _ in range(n)]
     
-    for i in range(m):
-        u = int(data[2 + i*2]) - 1
-        v = int(data[2 + i*2 + 1]) - 1
-        graph[u].append(v)
-    
-    def bfs(start):
-        dist = [-1] * n
-        q = deque()
-        dist[start] = 0
-        q.append(start)
+    index = 2
+    for _ in range(m):
+        u = int(data[index]) - 1
+        v = int(data[index + 1]) - 1
+        index += 2
+        graph[u][v] = 1
         
-        while q:
-            u = q.popleft()
-            for v in graph[u]:
-                if dist[v] == -1:
-                    dist[v] = dist[u] + 1
-                    q.append(v)
-        return dist
+    dist = [[float('inf')] * n for _ in range(n)]
     
-    max_k = 0
     for i in range(n):
-        dist = bfs(i)
+        dist[i][i] = 0
+        
+    for i in range(n):
         for j in range(n):
-            if i != j:
-                max_k = max(max_k, dist[j])
-    
-    print(max_k)
+            if graph[i][j]:
+                dist[i][j] = 0
+            elif i != j:
+                dist[i][j] = 1
+                
+    for k in range(n):
+        for i in range(n):
+            for j in range(n):
+                if dist[i][j] > dist[i][k] + dist[k][j]:
+                    dist[i][j] = dist[i][k] + dist[k][j]
+                    
+    ans = 0
+    for i in range(n):
+        for j in range(n):
+            if dist[i][j] > ans:
+                ans = dist[i][j]
+                
+    print(ans)
 
 if __name__ == "__main__":
     main()

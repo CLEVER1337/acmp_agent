@@ -1,14 +1,6 @@
 
 def main():
-    import sys
-    data = sys.stdin.read().split()
-    if not data:
-        print(-1)
-        return
-        
-    n = int(data[0])
-    m = int(data[1])
-    
+    n, m = map(int, input().split())
     if n == 0 and m == 0:
         print(0)
         return
@@ -17,26 +9,23 @@ def main():
         print(-1)
         return
         
-    attacks = 0
-    heads = n
-    tails = m
-    
-    while heads > 0 or tails > 0:
-        if tails >= 2:
-            tails -= 2
-            heads += 1
-            attacks += 1
-        elif heads >= 2:
-            heads -= 2
-            attacks += 1
-        elif tails == 1:
-            tails += 1
-            attacks += 1
+    count = 0
+    while n > 0 or m > 0:
+        if m % 2 != 0:
+            m += 1
+            count += 1
+        elif n > 0:
+            n -= 2
+            count += 1
         else:
+            m -= 2
+            count += 1
+            
+        if count > 100000:
             print(-1)
             return
             
-    print(attacks)
+    print(count)
 
 if __name__ == "__main__":
     main()

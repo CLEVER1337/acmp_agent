@@ -1,41 +1,57 @@
 
 from itertools import permutations
 
-def get_transpositions(word):
-    trans = set()
-    n = len(word)
-    for i in range(n):
-        for j in range(i + 1, n):
-            lst = list(word)
-            lst[i], lst[j] = lst[j], lst[i]
-            trans.add(''.join(lst))
-    return trans
-
-def solve():
-    letters = input().strip()
-    all_words = set(''.join(p) for p in permutations(letters))
+def main():
+    s = input().strip()
+    perms = set(permutations(s))
+    words = [''.join(p) for p in perms]
     
-    selected = set()
-    transpositions_cache = {}
+    graph = {}
+    for word in words:
+        graph[word] = set()
+        n = len(word)
+        for i in range(n):
+            for j in range(i+1, n):
+                swapped = list(word)
+                swapped[i], swapped[j] = swapped[j], swapped[i]
+                neighbor = ''.join(swapped)
+                if neighbor != word and neighbor in graph:
+                    graph[word].add(neighbor)
+                    graph[neighbor].add(word)
     
-    for word in sorted(all_words):
-        if word in selected:
-            continue
+    independent_sets = []
+    current_set = set()
+    used = set()
+    
+    def backtrack(idx):
+        if idx == len(words):
+            independent_sets.append(current_set.copy())
+            return
+        
+        word = words[idx]
+        if word not in used:
+            can_add = True
+            for neighbor in graph[word]:
+                if neighbor in current_set:
+                    can_add = False
+                    break
             
-        word_trans = get_transpositions(word)
-        transpositions_cache[word] = word_trans
-        
-        conflict = False
-        for selected_word in selected:
-            if word in transpositions_cache[selected_word] or selected_word in word_trans:
-                conflict = True
-                break
-        
-        if not conflict:
-            selected.add(word)
+            if can_add:
+                current_set.add(word)
+                used.add(word)
+                backtrack(idx + 1)
+                current_set.remove(word)
+                used.remove(word)
+            
+            backtrack(idx + 1)
+        else:
+            backtrack(idx + 1)
     
-    for word in sorted(selected):
+    backtrack(0)
+    
+    max_set = max(independent_sets, key=len)
+    for word in sorted(max_set):
         print(word)
 
-if __name__ == '__main__':
-    solve()
+if __name__ == "__main__":
+    main()

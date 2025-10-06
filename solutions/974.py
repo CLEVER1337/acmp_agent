@@ -2,14 +2,19 @@
 import sys
 
 def main():
-    data = sys.stdin.read().splitlines()
+    data = sys.stdin.read().split()
+    index = 0
     results = []
-    for line in data:
-        a, b, c = map(int, line.split())
+    while index < len(data):
+        a = int(data[index])
+        b = int(data[index+1])
+        c = int(data[index+2])
+        index += 3
         if a == 0 and b == 0 and c == 0:
             break
         stones = sorted([a, b, c])
-        if stones[0] ^ stones[1] == stones[2]:
+        x, y, z = stones
+        if (x ^ y ^ z) == 0:
             results.append("Bob")
         else:
             results.append("Alice")

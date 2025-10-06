@@ -1,80 +1,106 @@
 
+import math
+
 def main():
-    with open("INPUT.TXT", "r") as f:
+    with open('INPUT.TXT', 'r') as f:
         data = f.read().split()
-        A, B, C, D = map(int, data)
+        A = int(data[0])
+        B = int(data[1])
+        C = int(data[2])
+        D = int(data[3])
     
     if A == 0 and B == 0 and C == 0:
         if D == 0:
-            with open("OUTPUT.TXT", "w") as f:
-                f.write("-1")
-            return
+            print(-1)
         else:
-            roots = []
-    elif A == 0 and B == 0:
-        if C != 0 and D % C == 0:
-            roots = [-D // C]
+            print(0)
+        return
+    
+    if A == 0 and B == 0:
+        x = -D / C
+        if x.is_integer():
+            print(1)
+            print(int(x))
         else:
-            roots = []
-    elif A == 0:
+            print(0)
+        return
+    
+    if A == 0:
         discriminant = C * C - 4 * B * D
         if discriminant < 0:
-            roots = []
+            print(0)
+            return
         elif discriminant == 0:
-            if C % (2 * B) == 0:
-                roots = [-C // (2 * B)]
+            x = -C / (2 * B)
+            if x.is_integer():
+                print(1)
+                print(int(x))
             else:
-                roots = []
+                print(0)
         else:
-            root1 = (-C + discriminant**0.5) / (2 * B)
-            root2 = (-C - discriminant**0.5) / (2 * B)
-            roots = []
-            if abs(root1 - round(root1)) < 1e-10:
-                roots.append(int(round(root1)))
-            if abs(root2 - round(root2)) < 1e-10:
-                roots.append(int(round(root2)))
-            roots = sorted(list(set(roots)))
-    else:
-        roots = []
-        divisors_D = set()
-        divisors_A = set()
-        
-        for i in range(1, int(abs(D))**0.5 + 1):
-            if D != 0 and abs(D) % i == 0:
-                divisors_D.add(i)
-                divisors_D.add(-i)
-                divisors_D.add(D // i)
-                divisors_D.add(-D // i)
-        
-        for i in range(1, int(abs(A))**0.5 + 1):
-            if A != 0 and abs(A) % i == 0:
-                divisors_A.add(i)
-                divisors_A.add(-i)
-                divisors_A.add(A // i)
-                divisors_A.add(-A // i)
-        
-        candidates = set()
-        if D == 0:
-            candidates.add(0)
-        
-        for p in divisors_D:
-            for q in divisors_A:
-                if q != 0 and p % q == 0:
-                    candidate = p // q
-                    candidates.add(candidate)
-                    candidates.add(-candidate)
-        
-        for x in candidates:
-            if A*x*x*x + B*x*x + C*x + D == 0:
-                roots.append(x)
-        
-        roots = sorted(list(set(roots)))
+            sqrt_discr = math.isqrt(discriminant)
+            if sqrt_discr * sqrt_discr != discriminant:
+                print(0)
+                return
+            
+            x1 = (-C - sqrt_discr) / (2 * B)
+            x2 = (-C + sqrt_discr) / (2 * B)
+            roots = set()
+            if x1.is_integer():
+                roots.add(int(x1))
+            if x2.is_integer():
+                roots.add(int(x2))
+            
+            roots = sorted(roots)
+            print(len(roots))
+            for root in roots:
+                print(root)
+        return
     
-    with open("OUTPUT.TXT", "w") as f:
-        if len(roots) == 0:
-            f.write("0")
-        else:
-            f.write(f"{len(roots)} " + " ".join(map(str, roots)))
+    def f(x):
+        return A * x * x * x + B * x * x + C * x + D
+    
+    roots = set()
+    divisors_D = set()
+    divisors_A = set()
+    
+    d_abs = abs(D)
+    a_abs = abs(A)
+    
+    for i in range(1, int(math.isqrt(d_abs)) + 1):
+        if d_abs % i == 0:
+            divisors_D.add(i)
+            divisors_D.add(-i)
+            divisors_D.add(d_abs // i)
+            divisors_D.add(-(d_abs // i))
+    
+    for i in range(1, int(math.isqrt(a_abs)) + 1):
+        if a_abs % i == 0:
+            divisors_A.add(i)
+            divisors_A.add(-i)
+            divisors_A.add(a_abs // i)
+            divisors_A.add(-(a_abs // i))
+    
+    divisors_D.add(0)
+    
+    candidates = set()
+    for p in divisors_D:
+        for q in divisors_A:
+            if q != 0:
+                candidate = p / q
+                if candidate.is_integer():
+                    candidates.add(int(candidate))
+                else:
+                    candidates.add(candidate)
+    
+    for candidate in candidates:
+        if isinstance(candidate, int) and f(candidate) == 0:
+            roots.add(candidate)
+    
+    roots = sorted(roots)
+    print(len(roots))
+    for root in roots:
+        print(root)
 
 if __name__ == "__main__":
     main()

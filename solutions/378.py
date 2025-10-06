@@ -13,7 +13,7 @@ def main():
         for s in range(max_sum, num - 1, -1):
             if dp[s - num]:
                 dp[s] = True
-                
+    
     count = sum(dp)
     print(count)
 

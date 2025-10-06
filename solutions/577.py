@@ -1,7 +1,9 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        N, M = map(int, f.readline().split())
+    import sys
+    data = sys.stdin.readline().split()
+    N = int(data[0])
+    M = int(data[1])
     
     count = [0] * 10
     
@@ -12,10 +14,9 @@ def main():
                 digit = product % 10
                 count[digit] += 1
                 product //= 10
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        for cnt in count:
-            f.write(f"{cnt}\n")
+                
+    for i in range(10):
+        print(count[i])
 
 if __name__ == "__main__":
     main()

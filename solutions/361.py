@@ -5,24 +5,32 @@ def main():
     max_len = 0
     
     for i in range(n):
-        for j in range(i + 1, n + 1):
-            substr1 = s[i:j]
-            freq1 = [0] * 26
-            for c in substr1:
-                freq1[ord(c) - ord('a')] += 1
+        for j in range(i + 1, n):
+            length = j - i + 1
+            if length <= max_len:
+                continue
                 
-            for k in range(i + 1, n):
-                for l in range(k + len(substr1), n + 1):
-                    substr2 = s[k:l]
-                    if len(substr2) != len(substr1):
-                        continue
-                    freq2 = [0] * 26
-                    for c in substr2:
-                        freq2[ord(c) - ord('a')] += 1
+            substr1 = s[i:j+1]
+            count1 = [0] * 26
+            for c in substr1:
+                count1[ord(c) - ord('a')] += 1
+                
+            for k in range(i + 1, n - length + 1):
+                substr2 = s[k:k+length]
+                count2 = [0] * 26
+                for c in substr2:
+                    count2[ord(c) - ord('a')] += 1
                     
-                    if freq1 == freq2:
-                        max_len = max(max_len, len(substr1))
-    
+                match = True
+                for idx in range(26):
+                    if count1[idx] != count2[idx]:
+                        match = False
+                        break
+                        
+                if match:
+                    max_len = max(max_len, length)
+                    break
+                    
     print(max_len)
 
 if __name__ == "__main__":

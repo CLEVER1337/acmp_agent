@@ -9,19 +9,14 @@ def main():
         return
         
     n, k = map(int, data[0].split())
-    graph = [['' for _ in range(n+1)] for _ in range(n+1)]
-    
-    for i in range(1, n+1):
-        line = data[i].strip()
-        for j in range(1, n+1):
-            if i == j:
-                continue
-            graph[i][j] = line[j-1]
+    graph = []
+    for i in range(1, 1+n):
+        graph.append(data[i].strip())
     
     routes = []
-    for i in range(n+1, n+1+k):
-        route = list(map(int, data[i].split()))
-        routes.append(route)
+    for i in range(1+n, 1+n+k):
+        parts = list(map(int, data[i].split()))
+        routes.append(parts)
     
     in_degree = [0] * (n+1)
     adj = [[] for _ in range(n+1)]
@@ -29,33 +24,46 @@ def main():
     constraints = {}
     for route in routes:
         for i in range(len(route)-1):
-            u, v = route[i], route[i+1]
+            u = route[i]
+            v = route[i+1]
             if u not in constraints:
                 constraints[u] = set()
             constraints[u].add(v)
+            for j in range(i+2, len(route)):
+                w = route[j]
+                constraints[u].add(w)
     
     for u in range(1, n+1):
         for v in range(1, n+1):
             if u == v:
                 continue
-            if graph[u][v] == '+':
-                adj[u].append(v)
-                in_degree[v] += 1
-            elif graph[u][v] == '-':
-                adj[v].append(u)
-                in_degree[u] += 1
-    
-    for u in constraints:
-        for v in constraints[u]:
-            if v not in adj[u]:
-                adj[u].append(v)
-                in_degree[v] += 1
+            if u in constraints and v in constraints[u]:
+                if graph[u-1][v-1] == '+':
+                    adj[u].append(v)
+                    in_degree[v] += 1
+                else:
+                    print(-1)
+                    return
+            elif v in constraints and u in constraints[v]:
+                if graph[u-1][v-1] == '-':
+                    adj[u].append(v)
+                    in_degree[v] += 1
+                else:
+                    print(-1)
+                    return
+            else:
+                if graph[u-1][v-1] == '+':
+                    adj[u].append(v)
+                    in_degree[v] += 1
+                elif graph[u-1][v-1] == '-':
+                    adj[v].append(u)
+                    in_degree[u] += 1
     
     q = deque()
     for i in range(1, n+1):
         if in_degree[i] == 0:
             q.append(i)
-    
+            
     result = []
     while q:
         if len(q) > 1:
@@ -67,7 +75,7 @@ def main():
             in_degree[v] -= 1
             if in_degree[v] == 0:
                 q.append(v)
-    
+                
     if len(result) != n:
         print(-1)
     else:

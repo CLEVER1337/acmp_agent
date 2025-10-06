@@ -2,32 +2,37 @@
 import math
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        n = int(f.readline().strip())
-        lengths = list(map(int, f.readline().split()))
+    n = int(input().strip())
+    L = list(map(int, input().split()))
     
-    total_length = sum(lengths)
-    max_side = total_length // 2
+    total = sum(L)
+    half = total / 2.0
     
-    dp = [False] * (max_side + 1)
+    dp = [False] * (int(total) + 1)
     dp[0] = True
     
-    for l in lengths:
-        for j in range(max_side, l - 1, -1):
-            if dp[j - l]:
-                dp[j] = True
+    for length in L:
+        for j in range(len(dp) - 1, -1, -1):
+            if dp[j] and j + length < len(dp):
+                dp[j + length] = True
     
-    best_a = 0
-    for a in range(max_side, 0, -1):
-        if dp[a]:
-            b = total_length - 2 * a
-            if b > 0:
-                area = math.sqrt(a * b * a * b) / 4
-                if area > best_a:
-                    best_a = area
+    best_diff = float('inf')
+    best_sum = 0
     
-    with open("OUTPUT.TXT", "w") as f:
-        f.write("{:.2f}".format(best_a))
-
-if __name__ == "__main__":
-    main()
+    for s in range(len(dp)):
+        if dp[s]:
+            if abs(s - half) < best_diff:
+                best_diff = abs(s - half)
+                best_sum = s
+    
+    a = best_sum
+    b = total - best_sum
+    
+    if a > b:
+        a, b = b, a
+    
+    if a <= 0 or b <= 0:
+        print(0.0)
+    else:
+        area = math.sqrt(a * a - (a * a + b * b - total * total) ** 2 / (4.0 * b * b)) * b / 2.0
+        print("{:.10f}".format(area))

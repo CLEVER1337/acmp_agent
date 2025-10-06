@@ -8,63 +8,69 @@ def main():
     K = int(data[0])
     N = int(data[1])
     M = int(data[2])
-    
     grid = []
     index = 3
+    start = None
+    end = None
+    
     for i in range(N):
         row = list(map(int, data[index:index+M]))
         index += M
         grid.append(row)
-    
-    start = None
-    end = None
-    for i in range(N):
         for j in range(M):
-            if grid[i][j] == 2:
+            if row[j] == 2:
                 start = (i, j)
-            elif grid[i][j] == 3:
+            elif row[j] == 3:
                 end = (i, j)
     
-    if not start or not end:
-        print(-1)
-        return
-    
     directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-    visited = [[[[False] * (K+1) for _ in range(4)] for _ in range(M)] for _ in range(N)]
+    INF = float('inf')
+    dist = [[[[INF] * (K+1) for _ in range(4)] for _ in range(M)] for _ in range(N)]
     
     queue = deque()
-    start_x, start_y = start
     for d in range(4):
-        queue.append((start_x, start_y, d, 0, 0))
-        visited[start_x][start_y][d][0] = True
+        dist[start[0]][start[1]][d][0] = 0
+        queue.append((start[0], start[1], d, 0))
     
     while queue:
-        x, y, direction, turns, time = queue.popleft()
+        x, y, dir_idx, turns = queue.popleft()
+        current_dist = dist[x][y][dir_idx][turns]
         
         if (x, y) == end:
-            print(time)
-            return
+            continue
+            
+        dx, dy = directions[dir_idx]
+        nx, ny = x + dx, y + dy
+        if 0 <= nx < N and 0 <= ny < M and grid[nx][ny] != 1:
+            if dist[nx][ny][dir_idx][turns] > current_dist + 1:
+                dist[nx][ny][dir_idx][turns] = current_dist + 1
+                queue.append((nx, ny, dir_idx, turns))
         
-        for dx, dy in directions:
-            nx, ny = x + dx, y + dy
-            new_direction = directions.index((dx, dy))
-            new_turns = turns
-            
-            if new_direction != direction:
-                if (new_direction - direction) % 4 == 1:
-                    new_turns += 1
-                elif (new_direction - direction) % 4 == 3:
-                    new_turns += 1
-            
-            if new_turns > K:
+        for new_dir in range(4):
+            if new_dir == dir_idx:
                 continue
-            
-            if 0 <= nx < N and 0 <= ny < M:
-                if grid[nx][ny] != 1 and not visited[nx][ny][new_direction][new_turns]:
-                    visited[nx][ny][new_direction][new_turns] = True
-                    queue.append((nx, ny, new_direction, new_turns, time + 1))
+                
+            turn_cost = 1
+            if (dir_idx + 1) % 4 == new_dir:
+                new_turns = turns + 1
+            else:
+                new_turns = turns
+                
+            if new_turns <= K:
+                if dist[x][y][new_dir][new_turns] > current_dist + turn_cost:
+                    dist[x][y][new_dir][new_turns] = current_dist + turn_cost
+                    queue.append((x, y, new_dir, new_turns))
     
-    print(-1)
+    result = INF
+    for d in range(4):
+        for t in range(K+1):
+            result = min(result, dist[end[0]][end[1]][d][t])
+    
+    if result == INF:
+        result = -1
+        
+    with open('OUTPUT.TXT', 'w') as f:
+        f.write(str(result))
 
 if __name__ == "__main__":
     main()

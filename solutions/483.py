@@ -1,21 +1,56 @@
 
-n = int(input())
-s = input().strip()
+import sys
 
-if s == '0' * n:
-    print('0')
-else:
-    if s[-1] == '1':
-        print(s)
-    else:
-        count = 0
-        for i in range(len(s)-1, -1, -1):
-            if s[i] == '0':
-                count += 1
-            else:
-                break
-        if count == 0:
-            print(s)
-        else:
-            result = s[:-count] + '0' * (count - 1) + '1'
-            print(result)
+def main():
+    data = sys.stdin.read().splitlines()
+    n = int(data[0])
+    s = data[1].strip()
+    
+    if n == 0:
+        print("0")
+        return
+        
+    if all(c == '0' for c in s):
+        print("0")
+        return
+        
+    if s == '1':
+        print("0")
+        return
+        
+    if s == '0':
+        print("0")
+        return
+        
+    result = []
+    i = 0
+    while i < n and s[i] == '0':
+        i += 1
+        
+    if i == n:
+        print("0")
+        return
+        
+    s = s[i:]
+    n = len(s)
+    
+    if n == 1:
+        print("0")
+        return
+        
+    k = n - 1
+    while k >= 0 and s[k] == '0':
+        k -= 1
+        
+    if k < 0:
+        print("0")
+        return
+        
+    result = ['1'] * (k + 1)
+    for i in range(k + 1, n):
+        result.append('0')
+        
+    print(''.join(result))
+
+if __name__ == "__main__":
+    main()

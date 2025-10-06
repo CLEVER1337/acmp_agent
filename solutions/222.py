@@ -21,52 +21,30 @@ def main():
         index += 3
         trees.append((x, y, r))
     
-    for tree in trees:
-        x, y, r = tree
+    for x, y, r in trees:
         dx = obs_x - x
         dy = obs_y - y
-        dist = math.sqrt(dx*dx + dy*dy)
+        dist_sq = dx*dx + dy*dy
+        r_sq = r*r
         
-        if dist <= r:
+        if dist_sq <= r_sq:
             print("NO")
             return
-    
-    angles = []
-    for tree in trees:
-        x, y, r = tree
-        dx = x - obs_x
-        dy = y - obs_y
-        dist = math.sqrt(dx*dx + dy*dy)
-        
-        angle_center = math.atan2(dy, dx)
-        angle_half = math.asin(r / dist)
-        
-        start_angle = angle_center - angle_half
-        end_angle = angle_center + angle_half
-        
-        angles.append((start_angle, end_angle))
-    
-    for i in range(len(angles)):
-        start1, end1 = angles[i]
-        while end1 < start1:
-            end1 += 2 * math.pi
-        
-        for j in range(i + 1, len(angles)):
-            start2, end2 = angles[j]
-            while end2 < start2:
-                end2 += 2 * math.pi
             
-            if start1 <= start2 <= end1 or start1 <= end2 <= end1:
-                continue
-            if start2 <= start1 <= end2 or start2 <= end1 <= end2:
-                continue
+    for i in range(n):
+        x1, y1, r1 = trees[i]
+        for j in range(i + 1, n):
+            x2, y2, r2 = trees[j]
+            dx = x2 - x1
+            dy = y2 - y1
+            dist_sq = dx*dx + dy*dy
+            sum_r = r1 + r2
+            diff_r = abs(r1 - r2)
             
-            if start1 + 2 * math.pi <= end2 or start2 + 2 * math.pi <= end1:
-                continue
+            if dist_sq <= sum_r * sum_r and dist_sq >= diff_r * diff_r:
+                print("NO")
+                return
                 
-            print("NO")
-            return
-    
     print("YES")
 
 if __name__ == "__main__":

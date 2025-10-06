@@ -1,25 +1,28 @@
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        N, K = map(int, f.readline().split())
+    import sys
+    data = sys.stdin.read().split()
+    N = int(data[0])
+    K = int(data[1])
     
     if (K - N) % 2 != 0 or K < N:
         print(0)
         return
-    
-    steps_to_target = (K - N) // 2
+        
+    steps_to_reach = (K - N) // 2
     total_steps = K
     
-    def comb(n, k):
-        if k < 0 or k > n:
-            return 0
-        result = 1
-        for i in range(1, k + 1):
-            result = result * (n - i + 1) // i
-        return result
+    dp = [[0] * (total_steps + 2) for _ in range(total_steps + 2)]
+    dp[0][0] = 1
     
-    result = comb(total_steps, steps_to_target)
-    print(result)
+    for step in range(1, total_steps + 1):
+        for pos in range(0, total_steps + 1):
+            if pos > 0:
+                dp[step][pos] += dp[step - 1][pos - 1]
+            if pos + 1 <= total_steps:
+                dp[step][pos] += dp[step - 1][pos + 1]
+                
+    print(dp[total_steps][N])
 
 if __name__ == "__main__":
     main()

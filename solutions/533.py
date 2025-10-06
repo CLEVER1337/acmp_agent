@@ -1,12 +1,13 @@
 
 import sys
-from collections import defaultdict
+from math import gcd
 
 def main():
     data = sys.stdin.read().split()
     if not data:
+        print(0)
         return
-    
+        
     n = int(data[0])
     points = []
     index = 1
@@ -16,27 +17,35 @@ def main():
         index += 2
         points.append((x, y))
     
-    result = 0
-    
+    total = 0
     for i in range(n):
-        dist_count = defaultdict(int)
-        same_point_count = 0
-        
+        vectors = []
         for j in range(n):
             if i == j:
                 continue
-                
-            dx = points[i][0] - points[j][0]
-            dy = points[i][1] - points[j][1]
-            dist_sq = dx * dx + dy * dy
-            
-            dist_count[dist_sq] += 1
+            dx = points[j][0] - points[i][0]
+            dy = points[j][1] - points[i][1]
+            g = gcd(dx, dy)
+            if g == 0:
+                continue
+            dx //= g
+            dy //= g
+            if dx < 0 or (dx == 0 and dy < 0):
+                dx = -dx
+                dy = -dy
+            vectors.append((dx, dy))
         
-        for count in dist_count.values():
-            if count >= 2:
-                result += count * (count - 1) // 2
+        vectors.sort()
+        count = 1
+        for k in range(1, len(vectors)):
+            if vectors[k] == vectors[k-1]:
+                count += 1
+            else:
+                total += count * (count - 1) // 2
+                count = 1
+        total += count * (count - 1) // 2
     
-    print(result)
+    print(total)
 
 if __name__ == "__main__":
     main()

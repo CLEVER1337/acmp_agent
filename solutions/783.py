@@ -1,25 +1,18 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        grid = [line.strip() for line in f.readlines()]
+    grid = []
+    for _ in range(8):
+        line = input().strip()
+        grid.append(line)
     
-    correct_colors = []
-    for i in range(8):
-        row = []
-        for j in range(8):
-            if (i + j) % 2 == 0:
-                row.append('W')
-            else:
-                row.append('B')
-        correct_colors.append(row)
-    
-    errors = 0
+    count = 0
     for i in range(8):
         for j in range(8):
-            if grid[i][j] != correct_colors[i][j]:
-                errors += 1
+            expected_color = 'W' if (i + j) % 2 == 0 else 'B'
+            if grid[i][j] != expected_color:
+                count += 1
     
-    print(min(errors, 64 - errors))
+    print(min(count, 64 - count))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

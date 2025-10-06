@@ -1,42 +1,41 @@
 
-import re
+import sys
 
 def main():
-    with open('input.txt', 'r', encoding='utf-8') as f:
-        lines = f.read().splitlines()
-    
-    if not lines:
+    data = sys.stdin.read().splitlines()
+    if not data:
         return
     
-    first_line = lines[0]
-    last_line = lines[-1]
-    
-    match = re.match(r'\d{2}:\d{2}:\d{2}: (\w+) signed on', first_line)
-    if match:
-        friend_name = match.group(1)
+    first_line = data[0].strip()
+    parts = first_line.split()
+    name = parts[1]
     
     output_lines = []
     
-    for i, line in enumerate(lines[1:-1]):
-        time_match = re.match(r'(\d{2}:\d{2}:\d{2}:) (.+)', line)
-        if not time_match:
+    for i in range(1, len(data) - 1):
+        line = data[i].strip()
+        time_end = line.find(' ')
+        if time_end == -1:
             continue
             
-        content = time_match.group(2).strip()
-        
-        if content.endswith('.'):
-            quoted_content = f'«{content[:-1]},»'
-        elif content.endswith('!') or content.endswith('?'):
-            quoted_content = f'«{content}»'
+        text_part = line[time_end + 1:]
+        if not text_part:
+            continue
+            
+        last_char = text_part[-1]
+        if last_char in '.!?':
+            if last_char == '.':
+                quoted_text = f'«{text_part[:-1]},»'
+            else:
+                quoted_text = f'«{text_part}»'
         else:
-            quoted_content = f'«{content},»'
-        
-        speaker = "Fedya" if i % 2 == 0 else friend_name
-        
-        output_lines.append(f'{quoted_content} --- skazal {speaker}.')
+            quoted_text = f'«{text_part},»'
+            
+        speaker = "Fedya" if i % 2 == 1 else name
+        output_lines.append(f"{quoted_text} --- skazal {speaker}.")
     
-    with open('OUTPUT.TXT', 'w', encoding='utf-8') as f:
-        f.write('\n'.join(output_lines))
+    for line in output_lines:
+        print(line)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

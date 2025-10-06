@@ -1,36 +1,43 @@
 
+import sys
+
 def is_prime(n):
-    if n < 2:
+    if n <= 1:
         return False
-    if n == 2:
+    if n <= 3:
         return True
-    if n % 2 == 0:
+    if n % 2 == 0 or n % 3 == 0:
         return False
-    i = 3
+    i = 5
     while i * i <= n:
-        if n % i == 0:
+        if n % i == 0 or n % (i + 2) == 0:
             return False
-        i += 2
+        i += 6
     return True
 
-def decrypt(s):
-    n = len(s)
+def main():
+    data = sys.stdin.read().strip()
+    if not data:
+        print("Impossible")
+        return
+        
+    n = len(data)
     groups = []
     left = 0
     right = n - 1
-    group_num = 1
+    group_id = 1
     
     while left <= right:
-        if group_num % 2 == 1:
-            size = min(group_num, right - left + 1)
-            groups.append(s[left:left+size])
-            left += size
+        if group_id % 2 == 1:
+            take = min(group_id, right - left + 1)
+            groups.append(data[left:left+take])
+            left += take
         else:
-            size = min(group_num, right - left + 1)
-            groups.append(s[right-size+1:right+1])
-            right -= size
-        group_num += 1
-    
+            take = min(group_id, right - left + 1)
+            groups.append(data[right-take+1:right+1])
+            right -= take
+        group_id += 1
+        
     decrypted = [''] * n
     pos = 0
     for i in range(0, len(groups), 2):
@@ -42,67 +49,27 @@ def decrypt(s):
         else:
             decrypted[pos:pos+len(groups[i])] = groups[i]
             pos += len(groups[i])
+            
+    original = ''.join(decrypted)
     
-    return ''.join(decrypted)
-
-def main():
-    with open('INPUT.TXT', 'r') as f:
-        encrypted = f.read().strip()
-    
-    if not encrypted:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write('Impossible')
+    primes = []
+    for i in range(2, n+1):
+        if is_prime(i):
+            primes.append(i)
+            
+    if not primes:
+        print("Impossible")
         return
-    
-    decrypted = decrypt(encrypted)
-    n = len(decrypted)
-    
+        
     result = []
-    current = []
-    in_word = False
-    
-    for i, char in enumerate(decrypted):
-        if char.isupper():
-            if in_word and current:
-                result.append(''.join(current))
-            current = [char]
-            in_word = True
-        elif char.islower() and in_word:
-            current.append(char)
-        else:
-            if current:
-                result.append(''.join(current))
-            current = []
-            in_word = False
-    
-    if current:
-        result.append(''.join(current))
-    
+    for idx in primes:
+        if idx - 1 < len(original):
+            result.append(original[idx-1])
+            
     if not result:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write('Impossible')
-        return
-    
-    primes = [i+1 for i in range(n) if is_prime(i+1)]
-    final_result = []
-    
-    for pos in primes:
-        if pos > len(result):
-            break
-        word_start = 0
-        for word in result:
-            word_end = word_start + len(word)
-            if word_start < pos <= word_end:
-                final_result.append(word)
-                break
-            word_start = word_end
-    
-    if not final_result:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write('Impossible')
+        print("Impossible")
     else:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write(''.join(final_result))
+        print(''.join(result))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,91 +1,44 @@
 
-import sys
-
-def convert_to_meters(length, unit):
-    if unit == 'm':
-        return length
-    elif unit == 'km':
-        return length * 1000
-    elif unit == 'mile':
-        return length * 1609
-    elif unit == 'uin':
-        return length * 33
-    elif unit == 'kairi':
-        return length * 1852
-    elif unit == 'zhang':
-        return length * 3
-    elif unit == 'sen':
-        return length * 38
-
-def heron(a, b, c):
-    s = (a + b + c) / 2
-    return (s * (s - a) * (s - b) * (s - c)) ** 0.5
-
 def main():
+    import sys
     data = sys.stdin.read().splitlines()
     n = int(data[0])
-    segments = []
+    conversion = {
+        'm': 1,
+        'km': 1000,
+        'mile': 1609,
+        'uin': 33,
+        'kairi': 1852,
+        'zhang': 3,
+        'sen': 38
+    }
     
+    lengths = []
     for i in range(1, n + 1):
         parts = data[i].split()
-        length = float(parts[0])
+        num = int(parts[0])
         unit = parts[1]
-        meters = convert_to_meters(length, unit)
-        segments.append((meters, i))
+        length_m = num * conversion[unit]
+        lengths.append((length_m, i))
     
-    segments.sort(key=lambda x: x[0])
-    lengths = [seg[0] for seg in segments]
+    lengths.sort(key=lambda x: x[0])
+    arr = [x[0] for x in lengths]
+    indices = [x[1] for x in lengths]
     
-    max_area = 0
-    best_triplet = None
+    max_area = 0.0
+    best_triple = None
     
-    for i in range(len(lengths) - 2):
-        a = lengths[i]
-        b = lengths[i + 1]
-        c = lengths[i + 2]
-        
+    for i in range(len(arr) - 2):
+        a, b, c = arr[i], arr[i+1], arr[i+2]
         if a + b > c:
-            area = heron(a, b, c)
+            p = (a + b + c) / 2.0
+            area = (p * (p - a) * (p - b) * (p - c)) ** 0.5
             if area > max_area:
                 max_area = area
-                best_triplet = (segments[i][1], segments[i+1][1], segments[i+2][1])
+                best_triple = (indices[i], indices[i+1], indices[i+2])
     
-    for i in range(len(lengths) - 3):
-        a = lengths[i]
-        b = lengths[i + 1]
-        c = lengths[i + 3]
-        
-        if a + b > c:
-            area = heron(a, b, c)
-            if area > max_area:
-                max_area = area
-                best_triplet = (segments[i][1], segments[i+1][1], segments[i+3][1])
-    
-    for i in range(len(lengths) - 3):
-        a = lengths[i]
-        b = lengths[i + 2]
-        c = lengths[i + 3]
-        
-        if a + b > c:
-            area = heron(a, b, c)
-            if area > max_area:
-                max_area = area
-                best_triplet = (segments[i][1], segments[i+2][1], segments[i+3][1])
-    
-    for i in range(len(lengths) - 4):
-        a = lengths[i]
-        b = lengths[i + 2]
-        c = lengths[i + 4]
-        
-        if a + b > c:
-            area = heron(a, b, c)
-            if area > max_area:
-                max_area = area
-                best_triplet = (segments[i][1], segments[i+2][1], segments[i+4][1])
-    
-    area_in_talang = max_area / 4
-    print(f"{area_in_talang:.10f}")
-    print(f"{best_triplet[0]} {best_triplet[1]} {best_triplet[2]}")
+    print("{:.10f}".format(max_area / 4.0))
+    print(" ".join(map(str, best_triple)))
 
 if __name__ == "__main__":
     main()

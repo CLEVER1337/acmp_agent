@@ -2,23 +2,30 @@
 import math
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        R, r, h, b = map(int, f.readline().split())
+    data = input().split()
+    R = int(data[0])
+    r = int(data[1])
+    h = int(data[2])
+    b = int(data[3])
     
-    # Вычисляем расстояние от центра ограды до точки касания дерева с землей
-    d = math.sqrt(b**2 - r**2)
-    
-    # Вычисляем угол между линией центр ограды - центр дерева и линией центр дерева - точка касания
-    alpha = math.asin(r / b)
-    
-    # Вычисляем максимальную высоту падающего дерева в точке касания
-    H_max = h * math.sin(alpha)
-    
-    # Проверяем условие: максимальная высота должна быть меньше расстояния от точки касания до ограды
-    if H_max < R - d:
-        print("YES")
+    d = b
+    if d < r:
+        d = r
+        
+    if d == 0:
+        if h <= R - r:
+            print("YES")
+        else:
+            print("NO")
     else:
-        print("NO")
+        sin_alpha = r / d
+        cos_alpha = math.sqrt(1 - sin_alpha * sin_alpha)
+        max_h = (R - d * cos_alpha) / sin_alpha
+        
+        if h <= max_h:
+            print("YES")
+        else:
+            print("NO")
 
 if __name__ == "__main__":
     main()

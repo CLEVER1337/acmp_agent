@@ -1,18 +1,17 @@
 
-def is_beautiful(num):
-    s = str(num)
-    total = sum(int(d) for d in s)
-    return total % len(s) == 0
-
-def find_nth_beautiful(n):
+def main():
+    N = int(input().strip())
     count = 0
     num = 1
-    while count < n:
-        if is_beautiful(num):
+    while count < N:
+        s = str(num)
+        total = sum(int(d) for d in s)
+        if total % len(s) == 0:
             count += 1
+            if count == N:
+                print(num)
+                return
         num += 1
-    return num - 1
 
-n = int(input())
-result = find_nth_beautiful(n)
-print(result)
+if __name__ == '__main__':
+    main()

@@ -1,10 +1,7 @@
 
 def main():
     import sys
-    data = sys.stdin.read().split()
-    n = int(data[0])
-    k = int(data[1])
-    
+    n, k = map(int, sys.stdin.readline().split())
     if k == 0:
         for i in range(n-1):
             print(0)
@@ -12,67 +9,77 @@ def main():
             
     clients = [set() for _ in range(n+1)]
     clients[1] = set(range(1, k+1))
-    
     rounds = [0] * (n+1)
-    received_from = [dict() for _ in range(n+1)]
-    upload_count = [0] * (n+1)
+    completed = [False] * (n+1)
+    completed[1] = True
+    received_from = [[0]*(n+1) for _ in range(n+1)]
     
-    current_round = 0
-    completed = 1
-    
-    while completed < n:
-        current_round += 1
-        
+    time = 0
+    while True:
+        time += 1
+        all_done = True
+        for i in range(2, n+1):
+            if not completed[i]:
+                all_done = False
+                break
+        if all_done:
+            break
+            
         requests = {}
-        for i in range(1, n+1):
-            if len(clients[i]) < k:
-                available_fragments = set(range(1, k+1)) - clients[i]
-                fragment_counts = {}
-                for frag in available_fragments:
-                    count = sum(1 for j in range(1, n+1) if frag in clients[j])
-                    fragment_counts[frag] = count
-                
-                min_count = min(fragment_counts.values())
-                candidate_frags = [frag for frag in fragment_counts if fragment_counts[frag] == min_count]
-                chosen_frag = min(candidate_frags)
-                
-                providers = [j for j in range(1, n+1) if chosen_frag in clients[j] and j != i]
-                if providers:
-                    provider_uploads = [upload_count[j] for j in providers]
-                    min_uploads = min(provider_uploads)
-                    candidate_providers = [j for j in providers if upload_count[j] == min_uploads]
-                    chosen_provider = min(candidate_providers)
-                    
-                    if chosen_provider not in requests:
-                        requests[chosen_provider] = []
-                    requests[chosen_provider].append((i, chosen_frag))
-        
-        satisfied_requests = []
-        for provider, req_list in requests.items():
-            if not req_list:
+        for i in range(2, n+1):
+            if completed[i]:
+                continue
+            available_frags = clients[i]
+            needed_frags = set(range(1, k+1)) - available_frags
+            if not needed_frags:
+                completed[i] = True
+                rounds[i] = time - 1
                 continue
                 
-            best_requests = []
-            for req in req_list:
-                requester, frag = req
-                value = received_from[provider].get(requester, 0)
-                best_requests.append((value, -len(clients[requester]), -requester, requester, frag))
+            frag_count = {}
+            for frag in needed_frags:
+                count = 0
+                for j in range(1, n+1):
+                    if frag in clients[j]:
+                        count += 1
+                frag_count[frag] = count
+                
+            min_count = min(frag_count.values()) if frag_count else float('inf')
+            candidate_frags = [frag for frag, cnt in frag_count.items() if cnt == min_count]
+            chosen_frag = min(candidate_frags) if candidate_frags else None
             
-            best_requests.sort(reverse=True)
-            best_request = best_requests[0]
-            satisfied_requests.append((best_request[3], best_request[4], provider))
-            upload_count[provider] += 1
-        
-        for requester, frag, provider in satisfied_requests:
-            clients[requester].add(frag)
-            if requester not in received_from[provider]:
-                received_from[provider][requester] = 0
-            received_from[provider][requester] += 1
+            if chosen_frag is None:
+                continue
+                
+            possible_sources = []
+            for j in range(1, n+1):
+                if chosen_frag in clients[j]:
+                    upload_count = sum(1 for reqs in requests.values() if reqs and reqs[0] == j)
+                    possible_sources.append((len(clients[j]), upload_count, j))
+                    
+            if not possible_sources:
+                continue
+                
+            possible_sources.sort(key=lambda x: (x[0], x[1], x[2]))
+            chosen_source = possible_sources[0][2]
             
-            if len(clients[requester]) == k and rounds[requester] == 0:
-                rounds[requester] = current_round
-                completed += 1
-    
+            if chosen_source not in requests:
+                requests[chosen_source] = []
+            requests[chosen_source].append((received_from[i][chosen_source], len(clients[i]), i, chosen_frag))
+            
+        for source in requests:
+            req_list = requests[source]
+            req_list.sort(key=lambda x: (-x[0], x[1], x[2]))
+            if req_list:
+                _, _, client_id, frag = req_list[0]
+                clients[client_id].add(frag)
+                received_from[client_id][source] += 1
+                
+        for i in range(2, n+1):
+            if len(clients[i]) == k and not completed[i]:
+                completed[i] = True
+                rounds[i] = time
+                
     for i in range(2, n+1):
         print(rounds[i])
 

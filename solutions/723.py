@@ -23,23 +23,28 @@ def main():
     for i in range(n-1):
         updated = False
         for a, b, t in edges:
-            if dist[a] != -INF and dist[b] < dist[a] + t:
-                dist[b] = dist[a] + t
-                updated = True
+            if dist[a] != -INF:
+                if dist[b] < dist[a] + t:
+                    dist[b] = dist[a] + t
+                    updated = True
         if not updated:
             break
     
     in_cycle = [False] * (n+1)
     for i in range(n):
+        updated = False
         for a, b, t in edges:
-            if dist[a] != -INF and dist[b] < dist[a] + t:
-                in_cycle[b] = True
-            if in_cycle[a]:
-                in_cycle[b] = True
+            if dist[a] != -INF:
+                if dist[b] < dist[a] + t:
+                    dist[b] = INF
+                    in_cycle[b] = True
+                    updated = True
+        if not updated:
+            break
     
     result = []
     for i in range(2, n+1):
-        if in_cycle[i] or dist[i] == -INF:
+        if dist[i] == INF or in_cycle[i]:
             result.append("-1")
         else:
             result.append(str(dist[i]))

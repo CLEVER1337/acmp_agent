@@ -1,81 +1,70 @@
 
-def generate_magic_square(n):
-    if n % 2 == 1:
-        return generate_odd_magic_square(n)
-    elif n % 4 == 0:
-        return generate_doubly_even_magic_square(n)
-    else:
-        return generate_singly_even_magic_square(n)
-
-def generate_odd_magic_square(n):
-    square = [[0] * n for _ in range(n)]
-    i, j = 0, n // 2
-    
-    for num in range(1, n * n + 1):
-        square[i][j] = num
-        next_i = (i - 1) % n
-        next_j = (j + 1) % n
-        
-        if square[next_i][next_j] == 0:
-            i, j = next_i, next_j
-        else:
-            i = (i + 1) % n
-    
-    return square
-
-def generate_doubly_even_magic_square(n):
-    square = [[0] * n for _ in range(n)]
-    num = 1
-    
-    for i in range(n):
-        for j in range(n):
-            if (i % 4 == j % 4) or ((i % 4) + (j % 4) == 3):
-                square[i][j] = num
-            else:
-                square[i][j] = n * n - num + 1
-            num += 1
-    
-    return square
-
-def generate_singly_even_magic_square(n):
-    k = n // 2
-    A = generate_odd_magic_square(k)
-    
-    square = [[0] * n for _ in range(n)]
-    
-    for i in range(k):
-        for j in range(k):
-            square[i][j] = A[i][j]
-            square[i][j + k] = A[i][j] + 2 * k * k
-            square[i + k][j] = A[i][j] + 3 * k * k
-            square[i + k][j + k] = A[i][j] + k * k
-    
-    m = k // 2
-    for i in range(k):
-        for j in range(m):
-            if i != m or (j != 0 and j != m - 1):
-                square[i][j], square[i + k][j] = square[i + k][j], square[i][j]
-        
-        for j in range(n - m + 1, n):
-            square[i][j], square[i + k][j] = square[i + k][j], square[i][j]
-    
-    square[m][m], square[m + k][m] = square[m + k][m], square[m][m]
-    square[m][0], square[m + k][0] = square[m + k][0], square[m][0]
-    
-    return square
-
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        n = int(f.readline().strip())
-    
+    n = int(input().strip())
+    if n == 1:
+        print(1)
+        return
     if n == 2:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write("Impossible")
+        print("Impossible")
+        return
+        
+    grid = [[0] * n for _ in range(n)]
+    
+    if n % 2 == 1:
+        i, j = 0, n // 2
+        num = 1
+        while num <= n * n:
+            grid[i][j] = num
+            num += 1
+            ni, nj = (i - 1) % n, (j + 1) % n
+            if grid[ni][nj] != 0:
+                ni, nj = (i + 1) % n, j
+            i, j = ni, nj
     else:
-        magic_square = generate_magic_square(n)
-        with open('OUTPUT.TXT', 'w') as f:
-            for row in magic_square:
-                f.write(' '.join(map(str, row)) + '\n')
+        if n % 4 == 0:
+            for i in range(n):
+                for j in range(n):
+                    if (i % 4 == 0 or i % 4 == 3) and (j % 4 == 0 or j % 4 == 3):
+                        grid[i][j] = i * n + j + 1
+                    elif (i % 4 == 1 or i % 4 == 2) and (j % 4 == 1 or j % 4 == 2):
+                        grid[i][j] = i * n + j + 1
+                    else:
+                        grid[i][j] = n * n - (i * n + j)
+        else:
+            k = n // 2
+            subgrid = [[0] * k for _ in range(k)]
+            i, j = 0, k // 2
+            num = 1
+            while num <= k * k:
+                subgrid[i][j] = num
+                num += 1
+                ni, nj = (i - 1) % k, (j + 1) % k
+                if subgrid[ni][nj] != 0:
+                    ni, nj = (i + 1) % k, j
+                i, j = ni, nj
+            
+            for i in range(k):
+                for j in range(k):
+                    val = subgrid[i][j]
+                    grid[i][j] = val
+                    grid[i + k][j + k] = val + k * k
+                    grid[i][j + k] = val + 2 * k * k
+                    grid[i + k][j] = val + 3 * k * k
+            
+            m = k // 2
+            for i in range(k):
+                for j in range(m):
+                    if i != m:
+                        grid[i][j], grid[i + k][j] = grid[i + k][j], grid[i][j]
+                    else:
+                        grid[i][j + m], grid[i + k][j + m] = grid[i + k][j + m], grid[i][j + m]
+            
+            for i in range(k):
+                for j in range(k - m + 1, k):
+                    grid[i][j], grid[i + k][j] = grid[i + k][j], grid[i][j]
+    
+    for row in grid:
+        print(' '.join(map(str, row)))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

@@ -4,64 +4,82 @@ def main():
     data = sys.stdin.read().splitlines()
     n, r = map(int, data[0].split())
     word = data[1].strip()
-    q = list(map(float, data[2].split()))
+    q_list = list(map(float, data[2].split()))
     
     L = len(word)
     unique_letters = set(word)
-    k = len(unique_letters)
+    m = len(unique_letters)
     
     from functools import lru_cache
     
     @lru_cache(maxsize=None)
-    def dp(mask, turn):
-        closed_count = bin(mask).count('1')
-        if closed_count == 0:
-            return 1.0 if turn == 0 else 0.0
+    def dp(mask, turn, i, j, k):
+        if k == 0:
+            return 1.0 if turn == r - 1 else 0.0
         
-        unknown_letters = set()
-        letter_positions = {}
-        for i in range(L):
-            if mask & (1 << i):
-                letter = word[i]
-                if letter not in letter_positions:
-                    letter_positions[letter] = []
-                letter_positions[letter].append(i)
-                unknown_letters.add(letter)
-        
-        j = len(unknown_letters)
+        total_prob = 0.0
         current_player = turn % n
-        prob_correct = q[current_player]
+        q = q_list[current_player]
         
-        if j == 0:
-            return 1.0 if turn == 0 else 0.0
-        
-        prob_win = 0.0
-        
-        for letter in unknown_letters:
-            new_mask = mask
-            for pos in letter_positions[letter]:
-                new_mask &= ~(1 << pos)
+        found = False
+        for idx, char in enumerate(word):
+            if mask & (1 << idx):
+                continue
+            if char in guessed:
+                continue
             
-            p_letter = 1.0 / j
-            p_guess = prob_correct * p_letter
-            
-            if new_mask == mask:
-                next_turn = (turn + 1) % n
-                result = dp(new_mask, next_turn)
-            else:
-                result = dp(new_mask, turn)
-            
-            prob_win += p_guess * result
+            if char not in guessed:
+                guessed.add(char)
+                new_mask = mask
+                count = 0
+                for pos, c in enumerate(word):
+                    if c == char:
+                        new_mask |= (1 << pos)
+                        count += 1
+                new_k = k - count
+                new_i = i - 1
+                new_j = j - 1
+                
+                prob_correct = (1.0 / j) * (1 - (1 - q) ** i)
+                result = dp(new_mask, turn, new_i, new_j, new_k)
+                total_prob += prob_correct * result
+                
+                guessed.remove(char)
+                found = True
         
-        prob_wrong = 1.0 - prob_correct
-        if prob_wrong > 1e-12:
-            next_turn = (turn + 1) % n
-            prob_win += prob_wrong * dp(mask, next_turn)
+        if not found:
+            for char in unique_letters:
+                if char not in guessed:
+                    guessed.add(char)
+                    new_mask = mask
+                    count = 0
+                    for pos, c in enumerate(word):
+                        if c == char:
+                            new_mask |= (1 << pos)
+                            count += 1
+                    new_k = k - count
+                    new_i = i - 1
+                    new_j = j - 1
+                    
+                    prob_correct = (1.0 / j) * (1 - (1 - q) ** i)
+                    result = dp(new_mask, turn, new_i, new_j, new_k)
+                    total_prob += prob_correct * result
+                    
+                    guessed.remove(char)
         
-        return prob_win
+        prob_wrong = 1 - (1 - (1 - q) ** i)
+        next_turn = (turn + 1) % n
+        total_prob += prob_wrong * dp(mask, next_turn, i, j, k)
+        
+        return total_prob
+
+    guessed = set()
+    initial_mask = 0
+    initial_i = m
+    initial_j = m
+    initial_k = L
     
-    initial_mask = (1 << L) - 1
-    result = dp(initial_mask, 0)
+    result = dp(initial_mask, 0, initial_i, initial_j, initial_k)
     print("{:.15f}".format(result))
 
 if __name__ == "__main__":

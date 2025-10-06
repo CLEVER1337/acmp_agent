@@ -1,24 +1,24 @@
 
-def generate(n, s='', balance=0, stack=[]):
-    if len(s) == n:
-        if balance == 0 and not stack:
-            print(s)
-        return
-    
-    for bracket in ['()', '[]']:
-        open_bracket, close_bracket = bracket[0], bracket[1]
-        
-        if balance < n // 2:
-            generate(n, s + open_bracket, balance + 1, stack + [open_bracket])
-        
-        if balance > 0 and stack and stack[-1] == open_bracket:
-            generate(n, s + close_bracket, balance - 1, stack[:-1])
-
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        n = int(f.read().strip())
+    n = int(input().strip())
+    result = []
+    def backtrack(s, left, right, square_left, square_right):
+        if len(s) == n:
+            result.append(s)
+            return
+        if left < n // 2:
+            backtrack(s + '(', left + 1, right, square_left, square_right)
+        if right < left:
+            backtrack(s + ')', left, right + 1, square_left, square_right)
+        if square_left < n // 2:
+            backtrack(s + '[', left, right, square_left + 1, square_right)
+        if square_right < square_left:
+            backtrack(s + ']', left, right, square_left, square_right + 1)
     
-    generate(n)
+    backtrack('', 0, 0, 0, 0)
+    with open('OUTPUT.TXT', 'w') as f:
+        for expr in result:
+            f.write(expr + '\n')
 
 if __name__ == '__main__':
     main()

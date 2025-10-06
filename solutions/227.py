@@ -1,11 +1,10 @@
 
-def solve():
+def main():
     import sys
     data = sys.stdin.read().split()
     if not data:
         print(-1)
         return
-        
     X = int(data[0])
     Y = int(data[1])
     
@@ -26,19 +25,6 @@ def solve():
         print(-1)
         return
         
-    if X == 0:
-        print(-1)
-        return
-        
-    def gcd(a, b):
-        while b:
-            a, b = b, a % b
-        return a
-        
-    if Y % gcd(X, Y - X) != 0:
-        print(-1)
-        return
-        
     steps = 0
     current = X
     buffer = 0
@@ -52,12 +38,11 @@ def solve():
                 current += buffer
                 steps += 1
             else:
-                if (Y - current) % buffer == 0:
-                    steps += (Y - current) // buffer
-                    current = Y
-                else:
-                    steps += 1
+                if buffer < current:
                     buffer = current
+                    steps += 1
+                else:
+                    break
                     
     if current == Y:
         print(steps)
@@ -65,4 +50,4 @@ def solve():
         print(-1)
 
 if __name__ == "__main__":
-    solve()
+    main()

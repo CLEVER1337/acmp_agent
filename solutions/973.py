@@ -6,94 +6,93 @@ import heapq
 def main():
     data = sys.stdin.read().split()
     if not data:
+        print(0)
         return
-    
+        
     it = iter(data)
     n = int(next(it)); m = int(next(it))
     
     edges = []
     graph = [[] for _ in range(n+1)]
+    reverse_graph = [[] for _ in range(n+1)]
     
     for i in range(1, m+1):
         u = int(next(it)); v = int(next(it)); w = int(next(it))
         edges.append((u, v, w, i))
         graph[u].append((v, w, i))
         graph[v].append((u, w, i))
+        reverse_graph[v].append((u, w, i))
+        reverse_graph[u].append((v, w, i))
     
-    def dijkstra(start):
-        dist = [10**18] * (n+1)
-        dist[start] = 0
-        heap = [(0, start)]
-        
-        while heap:
-            d, u = heapq.heappop(heap)
-            if d != dist[u]:
-                continue
-            for v, w, idx in graph[u]:
-                if dist[v] > d + w:
-                    dist[v] = d + w
-                    heapq.heappush(heap, (dist[v], v))
-        return dist
-    
-    dist1 = dijkstra(1)
-    distn = dijkstra(n)
-    shortest = dist1[n]
-    
-    if shortest == 10**18:
-        print(0)
-        return
-    
-    graph_dag = [[] for _ in range(n+1)]
-    graph_dag_rev = [[] for _ in range(n+1)]
-    
-    for u in range(1, n+1):
+    INF = 10**18
+    dist1 = [INF] * (n+1)
+    dist1[1] = 0
+    heap = [(0, 1)]
+    while heap:
+        d, u = heapq.heappop(heap)
+        if d != dist1[u]:
+            continue
         for v, w, idx in graph[u]:
-            if dist1[u] + w + distn[v] == shortest or dist1[v] + w + distn[u] == shortest:
-                graph_dag[u].append((v, idx))
-                graph_dag_rev[v].append((u, idx))
+            if dist1[v] > dist1[u] + w:
+                dist1[v] = dist1[u] + w
+                heapq.heappush(heap, (dist1[v], v))
     
-    order = []
-    visited = [False] * (n+1)
+    distn = [INF] * (n+1)
+    distn[n] = 0
+    heap = [(0, n)]
+    while heap:
+        d, u = heapq.heappop(heap)
+        if d != distn[u]:
+            continue
+        for v, w, idx in reverse_graph[u]:
+            if distn[v] > distn[u] + w:
+                distn[v] = distn[u] + w
+                heapq.heappush(heap, (distn[v], v))
     
-    def dfs(u):
-        visited[u] = True
-        for v, idx in graph_dag[u]:
-            if not visited[v]:
-                dfs(v)
-        order.append(u)
+    total_shortest = dist1[n]
+    
+    adj = [[] for _ in range(n+1)]
+    for u, v, w, idx in edges:
+        if dist1[u] + w + distn[v] == total_shortest:
+            adj[u].append((v, idx))
+            adj[v].append((u, idx))
+        elif dist1[v] + w + distn[u] == total_shortest:
+            adj[u].append((v, idx))
+            adj[v].append((u, idx))
+    
+    low = [0] * (n+1)
+    disc = [0] * (n+1)
+    parent = [0] * (n+1)
+    time = 0
+    bridges = set()
+    
+    def dfs(u, p):
+        nonlocal time
+        time += 1
+        disc[u] = time
+        low[u] = time
+        for v, idx in adj[u]:
+            if v == p:
+                continue
+            if disc[v] == 0:
+                parent[v] = u
+                dfs(v, u)
+                low[u] = min(low[u], low[v])
+                if low[v] > disc[u]:
+                    bridges.add(idx)
+            else:
+                low[u] = min(low[u], disc[v])
     
     for i in range(1, n+1):
-        if not visited[i]:
-            dfs(i)
+        if disc[i] == 0:
+            dfs(i, 0)
     
-    comp = [0] * (n+1)
-    comp_id = 0
-    visited2 = [False] * (n+1)
-    
-    def dfs_rev(u, comp_id_val):
-        visited2[u] = True
-        comp[u] = comp_id_val
-        for v, idx in graph_dag_rev[u]:
-            if not visited2[v]:
-                dfs_rev(v, comp_id_val)
-    
-    for u in reversed(order):
-        if not visited2[u]:
-            comp_id += 1
-            dfs_rev(u, comp_id)
-    
-    bridges = []
-    for u in range(1, n+1):
-        for v, idx in graph_dag[u]:
-            if comp[u] != comp[v]:
-                bridges.append(idx)
-    
-    bridges = sorted(set(bridges))
-    print(len(bridges))
-    if bridges:
-        print(' '.join(map(str, bridges)))
+    result = sorted(bridges)
+    print(len(result))
+    if result:
+        print(' '.join(map(str, result)))
     else:
         print()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

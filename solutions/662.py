@@ -1,6 +1,7 @@
 
+import sys
+
 def main():
-    import sys
     data = sys.stdin.read().split()
     n = int(data[0])
     players = []
@@ -12,21 +13,27 @@ def main():
         index += 3
         players.append((a1, a2, a3))
     
-    results = set()
+    possible_sums = set()
+    
     for p in range(0, 101):
-        total_scores = []
+        valid = True
+        total_sum = 0
+        
         for player in players:
             a1, a2, a3 = player
-            if p == 0:
-                total = a1 + a2 + a3
-            else:
-                total = (a1 + a2 + a3) % p
-            total_scores.append(total)
-        
-        sorted_scores = tuple(sorted(total_scores))
-        results.add(sorted_scores)
-    
-    print(len(results))
+            max_score = max(a1, a2, a3)
+            min_score = min(a1, a2, a3)
+            
+            if p < min_score or p > max_score:
+                valid = False
+                break
+                
+            total_sum += (a1 + a2 + a3 - min_score - max_score)
+            
+        if valid:
+            possible_sums.add(total_sum)
+            
+    print(len(possible_sums))
 
 if __name__ == "__main__":
     main()

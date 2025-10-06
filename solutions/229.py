@@ -1,42 +1,54 @@
 
-import sys
-
 def main():
+    import sys
     data = sys.stdin.read().split()
     n = int(data[0])
     participants = []
+    index = 1
     for i in range(n):
-        a = float(data[1 + 2*i])
-        b = float(data[2 + 2*i])
-        participants.append((a, b))
+        a = float(data[index])
+        b = float(data[index+1])
+        index += 2
+        participants.append((a, b, i+1))
     
-    can_win = []
-    for idx in range(n):
-        a0, b0 = participants[idx]
-        max_possible_total = a0 + b0
+    candidates = []
+    for idx, (a, b, num) in enumerate(participants):
+        max_total = a + b
         possible = True
         
-        for j in range(n):
+        for j, (other_a, other_b, other_num) in enumerate(participants):
             if j == idx:
                 continue
                 
-            aj, bj = participants[j]
-            min_needed_total = max_possible_total
+            total_other = other_a + other_b
+            if total_other <= max_total:
+                continue
+                
+            can_adjust = False
+            for delta1 in [0, 100 - a]:
+                for delta2 in [0, 100 - b]:
+                    if delta1 == 0 and delta2 == 0:
+                        continue
+                    new_a = min(a + delta1, 100)
+                    new_b = min(b + delta2, 100)
+                    new_total = new_a + new_b
+                    if new_total >= total_other:
+                        can_adjust = True
+                        break
+                if can_adjust:
+                    break
             
-            max_aj = min(100, aj + (100 - aj))
-            max_bj = min(100, bj + (100 - bj))
-            max_total_j = max_aj + max_bj
-            
-            if max_total_j < min_needed_total:
+            if not can_adjust:
                 possible = False
                 break
                 
         if possible:
-            can_win.append(idx + 1)
+            candidates.append(num)
             
-    print(f"{len(can_win)}")
-    if can_win:
-        print(" ".join(map(str, can_win)))
+    candidates.sort()
+    print(len(candidates))
+    if candidates:
+        print(" ".join(map(str, candidates)))
     else:
         print()
 

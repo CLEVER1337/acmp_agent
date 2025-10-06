@@ -3,47 +3,38 @@ def count_up_to(n):
     s = str(n)
     length = len(s)
     count = 0
-    freq = {}
+    digits = [0] * 10
+    used = [False] * length
     
     def dfs(pos, tight, leading_zero):
+        nonlocal count
         if pos == length:
-            if leading_zero:
-                return 0
-            for digit in freq:
-                if freq[digit] > 2:
-                    return 0
-            return 1
-            
-        limit = int(s[pos]) if tight else 9
-        total = 0
+            if not leading_zero:
+                count += 1
+            return
         
+        limit = int(s[pos]) if tight else 9
         for d in range(0, limit + 1):
-            new_tight = tight and (d == limit)
-            new_leading_zero = leading_zero and (d == 0)
-            
-            if not new_leading_zero:
-                freq[d] = freq.get(d, 0) + 1
-                
-            if freq.get(d, 0) <= 2:
-                total += dfs(pos + 1, new_tight, new_leading_zero)
-                
-            if not new_leading_zero:
-                freq[d] -= 1
-                if freq[d] == 0:
-                    del freq[d]
-                    
-        return total
+            if digits[d] >= 2:
+                continue
+            if leading_zero and d == 0:
+                digits[d] += 1
+                dfs(pos + 1, tight and (d == limit), True)
+                digits[d] -= 1
+            else:
+                if digits[d] < 2:
+                    digits[d] += 1
+                    dfs(pos + 1, tight and (d == limit), False)
+                    digits[d] -= 1
     
-    return dfs(0, True, True)
+    dfs(0, True, True)
+    return count
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        L, R = map(int, f.readline().split())
-    
-    result = count_up_to(R) - count_up_to(L - 1)
-    
-    with open("OUTPUT.TXT", "w") as f:
-        f.write(str(result))
+    L, R = map(int, input().split())
+    result_R = count_up_to(R)
+    result_L_minus = count_up_to(L - 1)
+    print(result_R - result_L_minus)
 
 if __name__ == "__main__":
     main()

@@ -10,13 +10,13 @@ def main():
     if n % H != 0:
         cols += 1
     
-    matrix = [[''] * cols for _ in range(H)]
+    grid = [[''] * cols for _ in range(H)]
     
     idx = 0
     for col in range(cols):
         for row in range(H):
             if idx < n:
-                matrix[row][col] = encoded[idx]
+                grid[row][col] = encoded[idx]
                 idx += 1
     
     original_order = sorted(range(1, H+1), key=lambda x: order.index(x))
@@ -24,9 +24,9 @@ def main():
     result = []
     for col in range(cols):
         for row_idx in original_order:
-            char = matrix[row_idx-1][col]
-            if char:
-                result.append(char)
+            row = row_idx - 1
+            if col < len(grid[row]):
+                result.append(grid[row][col])
     
     with open('OUTPUT.TXT', 'w', encoding='cp866') as f:
         f.write(''.join(result))

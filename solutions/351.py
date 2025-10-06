@@ -1,37 +1,40 @@
 
-import sys
 from collections import deque
 
 def main():
+    import sys
     data = sys.stdin.read().splitlines()
     n, k = map(int, data[0].split())
     s = data[1].strip()
     
     INF = float('inf')
-    dp = [INF] * n
-    dp[0] = 0
+    cost = [INF] * n
+    cost[0] = 0
     
-    last_occurrence = {}
-    queue = deque()
+    dq = deque()
+    dq.append(0)
     
-    for i in range(n):
-        char = s[i]
-        if char in last_occurrence:
-            dp[i] = min(dp[i], dp[last_occurrence[char]])
-        
-        while queue and queue[0] < i - k:
-            queue.popleft()
+    last_pos = {}
+    
+    for i in range(1, n):
+        while dq and dq[0] < i - k:
+            dq.popleft()
             
-        if queue:
-            dp[i] = min(dp[i], dp[queue[0]] + 1)
-            
-        while queue and dp[queue[-1]] >= dp[i]:
-            queue.pop()
-        queue.append(i)
+        if dq:
+            cost[i] = cost[dq[0]] + (1 if s[dq[0]] != s[i] else 0)
         
-        last_occurrence[char] = i
+        if s[i] in last_pos:
+            j = last_pos[s[i]]
+            if cost[j] <= cost[i]:
+                cost[i] = cost[j]
+        
+        last_pos[s[i]] = i
+        
+        while dq and cost[i] <= cost[dq[-1]]:
+            dq.pop()
+        dq.append(i)
     
-    print(dp[n-1])
+    print(cost[-1])
 
 if __name__ == "__main__":
     main()

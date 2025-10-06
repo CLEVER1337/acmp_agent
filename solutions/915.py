@@ -4,8 +4,9 @@ import sys
 def main():
     data = sys.stdin.read().split()
     if not data:
+        print(0)
         return
-    
+        
     n = int(data[0])
     m = int(data[1])
     grid = []
@@ -15,31 +16,28 @@ def main():
         index += m
         grid.append(row)
     
-    if n * m == 0:
+    if n == 0 or m == 0:
         print(0)
         return
         
-    dp = [[0] * m for _ in range(n)]
-    dp[0][0] = 6 * grid[0][0]
+    dp = [[-10**18] * m for _ in range(n)]
+    dp[0][0] = grid[0][0] * 6
     
     for i in range(n):
         for j in range(m):
             if i == 0 and j == 0:
                 continue
                 
-            candidates = []
-            if i >= 1:
-                candidates.append(dp[i-1][j] + 6 * grid[i][j])
-                candidates.append(dp[i-1][j] + 2 * grid[i][j])
-            if j >= 1:
-                candidates.append(dp[i][j-1] + 6 * grid[i][j])
-                candidates.append(dp[i][j-1] + 2 * grid[i][j])
+            from_top = -10**18
+            from_left = -10**18
             
-            if candidates:
-                dp[i][j] = max(candidates)
-            else:
-                dp[i][j] = -10**18
+            if i > 0:
+                from_top = dp[i-1][j] + grid[i][j] * (6 if i % 2 == 0 else 2)
+            if j > 0:
+                from_left = dp[i][j-1] + grid[i][j] * (6 if j % 2 == 0 else 2)
                 
+            dp[i][j] = max(from_top, from_left)
+    
     print(dp[n-1][m-1])
 
 if __name__ == "__main__":

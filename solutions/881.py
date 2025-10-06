@@ -16,58 +16,71 @@ def main():
         parts = data[i].strip().replace('(', '').replace(')', '').split(',')
         x = int(parts[0]) - 1
         y = int(parts[1]) - 1
-        direction = parts[2].strip()
-        robots.append((x, y, direction))
+        d = parts[2].strip()
+        robots.append((x, y, d))
     
     directions = {'U': (0, -1), 'D': (0, 1), 'L': (-1, 0), 'R': (1, 0)}
     time = 0
-    active_robots = set(range(k))
+    active = [True] * k
     
-    while active_robots:
-        time += 1
+    while any(active):
         positions = {}
-        new_positions = {}
         lasers = {}
         
-        for idx in active_robots:
-            x, y, d = robots[idx]
+        for idx, (x, y, d) in enumerate(robots):
+            if not active[idx]:
+                continue
+                
             dx, dy = directions[d]
             nx, ny = x + dx, y + dy
-            robots[idx] = (nx, ny, d)
-            positions[idx] = (nx, ny)
-            new_positions[(nx, ny)] = new_positions.get((nx, ny), []) + [idx]
             
-            lx, ly = nx, ny
-            while 0 <= lx < m and 0 <= ly < n and grid[ly][lx] != 'X':
+            if 0 <= nx < m and 0 <= ny < n and grid[ny][nx] != 'X':
+                positions[idx] = (nx, ny, d)
+            else:
+                positions[idx] = (x, y, d)
+                
+            lx, ly = x, y
+            while True:
                 lx += dx
                 ly += dy
-            lasers[idx] = (lx - dx, ly - dy)
+                if not (0 <= lx < m and 0 <= ly < n) or grid[ly][lx] == 'X':
+                    break
+                lasers[(lx, ly)] = lasers.get((lx, ly), 0) + 1
         
-        to_explode = set()
-        
-        for idx in active_robots:
-            x, y, d = robots[idx]
-            if not (0 <= x < m and 0 <= y < n) or grid[y][x] == 'X':
-                to_explode.add(idx)
-                continue
+        explosions = set()
+        for idx in positions:
+            x, y, d = positions[idx]
+            if (x, y) in lasers:
+                explosions.add(idx)
                 
-            if len(new_positions.get((x, y), [])) > 1:
-                to_explode.add(idx)
+        pos_count = {}
+        for idx in positions:
+            if idx in explosions:
                 continue
+            x, y, d = positions[idx]
+            pos_count[(x, y)] = pos_count.get((x, y), 0) + 1
+            
+        for pos, count in pos_count.items():
+            if count > 1:
+                for idx in positions:
+                    if idx in explosions:
+                        continue
+                    x, y, d = positions[idx]
+                    if (x, y) == pos:
+                        explosions.add(idx)
+                        
+        for idx in explosions:
+            active[idx] = False
+            
+        robots = []
+        for idx in range(k):
+            if active[idx]:
+                x, y, d = positions[idx]
+                robots.append((x, y, d))
+            else:
+                robots.append((0, 0, 'U'))
                 
-            lx, ly = lasers[idx]
-            dx, dy = directions[d]
-            cx, cy = x, y
-            while (cx, cy) != (lx, ly):
-                cx += dx
-                cy += dy
-                if (cx, cy) in positions.values():
-                    for other_idx, pos in positions.items():
-                        if pos == (cx, cy):
-                            to_explode.add(other_idx)
-                            to_explode.add(idx)
-        
-        active_robots -= to_explode
+        time += 1
         
     print(time)
 

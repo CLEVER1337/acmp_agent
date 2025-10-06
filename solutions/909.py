@@ -11,46 +11,46 @@ def main():
     n, m = map(int, data[0].split())
     grid = []
     for i in range(1, 1 + n):
-        grid.append(list(data[i]))
+        grid.append(list(data[i].strip()))
     
     visited = [[False] * m for _ in range(n)]
     directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+    
+    def dfs(x, y):
+        stack = [(x, y)]
+        visited[x][y] = True
+        has_s = False
+        has_x = False
+        
+        while stack:
+            cx, cy = stack.pop()
+            if grid[cx][cy] == 'S':
+                has_s = True
+            elif grid[cx][cy] == 'X':
+                has_x = True
+                
+            for dx, dy in directions:
+                nx, ny = cx + dx, cy + dy
+                if 0 <= nx < n and 0 <= ny < m and not visited[nx][ny] and grid[nx][ny] in ['S', 'X']:
+                    visited[nx][ny] = True
+                    stack.append((nx, ny))
+                    
+        return has_s, has_x
     
     whole_ships = 0
     damaged_ships = 0
     destroyed_ships = 0
     
-    def dfs(i, j):
-        stack = [(i, j)]
-        visited[i][j] = True
-        has_damaged = False
-        has_whole = False
-        
-        while stack:
-            x, y = stack.pop()
-            if grid[x][y] == 'X':
-                has_damaged = True
-            elif grid[x][y] == 'S':
-                has_whole = True
-                
-            for dx, dy in directions:
-                nx, ny = x + dx, y + dy
-                if 0 <= nx < n and 0 <= ny < m and not visited[nx][ny] and grid[nx][ny] in ['X', 'S']:
-                    visited[nx][ny] = True
-                    stack.append((nx, ny))
-        
-        return has_whole, has_damaged
-    
     for i in range(n):
         for j in range(m):
-            if not visited[i][j] and grid[i][j] in ['X', 'S']:
-                has_whole, has_damaged = dfs(i, j)
-                if has_whole and not has_damaged:
+            if not visited[i][j] and grid[i][j] in ['S', 'X']:
+                has_s, has_x = dfs(i, j)
+                if has_s and not has_x:
                     whole_ships += 1
-                elif has_damaged and not has_whole:
-                    destroyed_ships += 1
-                else:
+                elif has_s and has_x:
                     damaged_ships += 1
+                elif not has_s and has_x:
+                    destroyed_ships += 1
                     
     print(f"{whole_ships} {damaged_ships} {destroyed_ships}")
 

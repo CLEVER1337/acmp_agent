@@ -1,19 +1,24 @@
 
 n = int(input())
 arr = list(map(int, input().split()))
+target = list(range(1, n+1))
+positions = {val: idx for idx, val in enumerate(target)}
+max_seq = 0
+current_seq = 0
+prev_pos = -1
 
-target = list(range(1, n + 1))
-current_positions = {val: idx for idx, val in enumerate(arr)}
+for num in arr:
+    pos = positions[num]
+    if pos == prev_pos + 1:
+        current_seq += 1
+        prev_pos = pos
+    else:
+        if current_seq > max_seq:
+            max_seq = current_seq
+        current_seq = 1
+        prev_pos = pos
 
-max_chain = 0
-for num in range(1, n + 1):
-    chain = 1
-    next_num = num + 1
-    while next_num <= n and current_positions[next_num] > current_positions[num]:
-        chain += 1
-        num = next_num
-        next_num += 1
-    max_chain = max(max_chain, chain)
+if current_seq > max_seq:
+    max_seq = current_seq
 
-result = n - max_chain
-print(result)
+print(n - max_seq)

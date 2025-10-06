@@ -1,27 +1,20 @@
 
+def is_valid(num):
+    s = str(num)
+    for i in range(len(s) - 1):
+        if s[i] >= s[i+1]:
+            return False
+    return True
+
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        n = int(f.read().strip())
-    
-    sequence = []
-    num = 1
-    
-    while len(sequence) < n:
-        digits = list(str(num))
-        is_valid = True
-        
-        for i in range(len(digits) - 1):
-            if digits[i] >= digits[i + 1]:
-                is_valid = False
-                break
-                
-        if is_valid:
-            sequence.append(num)
-            
+    n = int(input().strip())
+    count = 0
+    num = 0
+    while count < n:
         num += 1
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(sequence[-1]))
+        if is_valid(num):
+            count += 1
+    print(num)
 
 if __name__ == '__main__':
     main()

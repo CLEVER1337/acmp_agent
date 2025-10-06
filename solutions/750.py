@@ -26,6 +26,7 @@ def main():
         deg[v] += 1
     
     win = [''] * (n + 1)
+    moves = [0] * (n + 1)
     q = deque()
     
     for i in range(1, n + 1):
@@ -36,16 +37,15 @@ def main():
     while q:
         u = q.popleft()
         for v in graph[u]:
-            if win[v] != '':
-                continue
-            if win[u] == 'P':
-                win[v] = 'N'
-                q.append(v)
-            else:
-                deg[v] -= 1
-                if deg[v] == 0:
-                    win[v] = 'P'
+            if win[v] == '':
+                if win[u] == 'P':
+                    win[v] = 'N'
                     q.append(v)
+                else:
+                    moves[v] += 1
+                    if moves[v] == deg[v]:
+                        win[v] = 'P'
+                        q.append(v)
     
     res1 = []
     for i in range(1, n1 + 1):
@@ -53,14 +53,14 @@ def main():
             res1.append('N')
         else:
             res1.append('P')
-            
+    
     res2 = []
     for i in range(n1 + 1, n1 + n2 + 1):
         if win[i] == 'N':
             res2.append('N')
         else:
             res2.append('P')
-            
+    
     print(''.join(res1))
     print(''.join(res2))
 

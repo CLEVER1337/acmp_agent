@@ -6,8 +6,9 @@ def main():
     m = int(data[1])
     
     k = n // 2
-    result = pow(2, k * k, m)
-    print(result)
+    total_patterns = pow(4, k * k, m)
+    
+    print(total_patterns % m)
 
 if __name__ == "__main__":
     main()

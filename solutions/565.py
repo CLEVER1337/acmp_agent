@@ -12,85 +12,91 @@ def main():
     r = int(data[1])
     items = []
     index = 2
-    
     for i in range(n):
         w = int(data[index])
-        d = int(data[index + 1])
+        d = int(data[index+1])
         index += 2
-        items.append((w, d, i + 1))
+        items.append((w, d, i+1))
     
-    # Сортируем вещи по времени высыхания на веревке (d_i)
-    items.sort(key=lambda x: x[1])
+    low, high = 0, 10**18
+    ans_time = -1
     
-    current_time = 0
-    heap = []
-    result = []
-    item_index = 0
+    def check(T):
+        heap = []
+        for i in range(n):
+            w, d, idx = items[i]
+            if w > T:
+                time_needed = (w - T + r - 2) // (r - 1)
+                if time_needed > d:
+                    return False
+                heapq.heappush(heap, (time_needed, d, idx))
+            elif w <= T:
+                if 0 > d:
+                    return False
+        time_passed = 0
+        while heap:
+            time_needed, deadline, idx = heapq.heappop(heap)
+            time_passed += 1
+            if time_passed > time_needed:
+                return False
+            if time_passed > deadline:
+                return False
+        return True
     
-    while item_index < n or heap:
-        # Добавляем все вещи, которые нужно начать сушить до current_time
-        while item_index < n and items[item_index][1] <= current_time:
-            w, d, idx = items[item_index]
-            # Если вещь уже должна была высохнуть, но еще не высохла
-            if w > current_time:
+    if r == 1:
+        max_w = 0
+        for w, d, idx in items:
+            if w > d:
                 print("Impossible")
                 return
-            item_index += 1
-        
-        if heap:
-            # Берем вещь с наибольшей потребностью в батарее
-            neg_need, w, d, idx = heapq.heappop(heap)
-            need = -neg_need
-            
-            # Вычисляем время сушки на батарее
-            time_on_battery = (need + r - 1) // r
-            
-            if time_on_battery > 0:
-                # Проверяем, успеет ли высохнуть
-                if current_time + time_on_battery > d:
-                    print("Impossible")
-                    return
-                
-                result.append((current_time, idx))
-                current_time += time_on_battery
-                
-                # Обновляем влажность после сушки на батарее
-                remaining_moisture = need - time_on_battery * r
-                if remaining_moisture > 0:
-                    heapq.heappush(heap, (-remaining_moisture, remaining_moisture, d, idx))
-            else:
-                # Вещь уже почти сухая, можно не ставить на батарею
-                pass
-                
-        elif item_index < n:
-            # Переходим к следующему времени, когда нужна батарея
-            next_d = items[item_index][1]
-            if current_time < next_d:
-                current_time = next_d
-            else:
-                current_time += 1
+            if w > max_w:
+                max_w = w
+        print(f"0 {1}")
+        for i in range(1, max_w):
+            print(f"{i} {1}")
+        return
+
+    left, right = 0, 10**18
+    while left <= right:
+        mid = (left + right) // 2
+        if check(mid):
+            ans_time = mid
+            right = mid - 1
         else:
-            break
+            left = mid + 1
             
-        # Добавляем новые вещи, которые стали актуальными
-        while item_index < n and items[item_index][1] <= current_time:
-            w, d, idx = items[item_index]
-            # Вычисляем, сколько влаги нужно убрать батареей
-            moisture_after_line = w - current_time
-            if moisture_after_line > 0:
-                heapq.heappush(heap, (-moisture_after_line, moisture_after_line, d, idx))
-            item_index += 1
-    
-    # Проверяем, все ли вещи обработаны
-    if len(result) == n or all items processed:
-        for time, idx in result:
-            if time > 10**9 or idx > 10**9:
-                print("Impossible")
-                return
-        for time, idx in result:
-            print(f"{time} {idx}")
-    else:
+    if ans_time == -1:
         print("Impossible")
+        return
+        
+    T = ans_time
+    events = []
+    heap = []
+    for i in range(n):
+        w, d, idx = items[i]
+        if w > T:
+            time_needed = (w - T + r - 2) // (r - 1)
+            heapq.heappush(heap, (time_needed, d, idx))
+        else:
+            heapq.heappush(heap, (0, d, idx))
+            
+    time_slots = []
+    current_time = 0
+    while heap:
+        time_needed, deadline, idx = heapq.heappop(heap)
+        if current_time < time_needed:
+            current_time = time_needed
+        if current_time > deadline:
+            print("Impossible")
+            return
+        time_slots.append((current_time, idx))
+        current_time += 1
+        
+    if len(time_slots) > 100000:
+        time_slots = time_slots[:100000]
+        
+    for t, idx in time_slots:
+        print(f"{t} {idx}")
 
 if __name__ == "__main__":
     main()

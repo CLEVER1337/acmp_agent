@@ -1,7 +1,9 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        N, M, K = map(int, f.readline().split())
+    data = input().split()
+    N = int(data[0])
+    M = int(data[1])
+    K = int(data[2])
     
     if M < 2 and N > 0:
         print(0)
@@ -10,32 +12,52 @@ def main():
     total_people = N + M
     buses = (total_people + K - 1) // K
     
-    min_buses_for_children = (N + K - 1) // K
-    min_adults_needed = 2 * min_buses_for_children
-    
-    if M < min_adults_needed:
-        print(0)
-        return
-        
-    buses_needed = buses
-    while buses_needed > 0:
-        max_children_per_bus = K - 2
-        if max_children_per_bus <= 0:
-            print(0)
-            return
+    for b in range(buses, total_people + 1):
+        if b == 0:
+            continue
             
-        total_children_capacity = buses_needed * max_children_per_bus
-        if total_children_capacity >= N:
-            adults_needed = 2 * buses_needed
-            if adults_needed <= M:
-                remaining_adults = M - adults_needed
-                remaining_people = N + remaining_adults
-                if remaining_people <= buses_needed * K:
-                    print(buses_needed)
-                    return
-        buses_needed -= 1
+        adults_per_bus = (M + b - 1) // b
+        children_per_bus = (N + b - 1) // b
         
+        if children_per_bus > 0 and adults_per_bus < 2:
+            continue
+            
+        if children_per_bus <= K - 2 and adults_per_bus <= K:
+            max_children_in_bus = min(K - 2, children_per_bus)
+            if max_children_in_bus * b >= N and adults_per_bus * b >= M:
+                print(b)
+                return
+        else:
+            total_possible = True
+            children_left = N
+            adults_left = M
+            
+            for i in range(b):
+                seats_available = K
+                adults_needed = 0
+                
+                if children_left > 0:
+                    adults_needed = 2
+                    children_in_bus = min(children_left, K - adults_needed)
+                    children_left -= children_in_bus
+                    seats_available -= children_in_bus
+                    adults_in_bus = min(adults_left, seats_available, adults_needed)
+                    adults_left -= adults_in_bus
+                    seats_available -= adults_in_bus
+                else:
+                    adults_in_bus = min(adults_left, seats_available)
+                    adults_left -= adults_in_bus
+                    seats_available -= adults_in_bus
+                
+                if adults_left < 0 or children_left < 0:
+                    total_possible = False
+                    break
+            
+            if total_possible and adults_left == 0 and children_left == 0:
+                print(b)
+                return
+                
     print(0)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

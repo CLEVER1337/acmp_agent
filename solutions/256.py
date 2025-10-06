@@ -4,9 +4,9 @@ def main():
     x, y, z = 0, 0, 0
     
     for _ in range(n):
-        line = input().split()
-        direction = line[0]
-        steps = int(line[1])
+        data = input().split()
+        direction = data[0]
+        steps = int(data[1])
         
         if direction == 'X':
             x += steps

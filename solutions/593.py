@@ -13,36 +13,35 @@ def main():
         towers.append((x, h, i))
     
     towers.sort(key=lambda t: t[0])
+    x_coords = [t[0] for t in towers]
+    heights = [t[1] for t in towers]
+    indices = [t[2] for t in towers]
     
     result = [0] * n
     
     for i in range(n):
         count = 0
-        x_i, h_i, idx_i = towers[i]
+        if i > 0:
+            max_slope = -10**18
+            for j in range(i - 1, -1, -1):
+                dx = x_coords[i] - x_coords[j]
+                dy = heights[i] - heights[j]
+                slope = dy / dx
+                if slope > max_slope:
+                    max_slope = slope
+                    count += 1
         
-        max_slope_left = float('-inf')
-        for j in range(i - 1, -1, -1):
-            x_j, h_j, idx_j = towers[j]
-            dx = x_i - x_j
-            dy = h_j - h_i
-            slope = dy / dx
-            
-            if slope > max_slope_left:
-                max_slope_left = slope
-                count += 1
+        if i < n - 1:
+            min_slope = 10**18
+            for j in range(i + 1, n):
+                dx = x_coords[j] - x_coords[i]
+                dy = heights[j] - heights[i]
+                slope = dy / dx
+                if slope < min_slope:
+                    min_slope = slope
+                    count += 1
         
-        max_slope_right = float('-inf')
-        for j in range(i + 1, n):
-            x_j, h_j, idx_j = towers[j]
-            dx = x_j - x_i
-            dy = h_j - h_i
-            slope = dy / dx
-            
-            if slope > max_slope_right:
-                max_slope_right = slope
-                count += 1
-        
-        result[idx_i] = count
+        result[indices[i]] = count
     
     for res in result:
         print(res)

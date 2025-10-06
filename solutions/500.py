@@ -7,16 +7,16 @@ def main():
     index = 1
     for i in range(n):
         age = int(data[index])
-        risk = int(data[index + 1])
+        risk = int(data[index+1])
         index += 2
         agents.append((age, risk))
     
-    agents.sort(key=lambda x: x[0])
+    agents.sort()
     
     if n == 2:
         print(min(agents[0][1], agents[1][1]))
         return
-    
+        
     dp = [0] * n
     dp[0] = agents[0][1]
     dp[1] = agents[1][1]

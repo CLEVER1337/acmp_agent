@@ -1,79 +1,78 @@
 
 import math
 
-def line_from_points(x1, y1, x2, y2):
-    A = y2 - y1
-    B = x1 - x2
-    C = x2 * y1 - x1 * y2
-    return A, B, C
+def readints():
+    return list(map(int, input().split()))
 
-def distance_point_to_line(A, B, C, x, y):
-    return abs(A * x + B * y + C) / math.sqrt(A * A + B * B)
+def distance_point_to_line(x0, y0, x1, y1, x2, y2):
+    numerator = abs((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1)
+    denominator = math.sqrt((y2 - y1) ** 2 + (x2 - x1) ** 2)
+    return numerator / denominator
 
-def distance_point_to_segment(x1, y1, x2, y2, px, py):
-    line_len_sq = (x2 - x1)**2 + (y2 - y1)**2
-    if line_len_sq == 0:
-        return math.sqrt((px - x1)**2 + (py - y1)**2)
+def distance_point_to_segment(x0, y0, x1, y1, x2, y2):
+    dx = x2 - x1
+    dy = y2 - y1
+    segment_length_squared = dx * dx + dy * dy
     
-    t = max(0, min(1, ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / line_len_sq))
-    proj_x = x1 + t * (x2 - x1)
-    proj_y = y1 + t * (y2 - y1)
-    return math.sqrt((px - proj_x)**2 + (py - proj_y)**2)
+    if segment_length_squared == 0:
+        return math.sqrt((x0 - x1) ** 2 + (y0 - y1) ** 2)
+    
+    t = max(0, min(1, ((x0 - x1) * dx + (y0 - y1) * dy) / segment_length_squared))
+    
+    projection_x = x1 + t * dx
+    projection_y = y1 + t * dy
+    
+    return math.sqrt((x0 - projection_x) ** 2 + (y0 - projection_y) ** 2)
 
 def ternary_search(f, left, right, eps=1e-8, max_iter=100):
     for _ in range(max_iter):
-        mid1 = left + (right - left) / 3
-        mid2 = right - (right - left) / 3
-        if f(mid1) > f(mid2):
-            left = mid1
-        else:
-            right = mid2
         if abs(right - left) < eps:
             break
+        m1 = left + (right - left) / 3
+        m2 = right - (right - left) / 3
+        if f(m1) > f(m2):
+            left = m1
+        else:
+            right = m2
     return (left + right) / 2
 
-def main():
-    import sys
-    data = sys.stdin.read().split()
-    if not data:
-        return
-    
-    n = int(data[0])
-    segments = []
+def solve():
+    n = int(input().strip())
+    lines = []
     for i in range(n):
-        idx = 1 + i * 4
-        x1 = int(data[idx]); y1 = int(data[idx+1])
-        x2 = int(data[idx+2]); y2 = int(data[idx+3])
-        segments.append((x1, y1, x2, y2))
+        data = readints()
+        lines.append(data)
     
-    min_x = min(min(x1, x2) for x1, y1, x2, y2 in segments)
-    max_x = max(max(x1, x2) for x1, y1, x2, y2 in segments)
-    min_y = min(min(y1, y2) for x1, y1, x2, y2 in segments)
-    max_y = max(max(y1, y2) for x1, y1, x2, y2 in segments)
-    
-    def f(x, y):
-        max_dist = 0.0
-        for seg in segments:
-            x1, y1, x2, y2 = seg
-            dist = distance_point_to_segment(x1, y1, x2, y2, x, y)
-            if dist > max_dist:
-                max_dist = dist
-        return max_dist
+    left_x = -1e9
+    right_x = 1e9
+    left_y = -1e9
+    right_y = 1e9
     
     def f_x(x):
         def f_y(y):
-            return f(x, y)
-        y_opt = ternary_search(f_y, min_y, max_y)
-        return f(x, y_opt)
+            max_dist = 0.0
+            for line in lines:
+                x1, y1, x2, y2 = line
+                dist = distance_point_to_line(x, y, x1, y1, x2, y2)
+                max_dist = max(max_dist, dist)
+            return max_dist
+        
+        y_opt = ternary_search(f_y, left_y, right_y)
+        return f_y(y_opt)
     
-    x_opt = ternary_search(f_x, min_x, max_x)
+    x_opt = ternary_search(f_x, left_x, right_x)
     
-    def f_y(y):
-        return f(x_opt, y)
+    def f_y_final(y):
+        max_dist = 0.0
+        for line in lines:
+            x1, y1, x2, y2 = line
+            dist = distance_point_to_line(x_opt, y, x1, y1, x2, y2)
+            max_dist = max(max_dist, dist)
+        return max_dist
     
-    y_opt = ternary_search(f_y, min_y, max_y)
+    y_opt = ternary_search(f_y_final, left_y, right_y)
     
     print(f"{x_opt:.10f} {y_opt:.10f}")
 
 if __name__ == "__main__":
-    main()
+    solve()

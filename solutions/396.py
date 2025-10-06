@@ -3,11 +3,14 @@ import sys
 
 def main():
     data = sys.stdin.read().split()
+    if not data:
+        return
+    
     n = int(data[0])
     m = int(data[1])
+    index = 2
     
     segments = []
-    index = 2
     for i in range(n):
         a = int(data[index])
         b = int(data[index + 1])
@@ -21,22 +24,23 @@ def main():
         events.append((seg[0], 1))
         events.append((seg[1] + 1, -1))
     
-    events.sort()
+    events.sort(key=lambda x: x[0])
     
-    queries = [(points[i], i) for i in range(m)]
-    queries.sort()
+    point_events = [(points[i], i) for i in range(m)]
+    point_events.sort(key=lambda x: x[0])
     
     result = [0] * m
-    count = 0
-    event_idx = 0
+    current_count = 0
+    event_index = 0
+    events_len = len(events)
     
-    for point, idx in queries:
-        while event_idx < len(events) and events[event_idx][0] <= point:
-            count += events[event_idx][1]
-            event_idx += 1
-        result[idx] = count
+    for point, orig_index in point_events:
+        while event_index < events_len and events[event_index][0] <= point:
+            current_count += events[event_index][1]
+            event_index += 1
+        result[orig_index] = current_count
     
-    print(' '.join(map(str, result)))
+    print(" ".join(map(str, result)))
 
 if __name__ == "__main__":
     main()

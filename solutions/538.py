@@ -9,13 +9,13 @@ def main():
     index = 1
     for i in range(n):
         x = float(data[index])
-        y = float(data[index + 1])
+        y = float(data[index+1])
         index += 2
         points.append((x, y))
     
     edges = []
     for i in range(n):
-        for j in range(i + 1, n):
+        for j in range(i+1, n):
             dx = points[i][0] - points[j][0]
             dy = points[i][1] - points[j][1]
             dist = math.sqrt(dx*dx + dy*dy)
@@ -45,36 +45,67 @@ def main():
             rank[u_root] += 1
         return True
     
+    graph = [[] for _ in range(n)]
     mst_edges = []
     for dist, u, v in edges:
         if union(u, v):
-            mst_edges.append((dist, u, v))
+            graph[u].append((v, dist))
+            graph[v].append((u, dist))
+            mst_edges.append((u, v, dist))
     
-    graph = [[] for _ in range(n)]
-    for dist, u, v in mst_edges:
-        graph[u].append((v, dist))
-        graph[v].append((u, dist))
+    max_edge = 0
+    for u, v, dist in mst_edges:
+        if dist > max_edge:
+            max_edge = dist
+    
+    low = 0.0
+    high = max_edge * 2
+    
+    def is_bipartite(limit):
+        color = [-1] * n
+        for i in range(n):
+            if color[i] == -1:
+                stack = [i]
+                color[i] = 0
+                while stack:
+                    u = stack.pop()
+                    for v, dist in graph[u]:
+                        if dist > limit:
+                            if color[v] == -1:
+                                color[v] = 1 - color[u]
+                                stack.append(v)
+                            elif color[v] == color[u]:
+                                return False
+        return True
+    
+    for _ in range(100):
+        mid = (low + high) / 2.0
+        if is_bipartite(mid):
+            low = mid
+        else:
+            high = mid
+    
+    power = low / 2.0
     
     color = [-1] * n
-    color[0] = 0
+    for i in range(n):
+        if color[i] == -1:
+            stack = [i]
+            color[i] = 0
+            while stack:
+                u = stack.pop()
+                for v, dist in graph[u]:
+                    if dist > low:
+                        if color[v] == -1:
+                            color[v] = 1 - color[u]
+                            stack.append(v)
     
-    stack = [0]
-    while stack:
-        u = stack.pop()
-        for v, dist in graph[u]:
-            if color[v] == -1:
-                color[v] = 1 - color[u]
-                stack.append(v)
+    result = []
+    for i in range(n):
+        result.append(str(color[i] + 1))
     
-    critical_dist = float('inf')
-    for dist, u, v in edges:
-        if color[u] == color[v]:
-            critical_dist = min(critical_dist, dist)
-    
-    max_power = critical_dist / 2.0
-    
-    print(f"{max_power:.10f}")
-    print(" ".join(str(c + 1) for c in color))
+    print("{:.10f}".format(power))
+    print(" ".join(result))
 
 if __name__ == "__main__":
     main()

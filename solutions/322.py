@@ -1,18 +1,15 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        text = f.read().strip()
-    
-    n = len(text)
-    fib_chars = []
+    s = input().strip()
+    n = len(s)
+    fibs = []
     a, b = 1, 1
-    
     while a <= n:
-        fib_chars.append(text[a-1])
+        fibs.append(a)
         a, b = b, a + b
     
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(''.join(fib_chars))
+    result = ''.join(s[i-1] for i in fibs if i <= n)
+    print(result)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

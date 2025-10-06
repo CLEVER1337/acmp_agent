@@ -1,92 +1,119 @@
 
 def main():
     import sys
+    from collections import Counter
+    
     data = sys.stdin.read().splitlines()
-    if not data:
-        print("0\n0\n0")
-        return
-        
-    target_word = data[0].strip()
-    target_count = [0] * 26
-    for c in target_word:
-        idx = ord(c) - ord('a')
-        if 0 <= idx < 26:
-            target_count[idx] += 1
-
-    def can_form(word):
-        if not word:
-            return False
-        count = [0] * 26
-        for c in word:
-            idx = ord(c) - ord('a')
-            if 0 <= idx < 26:
-                count[idx] += 1
-        for i in range(26):
-            if count[i] > target_count[i]:
+    long_word = data[0].strip()
+    long_count = Counter(long_word)
+    
+    def is_valid(word):
+        wc = Counter(word)
+        for c in wc:
+            if wc[c] > long_count.get(c, 0):
                 return False
         return True
-
-    n1 = int(data[1].strip())
-    player1_words = []
-    for i in range(2, 2 + n1):
-        word = data[i].strip()
-        if can_form(word):
-            player1_words.append(word)
-
-    n2 = int(data[2 + n1].strip())
-    player2_words = []
-    for i in range(3 + n1, 3 + n1 + n2):
-        word = data[i].strip()
-        if can_form(word):
-            player2_words.append(word)
-
-    common_words = set(player1_words) & set(player2_words)
-    p1_unique = len(player1_words) - len(common_words)
-    p2_unique = len(player2_words) - len(common_words)
-    common_count = len(common_words)
-
-    def both_optimal():
-        if p1_unique > p2_unique:
+    
+    idx = 1
+    n1 = int(data[idx]); idx += 1
+    words1 = []
+    for i in range(n1):
+        word = data[idx].strip(); idx += 1
+        if is_valid(word):
+            words1.append(word)
+    
+    n2 = int(data[idx]); idx += 1
+    words2 = []
+    for i in range(n2):
+        word = data[idx].strip(); idx += 1
+        if is_valid(word):
+            words2.append(word)
+    
+    words1 = list(set(words1))
+    words2 = list(set(words2))
+    
+    common_words = set(words1) & set(words2)
+    only1 = set(words1) - common_words
+    only2 = set(words2) - common_words
+    
+    total_common = len(common_words)
+    total_only1 = len(only1)
+    total_only2 = len(only2)
+    
+    def optimal_play():
+        if total_only1 > total_only2:
             return 1
-        elif p2_unique > p1_unique:
+        elif total_only2 > total_only1:
             return 2
         else:
-            if common_count % 2 == 1:
+            if total_common % 2 == 1:
                 return 1
             else:
                 return 0
-
-    def first_optimal_second_worst():
-        if p1_unique > p2_unique + common_count:
-            return 1
-        elif p2_unique > p1_unique:
-            return 2
-        else:
-            remaining = common_count - max(0, p2_unique - p1_unique)
-            if remaining % 2 == 1:
-                return 1
-            else:
+    
+    def first_sabotage():
+        if total_only1 == 0 and total_only2 == 0:
+            if total_common == 0:
                 return 0
-
-    def first_sandbagging():
-        if p2_unique > p1_unique + common_count:
-            return 2
-        elif p1_unique > p2_unique:
-            return 1
-        else:
-            remaining = common_count - max(0, p1_unique - p2_unique)
-            if remaining % 2 == 1:
+            else:
+                return 2
+        
+        if total_only1 >= total_only2:
+            if total_only1 > total_only2:
                 return 2
             else:
-                return 0
-
-    result1 = both_optimal()
-    result2 = first_optimal_second_worst()
-    result3 = first_sandbagging()
+                if total_common % 2 == 0:
+                    return 2
+                else:
+                    return 2
+        else:
+            if total_only2 > total_only1 + total_common:
+                return 2
+            else:
+                moves = total_only1 + total_common
+                if moves < total_only2:
+                    return 2
+                remaining = moves - total_only2
+                if remaining % 2 == 1:
+                    return 1
+                else:
+                    return 2
     
-    print(result1)
-    print(result2)
-    print(result3)
+    def second_sabotage():
+        if total_only1 == 0 and total_only2 == 0:
+            if total_common == 0:
+                return 0
+            else:
+                return 1
+        
+        if total_only2 >= total_only1:
+            if total_only2 > total_only1:
+                return 1
+            else:
+                if total_common % 2 == 0:
+                    return 1
+                else:
+                    return 1
+        else:
+            if total_only1 > total_only2 + total_common:
+                return 1
+            else:
+                moves = total_only2 + total_common
+                if moves < total_only1:
+                    return 1
+                remaining = moves - total_only1
+                if remaining % 2 == 1:
+                    return 2
+                else:
+                    return 1
+    
+    res1 = optimal_play()
+    res2 = first_sabotage()
+    res3 = second_sabotage()
+    
+    print(res1)
+    print(res2)
+    print(res3)
 
 if __name__ == "__main__":
     main()

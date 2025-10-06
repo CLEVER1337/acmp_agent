@@ -1,11 +1,16 @@
 
-def point_in_triangle(x, y, x1, y1, x2, y2, x3, y3):
-    def sign(p1, p2, p3):
-        return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
-    
-    d1 = sign((x, y), (x1, y1), (x2, y2))
-    d2 = sign((x, y), (x2, y2), (x3, y3))
-    d3 = sign((x, y), (x3, y3), (x1, y1))
+import sys
+
+def readints():
+    return list(map(int, sys.stdin.read().split()))
+
+def sign(p1, p2, p3):
+    return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
+
+def point_in_triangle(pt, v1, v2, v3):
+    d1 = sign(pt, v1, v2)
+    d2 = sign(pt, v2, v3)
+    d3 = sign(pt, v3, v1)
     
     has_neg = (d1 < 0) or (d2 < 0) or (d3 < 0)
     has_pos = (d1 > 0) or (d2 > 0) or (d3 > 0)
@@ -13,25 +18,29 @@ def point_in_triangle(x, y, x1, y1, x2, y2, x3, y3):
     return not (has_neg and has_pos)
 
 def main():
-    import sys
-    data = sys.stdin.read().split()
+    data = readints()
+    idx = 0
+    x, y = data[idx], data[idx+1]
+    idx += 2
+    k = data[idx]
+    idx += 1
     
-    xn = float(data[0])
-    yn = float(data[1])
-    k = int(data[2])
-    
+    city = (x, y)
     countries = []
-    index = 3
-    for i in range(k):
-        coords = list(map(float, data[index:index+6]))
-        countries.append(coords)
-        index += 6
-    
     result = []
-    for i, country in enumerate(countries, 1):
-        x1, y1, x2, y2, x3, y3 = country
-        if point_in_triangle(xn, yn, x1, y1, x2, y2, x3, y3):
-            result.append(i)
+    
+    for i in range(k):
+        coords = data[idx:idx+6]
+        idx += 6
+        v1 = (coords[0], coords[1])
+        v2 = (coords[2], coords[3])
+        v3 = (coords[4], coords[5])
+        countries.append((v1, v2, v3))
+    
+    for i in range(k):
+        v1, v2, v3 = countries[i]
+        if point_in_triangle(city, v1, v2, v3):
+            result.append(i+1)
     
     print(len(result))
     if result:

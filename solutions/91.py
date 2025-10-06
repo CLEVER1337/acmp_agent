@@ -1,68 +1,43 @@
 
 def main():
     n = int(input().strip())
-    if n == 1:
-        print(2)
-        print(1)
+    if n <= 5:
+        a_values = [0, 2, 3, 4, 7, 13]
+        b_values = [0, 1, 5, 6, 8, 9]
+        print(a_values[n])
+        print(b_values[n])
         return
-    elif n == 2:
-        print(3)
-        print(1)
-        return
-    elif n == 3:
-        print(4)
-        print(1)
-        return
-    elif n == 4:
-        print(7)
-        print(1)
-        return
-    elif n == 5:
-        print(13)
-        print(1)
-        return
-
+        
     max_size = max(10000, n * 2)
     a = [0] * (max_size + 1)
-    b = []
-    a[1] = 2
-    a[2] = 3
-    a[3] = 4
-    a[4] = 7
-    a[5] = 13
-
-    used = set(a[1:6])
-    next_num = 1
-    b_index = 0
-
-    for i in range(6, n + 1):
-        while next_num in used:
-            next_num += 1
-        b.append(next_num)
-        used.add(next_num)
-        next_num += 1
-        
-        if len(b) >= 3:
-            a[i] = b[b_index] + b[b_index + 2]
-            used.add(a[i])
+    b = [0] * (max_size + 1)
+    used = [False] * (max_size * 2)
+    
+    a[1], a[2], a[3], a[4], a[5] = 2, 3, 4, 7, 13
+    for num in a[1:6]:
+        if num <= max_size * 2:
+            used[num] = True
+            
+    b_index = 1
+    for i in range(1, max_size * 2):
+        if not used[i] and b_index <= max_size:
+            b[b_index] = i
+            used[i] = True
             b_index += 1
-        else:
-            while next_num in used:
-                next_num += 1
-            a[i] = next_num
-            used.add(next_num)
-            next_num += 1
-
+            
+    for i in range(6, max_size + 1):
+        a[i] = b[i-1] + b[i-3]
+        if a[i] < len(used):
+            used[a[i]] = True
+            
+        next_b = b[i-1] + 1
+        while used[next_b]:
+            next_b += 1
+        b[i] = next_b
+        used[next_b] = True
+        
     print(a[n])
-    
-    bn_list = []
-    current = 1
-    while len(bn_list) < n:
-        if current not in used:
-            bn_list.append(current)
-        current += 1
-    
-    print(bn_list[n - 1])
+    print(b[n])
 
 if __name__ == "__main__":
     main()

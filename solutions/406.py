@@ -4,37 +4,38 @@ import sys
 def main():
     data = sys.stdin.read().splitlines()
     n, m = map(int, data[0].split())
-    
-    freq_known = []
+    freq_info = []
     for i in range(1, 1 + n):
         parts = data[i].split()
         char = parts[0]
         freq = float(parts[1])
-        freq_known.append((char, freq))
+        freq_info.append((char, freq))
     
     encrypted_text = data[1 + n].strip()
     
-    freq_encrypted = {}
-    for char in encrypted_text:
-        freq_encrypted[char] = freq_encrypted.get(char, 0) + 1
+    from collections import defaultdict
+    encrypted_count = defaultdict(int)
+    for c in encrypted_text:
+        encrypted_count[c] += 1
     
-    total_chars = len(encrypted_text)
-    freq_encrypted_normalized = []
-    for char, count in freq_encrypted.items():
-        freq_encrypted_normalized.append((char, count / total_chars))
+    encrypted_chars = sorted(encrypted_count.keys())
+    encrypted_freqs = []
+    for c in encrypted_chars:
+        freq = encrypted_count[c] / m
+        encrypted_freqs.append((c, freq))
     
-    freq_encrypted_normalized.sort(key=lambda x: x[1], reverse=True)
-    freq_known.sort(key=lambda x: x[1], reverse=True)
+    sorted_original = sorted(freq_info, key=lambda x: x[1])
+    sorted_encrypted = sorted(encrypted_freqs, key=lambda x: x[1])
     
     mapping = {}
-    for i in range(len(freq_encrypted_normalized)):
-        encrypted_char = freq_encrypted_normalized[i][0]
-        known_char = freq_known[i][0]
-        mapping[encrypted_char] = known_char
+    for i in range(len(sorted_encrypted)):
+        encrypted_char = sorted_encrypted[i][0]
+        original_char = sorted_original[i][0]
+        mapping[encrypted_char] = original_char
     
     result = []
-    for encrypted_char, _ in freq_encrypted_normalized:
-        result.append(mapping[encrypted_char])
+    for c in encrypted_chars:
+        result.append(mapping[c])
     
     for char in result:
         print(char)

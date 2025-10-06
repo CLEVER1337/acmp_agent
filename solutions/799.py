@@ -1,26 +1,22 @@
 
-n = int(input())
+n = int(input().strip())
 scores = list(map(int, input().split()))
 
-best_place = 0
+max_score = max(scores)
+candidates = []
 
 for i in range(n):
     if scores[i] % 10 == 5:
-        if i < n - 1 and scores[i + 1] < scores[i]:
-            has_winner_before = False
-            for j in range(i):
-                if scores[j] > scores[i]:
-                    has_winner_before = True
-                    break
-            
-            if has_winner_before:
-                count_better = 0
-                for j in range(n):
-                    if scores[j] > scores[i]:
-                        count_better += 1
-                
-                place = count_better + 1
-                if best_place == 0 or place < best_place:
-                    best_place = place
+        if i < n - 1 and scores[i] > scores[i + 1]:
+            candidates.append(scores[i])
 
-print(best_place)
+if not candidates:
+    print(0)
+else:
+    best_candidate = max(candidates)
+    count_better = 0
+    for score in scores:
+        if score > best_candidate:
+            count_better += 1
+    place = count_better + 1
+    print(place)

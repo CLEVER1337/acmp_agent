@@ -1,66 +1,88 @@
 
 import sys
-import math
-
-def readints():
-    return list(map(int, sys.stdin.readline().split()))
-
-def readfloats():
-    return list(map(float, sys.stdin.readline().split()))
 
 def main():
-    data = sys.stdin.read().splitlines()
+    data = sys.stdin.read().split()
     if not data:
         print(0)
         return
         
-    R, K = readints()
-    N = int(data[1])
+    R = int(data[0])
+    K = int(data[1])
+    N = int(data[2])
     
-    if N == 0:
-        print(0)
-        return
-        
     hairs = []
-    for i in range(2, 2 + N):
-        xh, yh, xs, ys = readfloats()
+    index = 3
+    for i in range(N):
+        xh = float(data[index])
+        yh = float(data[index+1])
+        xs = float(data[index+2])
+        ys = float(data[index+3])
+        index += 4
         hairs.append((xh, yh, xs, ys))
     
-    def get_angle(xh, yh, xs, ys):
+    def get_angle(x, y):
+        return (x, y)
+    
+    points = []
+    for xh, yh, xs, ys in hairs:
         dx = xs - xh
         dy = ys - yh
         
-        angle_head = math.atan2(yh, xh)
+        a = dx*dx + dy*dy
+        b = 2*(xh*dx + yh*dy)
+        c = xh*xh + yh*yh - R*R
         
-        if abs(dx) < 1e-12:
-            if dy > 0:
-                angle_dir = math.pi / 2
-            else:
-                angle_dir = -math.pi / 2
-        else:
-            angle_dir = math.atan2(dy, dx)
-            
-        return angle_head, angle_dir
+        discriminant = b*b - 4*a*c
+        t = (-b + discriminant**0.5) / (2*a)
+        
+        px = xh + t * dx
+        py = yh + t * dy
+        
+        points.append((px, py))
     
-    angle_pairs = []
-    for xh, yh, xs, ys in hairs:
-        angle_head, angle_dir = get_angle(xh, yh, xs, ys)
-        angle_pairs.append((angle_head, angle_dir))
+    events = []
+    for i, (px, py) in enumerate(points):
+        angle = (px, py)
+        events.append((angle, i))
     
-    angle_pairs.sort()
+    events.sort(key=lambda x: (x[0][0], x[0][1]))
     
-    count = 0
-    n = len(angle_pairs)
+    order = [0] * N
+    for idx, (_, orig_idx) in enumerate(events):
+        order[orig_idx] = idx
     
-    for i in range(n):
-        head_i, dir_i = angle_pairs[i]
-        for j in range(i + 1, n):
-            head_j, dir_j = angle_pairs[j]
-            
-            if dir_i > dir_j:
-                count += 1
+    class Fenw:
+        def __init__(self, n):
+            self.n = n
+            self.tree = [0] * (n + 1)
+        
+        def update(self, index, delta):
+            i = index + 1
+            while i <= self.n:
+                self.tree[i] += delta
+                i += i & -i
+        
+        def query(self, index):
+            res = 0
+            i = index + 1
+            while i > 0:
+                res += self.tree[i]
+                i -= i & -i
+            return res
+        
+        def range_query(self, l, r):
+            return self.query(r) - self.query(l - 1)
     
-    print(count)
+    fenw = Fenw(N)
+    total = 0
+    
+    for i in range(N):
+        pos = order[i]
+        total += fenw.range_query(pos + 1, N - 1)
+        fenw.update(pos, 1)
+    
+    print(total)
 
 if __name__ == "__main__":
     main()

@@ -4,39 +4,35 @@ def main():
     data = sys.stdin.read().split()
     n = int(data[0])
     events = []
-    for i in range(n):
-        a = int(data[1 + 2*i])
-        b = int(data[2 + 2*i])
+    for i in range(1, len(data), 2):
+        a = int(data[i])
+        b = int(data[i+1])
         events.append((a, 1))
         events.append((b, -1))
     
     events.sort()
     
-    balance = 0
-    start_white = None
-    max_white_len = 0
-    prev = 0
+    current_color = 0
+    last_pos = 0
+    max_white = 0
+    count = 0
     
     for pos, event_type in events:
-        if balance == 0:
-            white_len = pos - prev
-            if white_len > max_white_len:
-                max_white_len = white_len
-            start_white = pos
-        elif balance == 1 and event_type == -1:
-            start_white = pos
+        if current_color == 0:
+            white_segment = pos - last_pos
+            if white_segment > max_white:
+                max_white = white_segment
         
-        balance += event_type
-        
-        if balance == 0:
-            prev = pos
+        count += event_type
+        current_color = count % 2
+        last_pos = pos
     
-    if balance == 0:
-        white_len = 10**9 - prev
-        if white_len > max_white_len:
-            max_white_len = white_len
-    
-    print(max_white_len)
+    if current_color == 0:
+        white_segment = 10**9 - last_pos
+        if white_segment > max_white:
+            max_white = white_segment
+            
+    print(max_white)
 
 if __name__ == "__main__":
     main()

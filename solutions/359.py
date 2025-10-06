@@ -5,25 +5,21 @@ def main():
         print(1)
         return
         
-    a, b = 1, 2
-    direction = 1
-    current_col = 2
-    current_num = 2
-    
-    while current_col < n:
-        if direction == 1:
-            steps = a + 1
-            a += 1
-            current_num += steps
-            direction = -1
+    left = 1
+    right = 10**12
+    while left < right:
+        mid = (left + right) // 2
+        count = 0
+        k = 1
+        while k * k <= mid:
+            count += (mid // k) - (k - 1)
+            k += 1
+        if count < n:
+            left = mid + 1
         else:
-            steps = b + 1
-            b += 1
-            current_num += steps
-            direction = 1
-        current_col += 1
-        
-    print(current_num)
+            right = mid
+            
+    print(left)
 
 if __name__ == "__main__":
     main()

@@ -1,90 +1,102 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
+    with open("INPUT.TXT", "r") as f:
         q_str = f.readline().strip()
         n = int(f.readline().strip())
     
     if '(' not in q_str:
-        integer_part, fractional_part = q_str.split('.')
-        result = str(int(integer_part + fractional_part) * n)
-        if len(result) <= len(fractional_part):
-            result = '0.' + result.zfill(len(fractional_part))[-len(fractional_part):]
+        integer_part_str, fractional_part_str = q_str.split('.') if '.' in q_str else (q_str, '0')
+        fractional_part_str = fractional_part_str.rstrip('0')
+        if fractional_part_str == '':
+            result = str(int(integer_part_str) * n)
+            with open("OUTPUT.TXT", "w") as f:
+                f.write(result)
+            return
+        
+        numerator = int(integer_part_str + fractional_part_str)
+        denominator = 10 ** len(fractional_part_str)
+        numerator = numerator * n
+        gcd_val = gcd(numerator, denominator)
+        numerator //= gcd_val
+        denominator //= gcd_val
+        
+        if denominator == 1:
+            with open("OUTPUT.TXT", "w") as f:
+                f.write(str(numerator))
         else:
-            result = result[:-len(fractional_part)] + '.' + result[-len(fractional_part):]
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write(result.rstrip('0').rstrip('.'))
+            integer_part = numerator // denominator
+            fractional_part = numerator % denominator
+            with open("OUTPUT.TXT", "w") as f:
+                f.write(f"{integer_part}.{fractional_part:0{len(str(denominator))-1}}")
         return
     
-    non_period_start = q_str.find('(')
-    non_period_end = q_str.find(')')
-    integer_part = q_str.split('.')[0]
-    non_repeating = q_str.split('.')[1].split('(')[0]
-    repeating = q_str[non_period_start+1:non_period_end]
+    dot_index = q_str.index('.')
+    open_bracket = q_str.index('(')
+    close_bracket = q_str.index(')')
     
-    full_non_repeating = non_repeating + repeating
-    k = len(repeating)
-    m = len(non_repeating)
+    non_periodic = q_str[dot_index+1:open_bracket]
+    periodic = q_str[open_bracket+1:close_bracket]
     
-    numerator = int(integer_part + full_non_repeating) - int(integer_part + non_repeating)
-    denominator = (10**(m+k) - 10**m)
+    integer_part_str = q_str[:dot_index]
+    
+    k = len(non_periodic)
+    l = len(periodic)
+    
+    a = int(integer_part_str + non_periodic + periodic) if non_periodic != '' else int(integer_part_str + periodic)
+    b = int(integer_part_str + non_periodic) if non_periodic != '' else int(integer_part_str)
+    
+    numerator = a - b
+    denominator = (10 ** (k + l)) - (10 ** k)
     
     numerator *= n
     gcd_val = gcd(numerator, denominator)
     numerator //= gcd_val
     denominator //= gcd_val
     
-    integer_part_result = numerator // denominator
-    numerator %= denominator
-    
-    if numerator == 0:
-        with open('OUTPUT.TXT', 'w') as f:
-            f.write(str(integer_part_result))
+    if denominator == 1:
+        with open("OUTPUT.TXT", "w") as f:
+            f.write(str(numerator))
         return
     
-    denominators = []
-    while denominator % 2 == 0:
-        denominators.append(2)
-        denominator //= 2
-    while denominator % 5 == 0:
-        denominators.append(5)
-        denominator //= 5
+    integer_part = numerator // denominator
+    fractional = numerator % denominator
     
-    non_period_len = len(denominators)
-    period_denom = denominator
+    if fractional == 0:
+        with open("OUTPUT.TXT", "w") as f:
+            f.write(str(integer_part))
+        return
     
     digits = []
-    rem = numerator
-    seen = {}
+    remainder = fractional
+    remainders_seen = {}
     period_start = -1
+    period_digits = []
+    non_periodic_digits = []
     
-    for i in range(1000):
-        rem *= 10
-        digit = rem // period_denom
-        digits.append(str(digit))
-        rem %= period_denom
+    while remainder != 0:
+        if remainder in remainders_seen:
+            period_start = remainders_seen[remainder]
+            non_periodic_digits = digits[:period_start]
+            period_digits = digits[period_start:]
+            break
         
-        if rem == 0:
-            break
-            
-        if rem in seen:
-            period_start = seen[rem]
-            break
-            
-        seen[rem] = i
+        remainders_seen[remainder] = len(digits)
+        remainder *= 10
+        digit = remainder // denominator
+        digits.append(digit)
+        remainder %= denominator
+    else:
+        non_periodic_digits = digits
+        period_digits = []
     
-    non_period_digits = digits[:non_period_len]
-    period_digits = digits[non_period_len:]
+    result_str = str(integer_part) + '.'
+    if non_periodic_digits:
+        result_str += ''.join(str(d) for d in non_periodic_digits)
     
-    if period_start != -1 and period_start >= non_period_len:
-        period_digits = digits[non_period_len:period_start] + digits[period_start:]
-    
-    result_str = str(integer_part_result) + '.'
-    if non_period_digits:
-        result_str += ''.join(non_period_digits)
     if period_digits:
-        result_str += '(' + ''.join(period_digits) + ')'
+        result_str += '(' + ''.join(str(d) for d in period_digits) + ')'
     
-    with open('OUTPUT.TXT', 'w') as f:
+    with open("OUTPUT.TXT", "w") as f:
         f.write(result_str)
 
 def gcd(a, b):
@@ -92,5 +104,5 @@ def gcd(a, b):
         a, b = b, a % b
     return a
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

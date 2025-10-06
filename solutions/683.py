@@ -1,9 +1,7 @@
 
 def main():
-    import sys
-    data = sys.stdin.read().split()
-    n = int(data[0])
-    a = list(map(int, data[1:1+n]))
+    n = int(input().strip())
+    arr = list(map(int, input().split()))
     
     if n <= 2:
         print(0)
@@ -16,7 +14,7 @@ def main():
             j = i + length
             dp[i][j] = float('inf')
             for k in range(i + 1, j):
-                cost = a[i] * a[k] * a[j] + dp[i][k] + dp[k][j]
+                cost = dp[i][k] + dp[k][j] + arr[i] * arr[j] * arr[k]
                 if cost < dp[i][j]:
                     dp[i][j] = cost
                     

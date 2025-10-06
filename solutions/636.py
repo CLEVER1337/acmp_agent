@@ -20,31 +20,28 @@ def main():
     for app_id in app_windows:
         app_windows[app_id].sort()
     
-    results = []
+    result = []
     current_pos = 0
     
     for i in range(n):
         app_id, window_id = windows[i]
+        windows_in_app = app_windows[app_id]
+        total_windows = len(windows_in_app)
         
-        app_list = app_windows[app_id]
-        m = len(app_list)
+        idx = windows_in_app.index(window_id)
+        left_dist = idx
+        right_dist = total_windows - idx
         
-        pos_in_app = app_list.index(window_id)
+        app_cost = min(left_dist, right_dist)
         
-        dist1 = abs(current_pos - i)
-        dist2 = n - dist1
-        dist_main = min(dist1, dist2)
+        list_dist = min(abs(i - current_pos), n - abs(i - current_pos))
         
-        dist_app1 = pos_in_app
-        dist_app2 = m - pos_in_app
-        dist_app = min(dist_app1, dist_app2)
-        
-        total = dist_main + dist_app
-        results.append(str(total))
+        total_cost = list_dist + app_cost
+        result.append(str(total_cost))
         
         current_pos = i
     
-    print(" ".join(results))
+    print(" ".join(result))
 
 if __name__ == "__main__":
     main()

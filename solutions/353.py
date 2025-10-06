@@ -11,8 +11,8 @@ def main():
     
     for i in range(n - 2):
         a = segments[i]
-        b = segments[i + 1]
-        c = segments[i + 2]
+        b = segments[i+1]
+        c = segments[i+2]
         
         if a < b + c:
             p = (a + b + c) / 2.0

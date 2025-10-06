@@ -1,48 +1,47 @@
 
 def main():
-    with open("INPUT.TXT", "r") as f:
-        day, month = map(int, f.readline().split())
-    
     days_in_month = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    day, month = map(int, input().split())
+    month -= 1
     
-    def is_valid_date(d, m):
-        return 1 <= m <= 12 and 1 <= d <= days_in_month[m-1]
+    n = 12
+    m = 31
+    dp = [[False] * (m + 1) for _ in range(n + 1)]
     
-    memo = {}
+    dp[11][30] = True
     
-    def can_win(d, m):
-        if (d, m) == (31, 12):
-            return False
-        
-        if (d, m) in memo:
-            return memo[(d, m)]
-        
-        moves = []
-        if is_valid_date(d + 1, m):
-            moves.append((d + 1, m))
-        if is_valid_date(d + 2, m):
-            moves.append((d + 2, m))
-        if is_valid_date(d, m + 1):
-            moves.append((d, m + 1))
-        if is_valid_date(d, m + 2):
-            moves.append((d, m + 2))
-        
-        if not moves:
-            memo[(d, m)] = False
-            return False
-        
-        for next_d, next_m in moves:
-            if not can_win(next_d, next_m):
-                memo[(d, m)] = True
-                return True
-        
-        memo[(d, m)] = False
-        return False
-    
-    result = 1 if can_win(day, month) else 2
-    
-    with open("OUTPUT.TXT", "w") as f:
-        f.write(str(result))
+    for mm in range(11, -1, -1):
+        max_day = days_in_month[mm] - 1 if mm == 11 else days_in_month[mm]
+        for dd in range(max_day, -1, -1):
+            if mm == 11 and dd == 30:
+                continue
+                
+            moves = []
+            if dd + 1 < days_in_month[mm]:
+                moves.append((mm, dd + 1))
+            if dd + 2 < days_in_month[mm]:
+                moves.append((mm, dd + 2))
+            if mm + 1 < 12:
+                new_days = min(days_in_month[mm + 1], dd)
+                if new_days > 0:
+                    moves.append((mm + 1, new_days - 1))
+            if mm + 2 < 12:
+                new_days = min(days_in_month[mm + 2], dd)
+                if new_days > 0:
+                    moves.append((mm + 2, new_days - 1))
+                    
+            winning = False
+            for nm, nd in moves:
+                if nm == 11 and nd == 30:
+                    winning = True
+                    break
+                if not dp[nm][nd]:
+                    winning = True
+                    break
+                    
+            dp[mm][dd] = winning
+            
+    print(1 if dp[month][day] else 2)
 
 if __name__ == "__main__":
     main()

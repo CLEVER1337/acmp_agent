@@ -1,46 +1,62 @@
 
-import re
+import sys
 
 def main():
-    with open('INPUT.TXT', 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-    
-    if not lines:
+    data = sys.stdin.read().splitlines()
+    if not data:
         return
     
-    query = lines[0].strip()
-    text_lines = lines[1:]
+    query = data[0].strip()
+    text_lines = data[1:]
     
-    # Получаем слова из запроса
+    if not query:
+        print(''.join(text_lines), end='')
+        return
+        
     query_words = query.split()
-    query_pattern = r'\s+'.join(re.escape(word) for word in query_words)
+    normalized_query = ' '.join(query_words).lower()
     
-    # Читаем весь текст
     full_text = ''.join(text_lines)
     
-    # Находим все вхождения
-    matches = []
-    for match in re.finditer(query_pattern, full_text, re.IGNORECASE):
-        matches.append(match.start())
-    
-    # Строим результат с символами @
     result = []
-    current_pos = 0
+    i = 0
+    n = len(full_text)
     
-    for match_pos in sorted(matches):
-        # Добавляем текст до вхождения
-        result.append(full_text[current_pos:match_pos])
-        # Добавляем символ @
-        result.append('@')
-        # Добавляем само вхождение
-        result.append(full_text[match_pos:match_pos + len(query.replace(' ', '')) + (len(query_words) - 1)])
-        current_pos = match_pos + len(query.replace(' ', '')) + (len(query_words) - 1)
-    
-    # Добавляем оставшийся текст
-    result.append(full_text[current_pos:])
-    
-    with open('OUTPUT.TXT', 'w', encoding='utf-8') as f:
-        f.write(''.join(result))
+    while i < n:
+        if full_text[i].isspace():
+            result.append(full_text[i])
+            i += 1
+            continue
+            
+        start = i
+        words_found = []
+        current_word = []
+        j = i
+        
+        while j < n and len(words_found) < len(query_words):
+            if not full_text[j].isspace():
+                current_word.append(full_text[j])
+                j += 1
+            else:
+                if current_word:
+                    words_found.append(''.join(current_word))
+                    current_word = []
+                j += 1
+                while j < n and full_text[j].isspace():
+                    j += 1
+        
+        if current_word and len(words_found) < len(query_words):
+            words_found.append(''.join(current_word))
+            
+        if len(words_found) == len(query_words):
+            candidate = ' '.join(words_found).lower()
+            if candidate == normalized_query:
+                result.append('@')
+                
+        result.append(full_text[i])
+        i += 1
+        
+    print(''.join(result), end='')
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

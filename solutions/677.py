@@ -1,16 +1,14 @@
 
 def main():
     K, N, M, D = map(int, input().split())
-    total = K * N * M * D
-    for x in range(1, total + 1):
-        if (x % K == 0 and x % N == 0 and x % M == 0):
-            part1 = x // K
-            part2 = x // N
-            part3 = x // M
-            if part1 + part2 + part3 + D == x:
-                print(x)
-                return
-    print(-1)
-
-if __name__ == "__main__":
-    main()
+    total = -1
+    for x in range(1, 1000000):
+        part1 = x // K
+        part2 = x // M
+        part3 = x // N
+        rest = x - part1 - part2 - part3
+        if rest == D:
+            if part1 * K <= x and part2 * M <= x and part3 * N <= x:
+                total = x
+                break
+    print(total)

@@ -1,6 +1,5 @@
 
 import sys
-from collections import defaultdict
 
 def main():
     data = sys.stdin.read().split()
@@ -10,58 +9,58 @@ def main():
     K = int(data[0])
     N = int(data[1])
     M = int(data[2])
-    total_players = 2 * K
+    total_players = 1 << K
     
-    agreements = defaultdict(set)
-    idx = 3
+    agreements = {}
+    index = 3
     for i in range(N):
-        x = int(data[idx])
-        y = int(data[idx+1])
-        idx += 2
-        agreements[x].add(y)
+        x = int(data[index])
+        y = int(data[index+1])
+        index += 2
+        agreements[(min(x, y), max(x, y))] = x
     
-    candidates = list(map(int, data[idx:idx+M]))
-    idx += M
+    candidates = list(map(int, data[index:index+M]))
+    index += M
     
     rounds = [0] * (total_players + 1)
     
-    for player in range(1, total_players + 1):
-        can_win = [False] * (total_players + 1)
-        can_win[player] = True
-        
-        for round_num in range(1, K + 1):
-            next_can_win = [False] * (total_players + 1)
-            matches = total_players // (2 ** (round_num - 1))
+    def can_win_in_round(player, round_num):
+        if round_num == 0:
+            return True
             
-            for match in range(matches // 2):
-                left_start = 2 * match * (2 ** (round_num - 1)) + 1
-                right_start = left_start + (2 ** (round_num - 1))
+        start_segment = ((player - 1) >> (round_num - 1)) << (round_num - 1)
+        segment_size = 1 << (round_num - 1)
+        left_segment = start_segment + 1
+        right_segment = start_segment + segment_size
+        opponent_segment_start = left_segment if player > right_segment else right_segment + 1
+        opponent_segment_end = opponent_segment_start + segment_size - 1
+        
+        for opp in range(opponent_segment_start, opponent_segment_end + 1):
+            if opp < 1 or opp > total_players:
+                continue
                 
-                for left in range(left_start, left_start + (2 ** (round_num - 1))):
-                    if not can_win[left]:
-                        continue
-                    for right in range(right_start, right_start + (2 ** (round_num - 1))):
-                        if not can_win[right]:
-                            continue
-                            
-                        if right in agreements.get(left, set()):
-                            next_can_win[left] = True
-                        elif left in agreements.get(right, set()):
-                            next_can_win[right] = True
-                        else:
-                            next_can_win[left] = True
-                            next_can_win[right] = True
+            key = (min(player, opp), max(player, opp))
+            if key in agreements:
+                if agreements[key] != player:
+                    return False
+            else:
+                pass
                 
-            if any(next_can_win):
-                can_win = next_can_win
-                rounds[player] = round_num
+        return True
+        
+    for player in range(1, total_players + 1):
+        max_round = 0
+        for r in range(1, K + 1):
+            if can_win_in_round(player, r):
+                max_round = r
             else:
                 break
-    
+        rounds[player] = max_round
+        
     result = []
-    for candidate in candidates:
-        result.append(str(rounds[candidate]))
-    
+    for cand in candidates:
+        result.append(str(rounds[cand]))
+        
     sys.stdout.write("\n".join(result))
 
 if __name__ == "__main__":

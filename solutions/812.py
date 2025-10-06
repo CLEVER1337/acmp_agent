@@ -1,7 +1,9 @@
 
 def main():
-    with open('INPUT.TXT', 'r') as f:
-        N, A = map(int, f.readline().split())
+    import sys
+    data = sys.stdin.read().split()
+    N = int(data[0])
+    A = int(data[1])
     
     dp = [0] * (N + 1)
     dp[0] = 1
@@ -9,9 +11,8 @@ def main():
     for i in range(1, A + 1):
         for j in range(i, N + 1):
             dp[j] += dp[j - i]
-    
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(dp[N]))
+            
+    print(dp[N])
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

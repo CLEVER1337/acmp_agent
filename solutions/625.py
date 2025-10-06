@@ -1,58 +1,42 @@
 
 def main():
     mapping = {}
-    with open("INPUT.TXT", "r") as f:
-        lines = f.readlines()
-        
-        # Читаем символы для кнопок 1-9
-        for i in range(9):
-            button_chars = lines[i].strip()
-            for j, char in enumerate(button_chars):
-                mapping[char] = (str(i + 1), j + 1)
-        
-        text = lines[9].strip()
+    for i in range(1, 10):
+        line = input().strip()
+        for idx, char in enumerate(line):
+            mapping[char] = (str(i), idx + 1)
+    mapping[' '] = ('0', 1)
     
+    text = input().strip()
+    
+    caps_mode = True
     total_presses = 0
-    current_case = "upper"  # Начинаем с режима "первой заглавной буквы"
     prev_button = None
     
-    i = 0
-    while i < len(text):
-        char = text[i]
-        
-        if char == ' ':
-            total_presses += 1
-            prev_button = '0'
-            i += 1
-            continue
-        
+    for i, char in enumerate(text):
         if char in mapping:
-            button, presses_needed = mapping[char]
-            required_case = "upper" if char.isupper() else "lower"
-            
-            # Проверяем, нужно ли менять регистр
-            if current_case != required_case:
-                total_presses += 1  # Нажатие '#'
-                current_case = required_case
-            
-            # Если предыдущий символ был на той же кнопке и не пробел
-            if prev_button == button:
-                total_presses += 1  # Нажатие для перемещения курсора
-            
-            total_presses += presses_needed
-            prev_button = button
-            
-            # Проверяем, активируется ли режим "первой заглавной буквы"
-            if char in ['.', '!', '?'] and current_case == "lower":
-                current_case = "upper"
-            
-            i += 1
+            button, presses = mapping[char]
         else:
-            # Обработка специальных символов (должны быть в mapping по условию)
-            i += 1
-    
-    with open("OUTPUT.TXT", "w") as f:
-        f.write(str(total_presses))
+            continue
+            
+        if char.isalpha():
+            if char.isupper() and not caps_mode:
+                total_presses += 1
+                caps_mode = True
+            elif char.islower() and caps_mode:
+                total_presses += 1
+                caps_mode = False
+                
+        if button == prev_button and char != ' ':
+            total_presses += 1
+            
+        total_presses += presses
+        prev_button = button
+        
+        if char in '.!?' and not caps_mode:
+            caps_mode = True
+            
+    print(total_presses)
 
 if __name__ == "__main__":
     main()
