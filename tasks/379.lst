@@ -1,0 +1,5 @@
+Two players are playing. A certain date in 2008 is set. On their turn, each player names a later date, increasing either the day of the month or the month by 1 or 2, but not both at the same time. The combination of day and month must remain a valid date. The player who names December 31st loses. Both players play optimally. Based on the given date, output who will win.
+Input data
+The first line of the input file INPUT.TXT contains numbers representing the day and month. The month is specified from 1 to 12, the day from 1 to the number of days in that month; the date "December 31" is not present in the input data.
+Output data
+In the output file OUTPUT.TXT, output 1 if the first (starting) player wins, or 2 otherwise.

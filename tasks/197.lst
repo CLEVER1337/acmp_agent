@@ -1,0 +1,5 @@
+It is required to fill a square matrix in a snake-like pattern, as shown in the figure on the right: the filling starts with one from the top-left corner and ends in the bottom-right corner with the number N², where N is the order of the matrix.
+Input
+The input file INPUT.TXT contains a natural number N – the size of the square matrix (N ≤ 100).
+Output
+The output file OUTPUT.TXT should contain the matrix filled with numbers from 1 to N² in a snake-like pattern, with any number of spaces allowed between the numbers.

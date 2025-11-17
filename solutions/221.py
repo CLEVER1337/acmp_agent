@@ -1,76 +1,77 @@
 
+import sys
 from collections import deque
 
-def main():
-    with open('INPUT.TXT', 'r') as f:
-        data = f.read().split()
-    
-    K = int(data[0])
-    N = int(data[1])
-    M = int(data[2])
-    grid = []
-    index = 3
-    start = None
-    end = None
-    
-    for i in range(N):
-        row = list(map(int, data[index:index+M]))
-        index += M
-        grid.append(row)
-        for j in range(M):
-            if row[j] == 2:
-                start = (i, j)
-            elif row[j] == 3:
-                end = (i, j)
-    
-    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-    INF = float('inf')
-    dist = [[[[INF] * (K+1) for _ in range(4)] for _ in range(M)] for _ in range(N)]
-    
-    queue = deque()
-    for d in range(4):
-        dist[start[0]][start[1]][d][0] = 0
-        queue.append((start[0], start[1], d, 0))
-    
-    while queue:
-        x, y, dir_idx, turns = queue.popleft()
-        current_dist = dist[x][y][dir_idx][turns]
-        
-        if (x, y) == end:
-            continue
-            
-        dx, dy = directions[dir_idx]
-        nx, ny = x + dx, y + dy
-        if 0 <= nx < N and 0 <= ny < M and grid[nx][ny] != 1:
-            if dist[nx][ny][dir_idx][turns] > current_dist + 1:
-                dist[nx][ny][dir_idx][turns] = current_dist + 1
-                queue.append((nx, ny, dir_idx, turns))
-        
-        for new_dir in range(4):
-            if new_dir == dir_idx:
-                continue
-                
-            turn_cost = 1
-            if (dir_idx + 1) % 4 == new_dir:
-                new_turns = turns + 1
-            else:
-                new_turns = turns
-                
-            if new_turns <= K:
-                if dist[x][y][new_dir][new_turns] > current_dist + turn_cost:
-                    dist[x][y][new_dir][new_turns] = current_dist + turn_cost
-                    queue.append((x, y, new_dir, new_turns))
-    
-    result = INF
-    for d in range(4):
-        for t in range(K+1):
-            result = min(result, dist[end[0]][end[1]][d][t])
-    
-    if result == INF:
-        result = -1
-        
-    with open('OUTPUT.TXT', 'w') as f:
-        f.write(str(result))
+def solve() -> None:
+    data = sys.stdin.read().strip().split()
+    if not data:
+        return
+    it = iter(data)
+    K = int(next(it))          # allowed right turns
+    N = int(next(it))          # rows
+    M = int(next(it))          # columns
 
-if __name__ == "__main__":
-    main()
+    grid = []
+    start = None
+    target = None
+    for i in range(N):
+        row = []
+        for j in range(M):
+            v = int(next(it))
+            row.append(v)
+            if v == 2:
+                start = (i, j)
+            elif v == 3:
+                target = (i, j)
+        grid.append(row)
+
+    # trivial case
+    if start == target:
+        print(0)
+        return
+
+    # direction vectors: 0-up, 1-right, 2-down, 3-left
+    dx = [-1, 0, 1, 0]
+    dy = [0, 1, 0, -1]
+
+    # visited[x][y][dir][right_turns]
+    visited = [[[[False] * (K + 1) for _ in range(4)] for _ in range(M)] for _ in range(N)]
+    q = deque()
+
+    # first step from start – no turn is counted yet
+    for d in range(4):
+        nx = start[0] + dx[d]
+        ny = start[1] + dy[d]
+        if 0 <= nx < N and 0 <= ny < M and grid[nx][ny] != 1:
+            if not visited[nx][ny][d][0]:
+                visited[nx][ny][d][0] = True
+                q.append((nx, ny, d, 0, 1))
+
+    while q:
+        x, y, cur_dir, turns, steps = q.popleft()
+        if (x, y) == target:
+            print(steps)
+            return
+
+        for nxt_dir in range(4):
+            nx = x + dx[nxt_dir]
+            ny = y + dy[nxt_dir]
+            if not (0 <= nx < N and 0 <= ny < M):
+                continue
+            if grid[nx][ny] == 1:   # black cell – impassable
+                continue
+
+            # count a right turn if the new direction is clockwise from the current one
+            inc = 1 if nxt_dir == (cur_dir + 1) % 4 else 0
+            new_turns = turns + inc
+            if new_turns > K:
+                continue
+            if not visited[nx][ny][nxt_dir][new_turns]:
+                visited[nx][ny][nxt_dir][new_turns] = True
+                q.append((nx, ny, nxt_dir, new_turns, steps + 1))
+
+    # target unreachable
+    print(-1)
+
+if __name__ == '__main__':
+    solve()

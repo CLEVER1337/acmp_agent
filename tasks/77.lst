@@ -1,0 +1,5 @@
+For given natural numbers N and K, it is required to compute the number of integers from 1 to N that have exactly K zeros in their binary representation. For example, if N=8 and K=1, we can write all numbers from 1 to 8 in binary: 1, 10, 11, 100, 101, 110, 111, and 1000. From this, we can see that only the numbers 10, 101, and 110 have exactly one zero, meaning the correct answer is 3.
+Input
+The single line of the input file INPUT.TXT contains two natural numbers N and K separated by a space, not exceeding 10^9.
+Output
+The single line of the output file OUTPUT.TXT should contain a single integer — the number of integers from 1 to N with K zeros in their binary representation.

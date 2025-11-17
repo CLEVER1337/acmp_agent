@@ -1,0 +1,7 @@
+Write a program that will find all integer X satisfying the equation A*X^3 + B*X^2 + C*X + D = 0, where A, B, C, D are given integer coefficients.
+
+Input data
+The input file INPUT.TXT contains four integers: A, B, C, D. All numbers do not exceed 2×10^9 in absolute value.
+
+Output data
+In the output file OUTPUT.TXT, first output the number of distinct integer roots of this equation, and then the roots themselves in ascending order. If the equation has infinitely many roots, output a single number -1 (minus one).

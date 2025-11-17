@@ -1,0 +1,5 @@
+A rectangle consists of X×Y square cells of the same size. A rectangle of size (X-2)×(Y-2) is cut out of it, leaving a frame one cell wide. Determine if the entire frame can be covered with tiles of size A×1. The supply of tiles is unlimited; tiles do not overlap and do not extend beyond the frame. It is required to write a program that solves this problem.
+Input data
+The input text file INPUT.TXT contains in the first line a natural number K – the number of tests (1 ≤ K ≤ 10). The next K lines contain three natural numbers each: X, Y - the dimensions of the frame, A – the size of the tile (3 ≤ X, Y ≤ 2×10^9, 1 ≤ A ≤ 2×10^9). The numbers are separated by spaces.
+Output data
+The output text file OUTPUT.TXT should contain one line of K characters 0 or 1 (1 - if the covering exists, 0 - otherwise).

@@ -1,0 +1,8 @@
+Consider a table of size N×M, where the cells contain non-negative integers. We say that the table is *nice* if for every i, the sum of the numbers in its i-th row does not exceed R_i, and for every j, the sum of the numbers in its j-th column does not exceed C_j.
+You are given a table Z of size N×M (N rows and M columns), where some cells already contain non-negative integers. Find a nice table with the maximum sum of elements that matches Z in the cells where Z already contains numbers.
+
+Input
+The first line of the input file INPUT.TXT contains the numbers N and M (1 ≤ M, N ≤ 20). The next line contains N non-negative integers - R1, R2, ..., RN. The following line contains M non-negative integers C1, C2, ..., CM. All numbers do not exceed 10^6. The next N lines contain M integers each, which define Z. If a number is missing in a certain cell of the table, the input file contains the number -1 in that place.
+
+Output
+Output a single integer to the output file OUTPUT.TXT - the sum of the elements of the found table. If there is no solution, output the single number -1.

@@ -1,0 +1,10 @@
+As is known, the individual informatics olympiad consists of two rounds. In each round, participants receive certain scores, and the final score is determined as the sum of the scores obtained. The scores each participant received in each round are known. The jury wants to falsify the olympiad results so that the "desired" participant wins.
+At the same time, the jury can perform the following "manipulations" (several manipulations can be applied to the same or different rounds):
+The plausibility of the results must be maintained, which means that no participant should receive more than 100 points for each round.
+Determine the list of participants who, as a result of such falsifications, can become the winners of the olympiad (that is, have a total score for the two rounds not less than that of every other participant).
+
+Input
+The input file INPUT.TXT first contains the number of participants N (1 ≤ N ≤ 1000), followed by N pairs of numbers — the results of each participant in the 1st and 2nd rounds (a participant's result for a round is a real number from 0 to 100) with no more than 3 digits after the decimal point.
+
+Output
+The output file OUTPUT.TXT should first contain the number of participants who can become the winners of the olympiad, followed by their numbers in ascending order.

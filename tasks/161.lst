@@ -1,0 +1,7 @@
+A permutation of N elements is an ordered set of N distinct numbers from 1 to N. Let a permutation π be given. Denote φ[i] as the number of such j that π[j] > π[i] and j < i. φ is called the inversion table of permutation π. It is required to restore the permutation from the given inversion table.
+
+Input data
+The first line of the input file INPUT.TXT contains a number 0 < N ≤ 2000 - the order of the permutation. The second line contains the inversion table.
+
+Output data
+Output the desired permutation to the OUTPUT.TXT file.

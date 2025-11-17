@@ -1,0 +1,15 @@
+On an N×M grid (N rows and M columns), K rectangles were placed one on top of another in random order. The side lengths of the rectangles are expressed as an integer number of cells. The rectangles do not extend beyond the grid boundaries. The edges of the rectangles coincide with the grid cell boundaries.
+
+The resulting situation was recorded in a table of numbers (each grid cell corresponds to a table cell). If a grid cell is not covered by any rectangle, the number 0 is written in the corresponding table cell. If a cell is covered by one or more rectangles, the number written in the corresponding table cell corresponds to the number of the topmost rectangle covering that cell.
+
+It is required to write a program that will determine the position and size of the rectangles. It is guaranteed that the input data contains sufficient information to uniquely determine the dimensions of the rectangles.
+
+The input file INPUT.TXT contains integers N, M, K (1 ≤ N ≤ 200, 1 ≤ M ≤ 200, 1 ≤ K ≤ 255) in the first line. This is followed by N lines with M numbers each — the contents of the table. All numbers in the table are integers in the range from 0 to K inclusive.
+
+Input data
+
+The output file OUTPUT.TXT should contain K lines. Each line should describe the rectangle corresponding to its number with four numbers X1 Y1 X2 Y2 (X1 and Y1 should describe the coordinates of the lower left corner of the rectangle, and X2 and Y2 — the coordinates of the upper right corner). The numbers should be separated by a space.
+
+Output data
+
+The origin of the coordinate system is located in the lower left corner of the table. Thus, the coordinates of the lower left corner of the grid are (0,0), and the upper right corner is (M,N).

@@ -1,0 +1,6 @@
+Consider a numerical sequence initially consisting of two ones: 1, 1. Then, at each subsequent step, we insert the sum between adjacent elements. In the example, the added elements are highlighted:
+It is required to write a program that calculates the sum of the terms of the sequence constructed after K steps.
+Input data
+The input file INPUT.TXT contains one natural number K (0 ≤ K ≤ 100) – the number of the last step.
+Output data
+The output file OUTPUT.TXT must contain one natural number – the sum of the elements of the sequence constructed after K steps.

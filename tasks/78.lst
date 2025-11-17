@@ -1,0 +1,5 @@
+A group of programmers gathered on Monday and spent all their money to buy Sprite in 0.25-liter bottles, remembering to take the change. On Tuesday, they returned the empty bottles, added the remaining change, and again bought as many bottles of Sprite as they could. They continued this way until Friday. On Friday, after returning the bottles and adding Thursday's change, they could only buy one bottle of the drink. At that point, they had no money left.
+You need to write a program that determines the minimum amount the programmers had on Monday.
+The input file INPUT.TXT consists of a single line containing two integers F (the cost of one bottle of Sprite) and P (the cost of one empty Sprite bottle), separated by a space.
+Input constraints: 1 ≤ P < F ≤ 10^9, the initial amount does not exceed 2×10^9.
+Output data: Output a single integer to the output file OUTPUT.TXT – the minimum amount the programmers had on Monday.

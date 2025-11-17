@@ -1,0 +1,6 @@
+A template of size n is a string of length n, each character of which belongs to the set {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, a, b, c, d, e, f, g, ?}. Templates are converted into strings of digits according to the following rules:
+Given two templates: p1 and p2. Consider the set S1 of strings that can be obtained from p1 according to the described rules, and the set S2 of strings that can be obtained from p2. It is necessary to find the number of strings that are in both of these sets.
+Input
+The first line of the input file INPUT.TXT contains template p1, the second line contains template p2. The templates have the same positive size, not exceeding 9.
+Output
+Output the answer to the problem in the output file OUTPUT.TXT.

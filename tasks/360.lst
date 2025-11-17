@@ -1,0 +1,5 @@
+In a given two-dimensional integer array of size N × N, find three elements with the maximum sum. The first element must be adjacent horizontally or vertically to the second, and the second must be adjacent to the third.
+Input
+The input file INPUT.TXT contains the integer N (1 < N ≤ 2000) in the first line. The next N lines each contain N numbers – the elements of the array. The elements of the matrix do not exceed 100 in absolute value.
+Output
+The output file OUTPUT.TXT must contain a single number – the maximum sum.

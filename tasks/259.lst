@@ -1,0 +1,12 @@
+Given a string S consisting of N characters. We define a function A(i) for the first i characters of this string as follows:
+A(i) = the maximum possible k such that the following two strings are equal:
+S[1]+S[2]+S[3]+…+S[k]
+S[i]+S[i–1]+S[i–2]+…+S[i–k+1]
+where S[i] is the i-th character of string S, and the + sign means that the characters are concatenated directly one after another.
+Write a program that will compute the values of function A for a given string for all possible values of i from 1 to N.
+
+Input
+The first line of the input file INPUT.TXT contains a single number N. 1 ≤ N ≤ 200000. The second line contains a string of N characters, consisting only of uppercase and/or lowercase English letters.
+
+Output
+In the output file OUTPUT.TXT, output N numbers — the values of the function A(1), A(2), … A(N).

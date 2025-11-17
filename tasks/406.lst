@@ -1,0 +1,8 @@
+A substitution cipher is one in which each letter of the message is replaced by some other letter, and all spaces and punctuation are removed. To preserve the possibility of unambiguous decryption, no two letters are transformed into one.
+Knowing the fact that the frequencies of letters in meaningful text differ, one can determine with good accuracy how the letters were encrypted. Among all possible ways to permute the letters, one should choose the one for which the value of the sum ∑c|ec – pc| is minimized.
+Here, ec and pc denote the frequencies of symbol c, calculated for the average text and for the note obtained from the encrypted text after applying the given permutation.
+The task is to write a program that decrypts the encoded message based on given frequencies.
+Input
+The first line of the input file INPUT.TXT contains two integers – N and M (1 ≤ N ≤ 26, 1 ≤ M ≤ 105). The next N lines specify the letters that, according to Christina's information, could appear in the original text. The corresponding letter ci is the first character of the line; after a space, the frequency of this letter pi is given with 4 decimal places. All pi are non-negative, and their sum is 1. The last line contains M characters – the text that needs to be decrypted. The original and encrypted text consists of lowercase English letters.
+Output
+Output N characters to the file OUTPUT.TXT, one per line, which, according to the described method, should be mapped to the characters from the input file. If there are multiple optimal solutions, output any one of them.

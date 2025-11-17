@@ -1,0 +1,8 @@
+To explore the surface of Mars, scientists need to develop an alert system capable of transmitting information in a chain-like manner between the cities planned to be built there. Moreover, each city must have a radio station built in such a way that communication exists between all cities. All such stations must transmit signals to each other at an equal distance R. Thus, information can be transmitted from one city to another only when the distance between them is no more than R.
+Given the coordinates of the cities, to conserve the energy of the radio stations, you must determine the minimum value of R at which information can be delivered from any city to all others.
+
+Input data
+The first line of the input file INPUT.TXT contains a natural number N – the number of cities (N ≤ 1000). This is followed by N lines containing the real coordinates (Xi, Yi) of the corresponding city. (-10000 ≤ Xi, Yi ≤ 10000). It is assumed that all cities are located on a plane.
+
+Output data
+Output a single real number – the smallest radius of the radio stations – to the output file OUTPUT.TXT. The number should be printed with two decimal places, without leading zeros, in the format shown in the examples.

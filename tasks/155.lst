@@ -1,0 +1,8 @@
+Amateur radio enthusiast Petya decided to build a crystal radio receiver. For this, he needed a capacitor with a capacitance of C µF. Petya has a set of N capacitors with capacitances C1, C2, ..., CN respectively. Petya remembers how to calculate the capacitance of two capacitors connected in parallel (Cnew = C1 + C2) and two capacitors connected in series (Cnew = (C1*C2)/(C1+C2)). Petya wants to solder a series-parallel circuit from the available set of capacitors such that its capacitance is as close as possible to the desired one (i.e., the absolute value of the difference is minimized). To make the circuit, Petya can use from 1 to N of his available capacitors.
+Recall the definition of a series-parallel circuit. A circuit composed of a single capacitor is a series-parallel circuit. Any circuit obtained by series connection of two series-parallel circuits is series-parallel, and any circuit obtained by parallel connection of two series-parallel circuits is series-parallel.
+The first line of each input file INPUT.TXT contains the numbers N and C (N is an integer: 1 ≤ N ≤ 6, C is a real number with no more than 4 decimal places: 0 < C < 1000).
+The second line contains the sequence of capacitances of the available capacitors C1, C2, ..., CN. All Ci values are natural numbers not exceeding 1000.
+Input data
+The output file OUTPUT.TXT should output YES if Petya manages to assemble a circuit whose capacitance differs by no more than 0.01 from the required value C. Otherwise, output NO.
+Output data
+Let's connect the first and second capacitors in series, and then connect the resulting circuit in parallel with the third. The resulting circuit will have a capacitance of 1.(6)

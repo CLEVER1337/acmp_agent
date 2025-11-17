@@ -1,0 +1,8 @@
+Anagrammer is a special device for obtaining anagrams from a word (i.e., words written with the same letters but in a different order). This device can perform 2 operations:
+A stack is a data storage that operates on the "first in, last out" principle. A stack can be imagined as a pyramid. When we add a letter to the stack, it corresponds to putting a ring with the corresponding letter on top of the pyramid rod. When we take a letter from the stack, it corresponds to removing the top ring from the rod and seeing which letter is written on it.
+For example, the word TROT can be transformed into the word TORT by the anagrammer using two different sequences of operations: 11112222 or 12112212.
+Write a program that, given two words, calculates the number of different sequences of anagrammer operations that transform the first of these words into the second.
+Input
+The first line of the input file INPUT.TXT contains the original word, and the second line contains the word to be obtained. The words consist only of uppercase English letters and have a length from 1 to 50 characters. Both words have the same length. These lines do not contain spaces.
+Output
+The first line of the output file OUTPUT.TXT should contain the number of sequences of anagrammer operations that can transform the first word into the second.

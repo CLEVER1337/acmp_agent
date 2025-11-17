@@ -1,0 +1,6 @@
+A clearing is a straight line that passes through the forest (meaning there are trees on both sides of this line), and it does not pass through any of the forest's trees, nor does it touch them. We will say that a forest is dense if there is not a single clearing in it.
+On the forest map, all trees are depicted as circles. No two circles intersect or touch each other. The task is to determine from this map whether the forest is dense.
+Input
+The input file INPUT.TXT first contains an integer N — the number of trees (1 ≤ N ≤ 200). Then follow N triplets of numbers describing the trees. The first two numbers specify the coordinates of the center, and the third specifies the radius. All data is given exactly and expressed as real numbers with no more than 2 decimal places, not exceeding 1000 in absolute value.
+Output
+The first line of the output file OUTPUT.TXT should contain the message YES if the forest is dense, and NO otherwise.

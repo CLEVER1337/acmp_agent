@@ -1,0 +1,11 @@
+You are one of the developers of the new architectural software package "CadArch". One of its functions is designing the layout of floor tiles. You are currently working on the software implementation of a module responsible for laying tiles in rectangular rooms. For simplicity, we will assume that the room floor is a rectangle measuring n by m meters, divided into m∙n squares with a side of 1 meter. Additionally, we will assume that there are four types of tiles, shown in the table. Each tile is a square measuring 2 by 2 meters, from which one 1 by 1 meter square has been cut out.
+
+The module being designed must work as follows. The input to the module is a set of commands, each indicating where and what type of tile needs to be placed. A command is processed as follows: if none of the squares that the current tile should occupy are already taken and the tile fits entirely within the rectangle, then the tile is placed at the specified location; otherwise, it is not.
+
+You are required to write a program that determines what area will be covered with tiles according to the given set of commands.
+
+Input data
+The first line of the input file INPUT.TXT contains two numbers n and m — the length and width of the room floor (1 ≤ m, n ≤ 50). The second line contains a number k — the number of commands to process. Each of the subsequent k lines contains a description of one command from the set. The command description consists of three numbers. The first number specifies the tile type (a number from 1 to 4), and the other two specify the coordinates of the top-left corner of the square (y, x) measuring 2 by 2 into which the corresponding tile is inscribed (0 ≤ x, y, k ≤ 1000).
+
+Output data
+The output file OUTPUT.TXT must contain one number, which is the area covered by tiles after executing the sequence of commands specified in the input file.

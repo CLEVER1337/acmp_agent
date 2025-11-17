@@ -1,0 +1,8 @@
+You need to check Vasya Pupkin's homework where he wrote an equality. For example, an entry like "2+3=5" is correct, while "23*7=421" is incorrect but valid. A valid expression record is defined as a sequence: number, operation ("+", "-", "*", "/"), number, equals sign, number. A number is considered a sequence of one or more decimal digits, which may be preceded by a single minus sign. There are no spaces in a valid expression record.
+If a record does not conform to the described rule, it is considered invalid. For example, the entries "2*=3", "173", and "2+2=a" are invalid.
+
+Input
+The input file INPUT.TXT consists of a single line containing the arithmetic expression record. All numbers in the record do not exceed 30000 in absolute value. The length of the arithmetic expression can be from 0 to 100 characters.
+
+Output
+In the output file OUTPUT.TXT, print "YES" if the specified record is correct (i.e., the equality is an identity), "NO" if it is valid but incorrect, and "ERROR" if the record is invalid.

@@ -1,0 +1,7 @@
+Given a natural number N. It is required to write a program that will find the next number after it that has the same number of ones in its binary representation as the binary representation of the number N.
+
+Input data
+The input file INPUT.TXT contains one natural number N (N ≤ 2^30).
+
+Output data
+The output file OUTPUT.TXT must contain the answer to the problem.

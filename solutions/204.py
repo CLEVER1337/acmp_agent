@@ -1,23 +1,29 @@
 
-def main():
-    s = input().strip()
+import sys
+
+def prefix_function(s: str):
     n = len(s)
     pi = [0] * n
-    j = 0
     for i in range(1, n):
+        j = pi[i - 1]
         while j > 0 and s[i] != s[j]:
             j = pi[j - 1]
         if s[i] == s[j]:
             j += 1
-        else:
-            j = 0
         pi[i] = j
-    
-    k = n - pi[n - 1]
-    if n % k == 0:
-        print(k)
-    else:
-        print(n)
+    return pi
 
-if __name__ == "__main__":
-    main()
+def solve() -> None:
+    data = sys.stdin.read().strip()
+    if not data:
+        print(0)
+        return
+    s = data
+    n = len(s)
+    pi = prefix_function(s)
+    # minimal period length
+    period = n - pi[-1]
+    print(period)
+
+if __name__ == '__main__':
+    solve()

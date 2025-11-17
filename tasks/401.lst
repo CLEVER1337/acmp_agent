@@ -1,0 +1,5 @@
+You have N boxes arranged in a row, A red balls and B blue balls. All red balls (and similarly, blue ones) are identical. You can place balls into the boxes. It is allowed to place balls of one or both types in the boxes simultaneously. It is also allowed to leave some boxes empty. It is not required to put all the balls into the boxes. You are required to write a program that determines the number of distinct ways to fill the boxes with balls.
+Input data
+The input file INPUT.TXT contains integers N, A, B. (1 ≤ N ≤ 20, 0 ≤ A, B ≤ 20)
+Output data
+Output the answer to the problem to the output file OUTPUT.TXT.

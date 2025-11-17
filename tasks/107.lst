@@ -1,0 +1,11 @@
+You have probably noticed that many companies use "beautiful" phone numbers for advertising, which are easy for potential customers to remember. But what if your company's number is unremarkable? You can take a closer look at it; what if, by regrouping the digits in some way, the number becomes much more beautiful? For example, if your company's number is 872-73-33, it can be made more beautiful by regrouping the digits like this: 8727-333.
+
+Let us introduce the following beauty score for partitioning the number. We will split the number with hyphens into groups of 2 to 4 digits. Now, the beauty of the partition is the sum of points brought by each group. We will calculate these points using the table provided on the right.
+
+In this table, the symbols "a", "b", "c" denote different digits. For example, the pattern "aab" fits groups like "223", "667", but does not fit "123" or "888". Using the proposed scoring, find the most beautiful partition for a given number.
+
+Input data
+The input file INPUT.TXT contains one string of 7 digits – the given phone number.
+
+Output data
+In the first line of the output file OUTPUT.TXT, output the most beautiful partition of the number, and in the second line – its beauty score. If there are multiple partitions with the maximum beauty score, output any one of them to the output file.

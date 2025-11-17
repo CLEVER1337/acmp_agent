@@ -1,0 +1,5 @@
+The labyrinth is a square consisting of N×N segments. Each segment can be either empty or filled with a solid stone wall. It is guaranteed that the top-left and bottom-right segments are empty. The labyrinth is surrounded by walls on the top, bottom, left, and right, leaving only the top-left and bottom-right corners free. The director of the labyrinth decided to paint the walls visible from the inside (see the picture). Help him calculate the amount of paint needed for this.
+Input data
+The first line of the input file INPUT.TXT contains the number N, followed by N lines of N characters each: a dot denotes an empty segment, a hash denotes a segment with a wall. The size of the segments is 5x5 meters, the height of the walls is 5 meters. (3 ≤ N ≤ 50)
+Output data
+In the output file OUTPUT.TXT, output a single number - the area of the visible part of the interior walls of the labyrinth in square meters.

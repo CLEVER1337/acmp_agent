@@ -1,0 +1,6 @@
+Usually, a bus ticket with a six-digit number is considered lucky if the sum of the first three digits equals the sum of the last three digits. Vasya loved getting lucky tickets, but it didn't happen often. So, he changed the definition of a lucky ticket. For him, a number is considered lucky if the sum of some of its digits equals the sum of the remaining digits. In his view, the ticket number 561743 is lucky because 5+1+4+3 = 6+7. As Vasya grew up, he still tried to find signs of a lucky number in the numbers of various documents out of habit. To do this, he expanded his definition of a lucky number for N-digit account numbers and other documents consisting of digits from 0 to K. A document number is considered lucky if the sum of some of its digits equals the sum of the remaining digits. Other numbers are unlucky. Unfortunately, despite the expanded definition of "happiness," there are still many unlucky numbers... You are asked to determine the number of unlucky N-digit numbers that can be created using digits from 0 to K. Leading zeros are allowed in the numbers.
+
+Input data
+The INPUT.TXT file contains a description of the format of the numbers in the form of two numbers N and K, separated by a space. (1 ≤ N ≤ 100, 1 ≤ K ≤ 9, N*K ≤ 300)
+Output data
+Output the number of unlucky numbers for the given N and K in the OUTPUT.TXT file.

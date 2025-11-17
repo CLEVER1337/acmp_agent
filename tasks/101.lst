@@ -1,0 +1,5 @@
+A maharaja is a chess piece that combines the capabilities of a queen and a knight. Thus, a maharaja can move and capture any number of squares diagonally, horizontally, and vertically (i.e., like a queen), as well as either two squares horizontally and one vertically, or one horizontally and two vertically (like a knight). Your task is to find the number of ways to place exactly K maharajas on an N x N board such that they do not attack each other.
+Input
+The input file INPUT.TXT contains two integers: N and K (1 ≤ K ≤ N ≤ 10).
+Output
+Output the answer to the problem in the output file OUTPUT.TXT.

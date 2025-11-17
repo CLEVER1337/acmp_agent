@@ -1,0 +1,7 @@
+In some information security problems, so-called hash functions are used. One of the most important classes of hash functions are the so-called polynomial hash functions. Let there be a string S = s1s2 ... sl, consisting of digits from 0 to 9. Then the value of the polynomial hash function p(S, x, m) is calculated as follows: (a mod b denotes the remainder of dividing a by b). For example, let S = 0123, then p(S, 2, 5) = (0 ∙ 1 + 1 ∙ 2 + 2 ∙ 4 + 3 ∙ 8) mod 5 = 4. One of the applications of hash functions is password storage. It often happens that passwords have to be stored in an unprotected database table, so instead, their hash values are stored. During password verification, the hash function of the entered string is computed and compared with the value stored in the table. Your task is to find a string S of digits from 0 to 9 of length L, such that the value of the polynomial hash function p(S, x, m) equals v, given the numbers x, m, L, and v.
+
+Input data
+The input file INPUT.TXT contains four integers: x (x is a prime number, 5 ≤ x ≤ 100), m (m is a power of two, 1 ≤ m ≤ 256), L (10 ≤ L ≤ 100), and v (0 ≤ v ≤ m-1).
+
+Output data
+Output the desired string to the OUTPUT.TXT file, or NO SOLUTION if no such string exists. If multiple solutions exist, output any.

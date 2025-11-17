@@ -1,0 +1,7 @@
+On a certain railway line, there are N stations sequentially numbered from 1 to N. The distances between some stations are known. The task is to precisely calculate the lengths of all segments between adjacent stations or to indicate that this is impossible (i.e., the provided information is either contradictory or insufficient).
+
+Input
+The input file INPUT.TXT first contains the numbers N — the number of stations (2 ≤ N ≤ 100) and E — the number of station pairs for which the distance is given (0 ≤ E ≤ 10000). Then, E triples of numbers follow; the first two numbers of each triple specify the station numbers (these are numbers in the range from 1 to N), and the third is the distance between these stations (all these distances are given precisely and are expressed as non-negative real numbers with no more than 3 digits after the decimal point).
+
+Output
+If the segment lengths can be uniquely restored, first output "YES" to the output file OUTPUT.TXT, followed by N–1 real numbers. The first of these numbers should correspond to the distance from station 1 to station 2, the second — from station 2 to station 3, and so on. All numbers must be output with a precision of 3 digits after the decimal point (for example, the number 2.3 should be output as 2.300). If the provided information about distances between stations is contradictory or does not allow for unique and precise restoration of the segment lengths, output "NO" to the output file.

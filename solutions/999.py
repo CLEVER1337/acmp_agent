@@ -8,108 +8,85 @@ def main():
         print(0)
         return
         
-    it = iter(data)
-    n = int(next(it)); m = int(next(it))
-    
+    n = int(data[0])
+    m = int(data[1])
     graph = [[] for _ in range(n+1)]
     edges = []
-    
+    index = 2
     for i in range(m):
-        u = int(next(it)); v = int(next(it)); t = int(next(it))
-        graph[u].append((v, t, i))
-        graph[v].append((u, t, i))
+        u = int(data[index]); v = int(data[index+1]); t = int(data[index+2]); index += 3
+        graph[u].append((v, t))
+        graph[v].append((u, t))
         edges.append((u, v, t))
     
     dist = [-1] * (n+1)
     parent = [0] * (n+1)
-    parent_type = [0] * (n+1)
+    road_type = [0] * (n+1)
     dist[1] = 0
     q = deque([1])
-    
     while q:
         u = q.popleft()
-        for v, t, idx in graph[u]:
+        for v, t in graph[u]:
             if dist[v] == -1:
-                dist[v] = dist[u] + t
+                dist[v] = dist[u] + 1
                 parent[v] = u
-                parent_type[v] = t
+                road_type[v] = t
                 q.append(v)
     
     tree_edges = set()
     back_edges = []
-    
-    for i, (u, v, t) in enumerate(edges):
-        if (parent[u] == v and parent_type[u] == t) or (parent[v] == u and parent_type[v] == t):
-            tree_edges.add(i)
+    for u, v, t in edges:
+        if (parent[u] == v and road_type[u] == t) or (parent[v] == u and road_type[v] == t):
+            tree_edges.add((min(u, v), max(u, v)))
         else:
-            back_edges.append((u, v, t, i))
+            if dist[u] < dist[v]:
+                u, v = v, u
+            back_edges.append((u, v, t))
     
-    depth = [0] * (n+1)
-    for i in range(2, n+1):
-        depth[i] = depth[parent[i]] + 1
+    low = [0] * (n+1)
+    disc = [-1] * (n+1)
+    time = 0
+    bridges = set()
+    def dfs(u, p):
+        nonlocal time
+        disc[u] = time
+        low[u] = time
+        time += 1
+        for v, t in graph[u]:
+            if v == p:
+                continue
+            if disc[v] == -1:
+                dfs(v, u)
+                low[u] = min(low[u], low[v])
+                if low[v] > disc[u]:
+                    bridges.add((min(u, v), max(u, v)))
+            else:
+                low[u] = min(low[u], disc[v])
     
-    up = [[0] * (n+1) for _ in range(17)]
     for i in range(1, n+1):
-        up[0][i] = parent[i]
+        if disc[i] == -1:
+            dfs(i, -1)
     
-    for k in range(1, 17):
-        for i in range(1, n+1):
-            up[k][i] = up[k-1][up[k-1][i]]
+    stone_bridges = set()
+    for u, v in bridges:
+        if (u, v) in tree_edges or (v, u) in tree_edges:
+            stone_bridges.add((min(u, v), max(u, v)))
     
-    def lca(u, v):
-        if depth[u] < depth[v]:
-            u, v = v, u
-        d = depth[u] - depth[v]
-        k = 0
-        while d:
-            if d & 1:
-                u = up[k][u]
-            d //= 2
-            k += 1
-        if u == v:
-            return u
-        for k in range(16, -1, -1):
-            if up[k][u] != up[k][v]:
-                u = up[k][u]
-                v = up[k][v]
-        return parent[u]
-    
-    stone_count = [0] * (n+1)
-    dirt_count = [0] * (n+1)
-    
-    for u, v, t, idx in back_edges:
-        w = lca(u, v)
-        if t == 1:
-            stone_count[u] += 1
-            stone_count[v] += 1
-            stone_count[w] -= 2
-        else:
-            dirt_count[u] += 1
-            dirt_count[v] += 1
-            dirt_count[w] -= 2
-    
-    stack = []
-    for i in range(1, n+1):
-        if depth[i] > 0:
-            stack.append(i)
-    
-    stack.sort(key=lambda x: depth[x], reverse=True)
-    
-    for u in stack:
-        p = parent[u]
-        stone_count[p] += stone_count[u]
-        dirt_count[p] += dirt_count[u]
+    count_back = [0] * (n+1)
+    for u, v, t in back_edges:
+        if t == 0:
+            count_back[u] += 1
+            count_back[v] += 1
     
     total = 0
-    for i in range(2, n+1):
-        if parent_type[i] == 1:
-            if stone_count[i] == 0:
-                total += dirt_count[i]
-            if dirt_count[i] == 0:
+    for u, v, t in edges:
+        if t == 1:
+            if (min(u, v), max(u, v)) in stone_bridges:
                 total += 1
         else:
-            if stone_count[i] == 0:
-                total += 1
+            if count_back[u] > 1 or count_back[v] > 1:
+                continue
+            total += 1
     
     print(total)
 

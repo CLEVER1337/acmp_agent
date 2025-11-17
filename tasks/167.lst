@@ -1,0 +1,7 @@
+Consider a figure similar to the one shown in the illustration (a large equilateral triangle composed of small equilateral triangles). The figure depicted consists of 4 levels of triangles. The task is to write a program that will determine the total number of triangles in it (it is necessary to consider not only the "small" triangles, but all triangles in general — in particular, the triangle highlighted in bold, as well as the entire figure itself, are the triangles of interest to us).
+
+Input
+The input file INPUT.TXT contains a single number N — the number of levels in the figure (1 ≤ N ≤ 10^5).
+
+Output
+The output file OUTPUT.TXT must contain a single number — the number of triangles in such a figure.

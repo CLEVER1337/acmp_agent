@@ -1,0 +1,8 @@
+Daily, the railway station dispatcher has to rearrange cars in many trains so that they go in the required order. To do this, the dispatcher can uncouple the arriving train at arbitrary points and rearrange the resulting consists of one or more cars in any order. The order of cars within a single consist cannot be changed, nor can the entire consist be reversed so that the last car in the consist becomes the first.
+The dispatcher asks for your help in determining the minimum number of couplings between cars that need to be uncoupled to rearrange the train into the required order.
+
+Input
+The first line of the input file INPUT.TXT contains an integer N (1 ≤ N ≤ 100). The second line contains a permutation of natural numbers from 1 to N (i.e., all natural numbers from 1 to N in some order). The numbers are separated by a single space. This permutation specifies the numbers of the cars in the arriving train. The departing train must have the cars in the order of their numbers.
+
+Output
+The program must write to the output file OUTPUT.TXT a single integer equal to the minimum number of couplings between cars that need to be uncoupled in this train to rearrange them in order.

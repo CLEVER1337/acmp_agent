@@ -1,0 +1,5 @@
+Natural numbers are written in a string without any separators. The beginning of this string looks like 123456789101112131415161718192021... . You are required to write a program that will determine the first occurrence of the decimal representation of a given number N in this string.
+Input data
+The input file INPUT.TXT contains the given number N (1 ≤ N ≤ 10^4).
+Output data
+The output file OUTPUT.TXT must contain a single number – the position starting from which the given number is written in the string for the first time. Position numbering starts from one.

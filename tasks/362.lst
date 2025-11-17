@@ -1,0 +1,5 @@
+Given the dimensions of a rectangular postcard and an envelope. It is required to determine whether the postcard will fit inside the envelope.
+Input data
+The input file INPUT.TXT contains the dimensions of the postcard in the first line, and the dimensions of the envelope in the second line. All dimensions are natural numbers not exceeding 100.
+Output data
+In the output file OUTPUT.TXT, output "Possible" if the postcard can be placed in the envelope, and "Impossible" otherwise.

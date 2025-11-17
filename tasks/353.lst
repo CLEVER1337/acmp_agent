@@ -1,0 +1,5 @@
+Given a set of several segments. It is necessary to form a triangle of the largest area, using three segments from the given ones as sides. A program is required that will find the largest area of the triangle.
+Input data
+The input file INPUT.TXT contains in the first line one integer N (3 ≤ N ≤ 1000) – the number of segments. The second line contains N integers from 1 to 1000 – the lengths of the segments. The numbers are separated by a space.
+Output data
+The output file OUTPUT.TXT must contain one number with three decimal places after the decimal point – the largest area of the triangle made from the given segments. If no triangle can be built from the given segments, then output 0.

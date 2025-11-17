@@ -1,0 +1,5 @@
+Output all distinct representations of a natural number N as a sum of natural numbers. Representations that differ only in the order of the terms are not considered distinct.
+Input
+The input file INPUT.TXT contains an integer N (2 ≤ N ≤ 40).
+Output
+Write all distinct representations of the number N without repetitions to the output file OUTPUT.TXT, one per line. Both the terms and the sums themselves can be in any order.

@@ -1,0 +1,6 @@
+In an infinite park, trees form a square grid with a spacing of one meter. Part of the park was decided to be fenced off with a fence that is a triangle with given vertex coordinates. Trees that lie exactly on the vertices or sides of the triangle will have to be cut down.
+It is required to write a program that will find the number of such trees.
+Input data
+The input file INPUT.TXT contains six integers - the coordinates of the triangle's vertices (abscissa, ordinate). All numbers are separated by spaces and do not exceed 10^9 in absolute value.
+Output data
+The output file OUTPUT.TXT must contain one number - the number of trees.

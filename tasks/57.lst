@@ -1,0 +1,6 @@
+The company "Masha and the Bears" is the largest Internet provider in the entire forest. That is why N piglets asked them to connect to the Internet. The piglets' houses are located at various points (xi, yi). The nearest connection point is located at (xnet, ynet).
+The piglets pay money depending on the length of the wire. Their amount of money is limited and amounts to p tugriks. They want to determine: will they have enough money for the connection? It is also known that one unit of wire length costs c tugriks. Help them make the necessary calculations!
+Input data
+The first line of the input file INPUT.TXT contains the numbers N, c, and p – integers with the following constraints: 1 ≤ N ≤ 10³, 0 ≤ c ≤ 10⁴, 0 ≤ p ≤ 10¹⁵. The next N lines contain the coordinates of the piglets' houses (xi; yi). The last line contains the coordinates of the connection point (xnet, ynet). All coordinates are integers and do not exceed 1000 in absolute value. It is guaranteed that the total wire length required for connection is either an integer or differs from an integer by more than 10⁻².
+Output data
+You should output "YES" to the output file OUTPUT.TXT if the piglets have enough money for the connection, and "NO" otherwise.

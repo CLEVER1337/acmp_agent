@@ -1,0 +1,11 @@
+Anton started learning math at school. He was fascinated by the new concept of a number line. Anton quickly learned how to calculate the distance between two points on this line and how to define segments and intervals on it.
+
+While preparing for a test, Anton encountered the following problem: "There are n points on a number line. You need to find two closest points among them." The distance between two points x and y on the number line is |x - y|.
+
+You need to write a program that will help Anton solve this problem.
+
+Input data
+The first line of the input file INPUT.TXT contains the number of points n (2 ≤ n ≤ 10^5). The second line contains n distinct integers xi - the coordinates of the given points on the number line. The numbers in the line are separated by spaces. The absolute values of all coordinates xi do not exceed 10^9.
+
+Output data
+The first line of the output file OUTPUT.TXT must contain the minimum distance between two points given in the input file. The second line of the output file must contain the numbers of the points corresponding to the found distance. The points are numbered with natural numbers from 1 to n in the order they are given in the input file. If there are several answers, output the one where the points are located further to the left on the number line. The number of the left point is output first, followed by a space and then the number of the right point.

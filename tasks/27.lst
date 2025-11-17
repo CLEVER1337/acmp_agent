@@ -1,0 +1,5 @@
+A renowned artist decided to create a new masterpiece. After many days of hard work, he wanted to examine his creation. The artist recalled that the painting was created as follows: first, a white canvas was taken, having the shape of a rectangle with width w and height h. Then the artist drew n rectangles on this canvas with sides parallel to the sides of the canvas and vertices located at integer coordinates. Help the artist determine the area of the unpainted part of the canvas.
+The first line of the input file INPUT.TXT contains two natural numbers w and h (1 ≤ w, h ≤ 100). The second line contains an integer n (0 ≤ n ≤ 5000) – the number of rectangles. The next n lines contain information about all the rectangles. Each line describes one rectangle as four numbers x1, y1, x2, y2, where (x1, y1) and (x2, y2) are the coordinates of the top-left and bottom-right corners of the rectangle respectively (0 ≤ x1 < x2 ≤ w, 0 ≤ y1 < y2 ≤ h).
+Input data
+Output a single integer to the output file OUTPUT.TXT – the area of the unpainted part of the canvas.
+Output data

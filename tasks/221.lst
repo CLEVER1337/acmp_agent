@@ -1,0 +1,8 @@
+In a gym measuring N×M meters, a modern attraction called the "Left Maze" was built. To do this, lines parallel to the gym walls were drawn on the floor at 1-meter intervals. Thus, the gym was divided into N×M cells. Then, some of these cells were painted black. The attraction consists of placing a participant in a certain cell of the gym and asking them to run to another specific cell as quickly as possible. The following conditions apply:
+It is known that moving from one cell to an adjacent one takes exactly 1 second. The task is to calculate the minimum time required for the participant to reach the target cell.
+
+Input
+The input file INPUT.TXT first contains the number K — the number of allowed right turns (an integer from 0 to 5), followed by the numbers N and M, specifying the dimensions of the gym — natural numbers not exceeding 20. Then, N lines follow, each containing M numbers. The number 0 denotes an unpainted cell, the number 1 — a painted cell, the number 2 — the starting cell of the participant, and the number 3 — the target cell (cells marked 2 and 3 are unpainted). The maze always has exactly one starting cell and exactly one target cell.
+
+Output
+In the output file OUTPUT.TXT, output the minimum time required to reach the target cell. If it is impossible to reach the target cell, output –1.

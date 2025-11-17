@@ -1,0 +1,7 @@
+When Vova entered the math classroom, a certain number of triangles were drawn chaotically on the blackboard. Vova really liked the idea of decorating the board with triangles and began to study the situation more carefully. Vova thought that the simplest and fastest way to draw exactly that many triangles neatly was to cut a template out of some material and trace it on the board with chalk. Furthermore, Vova assumed that whoever drew the triangles must have been in a great hurry, and therefore moved the template without lifting any part of it from the board. Help Vova test his hypothesis if he is ready to provide you with carefully measured coordinates of the triangle vertices.
+
+Input
+The first line of the input file INPUT.TXT contains a single integer - the number of triangles N (2 ≤ N ≤ 100). The next N lines describe the triangles; line i+1 contains 3 pairs of positive integers not exceeding 10000 - the coordinates of the vertices of triangle number i.
+
+Output
+Output the answer to the problem in the output file OUTPUT.TXT: YES if all the triangles could have been drawn by tracing a single template without lifting it from the board, and NO otherwise.

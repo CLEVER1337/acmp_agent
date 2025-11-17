@@ -1,0 +1,9 @@
+Due to the interplanetary checkers tournament, it was decided to build an orbital hotel. It was supposed to be a large cube of N×N×N blocks – small 1×1×1 cubes, and each block was to be painted on all its outer sides in a single color. Some blocks could be painted the same color.
+A year later, photographs were taken of the hotel from each of its 6 sides: front, left, back, right, top, bottom. Over the year of operation, it might have happened that due to weak fastening, some of the blocks the hotel was built from broke off and flew away into open space. The hotel restoration commission wants to determine the maximum possible number of remaining blocks based on the photographs.
+So, you need to determine the maximum number of 1×1×1 blocks the hotel could consist of, based on the views of the hotel (an N×N×N cube from which some 1×1×1 cubes may have been removed) from its 6 sides. The hotel might consist of two or more disconnected parts.
+The first line of the input file INPUT.TXT contains the number N — the size of the hotel (1≤N≤10). The next N lines contain the views of the hotel from its 6 sides (in the following order: front, left, back, right, top, bottom). Each such view is an N×N table where different uppercase English letters denote different colors, and a "." (dot) denotes that one can see straight through the hotel at that location. Each pair of consecutive views is separated by exactly one space in each of the N lines.
+The bottom edge of the top view corresponds to the top edge of the front view, and the top edge of the bottom view corresponds to the bottom edge of the front view. For the front, back, and side views, the top and bottom of the view correspond to the top and bottom of the hotel.
+Input data
+The input data is correct, meaning the input file describes a state that could occur.
+Output data
+Output a single number to the output file OUTPUT.TXT — the sought maximum number of remaining blocks in the hotel.

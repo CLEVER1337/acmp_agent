@@ -1,0 +1,13 @@
+In a distant kingdom, there are n cities connected by m two-way roads. Some roads are paved with stone, while others are mere country paths. The capital of the kingdom is located in city number 1. The roads are arranged such that it is possible to travel from any city to any other using only the stone-paved roads, and the number of stone roads is the minimum possible. The country roads, however, were built so that if a stone road is blocked or destroyed, it is still possible to travel from any city to any other via the roads.
+
+Let the number of stone roads that need to be traversed to get from city u to city v be denoted as s(u, v). The roads obey the following rule: if two cities u and v are connected by a road (whether stone or country), then either s(1, u) + s(u, v) = s(1, v) or s(1, v) + s(v, u) = s(1, u).
+
+The king of a neighboring kingdom plans to attack the distant kingdom. As the start of the operation, it is intended to destroy some roads. Calculations have shown that the funding allocated to the ministry of attack is sufficient to destroy exactly one stone and one country road. The king would like to destroy such a pair of roads so that afterward, it becomes impossible to travel from at least one city to another for some pair of cities.
+
+Now he asks the minister of attack to count the number of possible sabotage plans. However, the minister of attack is only trained to attack; counting is too difficult for him. Please help him!
+
+Input
+The first line of the input file INPUT.TXT contains n and m – the number of cities and roads, respectively (3 ≤ n ≤ 20,000, m ≤ 100,000). The next m lines describe the roads; each line contains three integers – the numbers of the cities connected by the corresponding road, and 1 if the corresponding road is paved with stone, or 0 if the corresponding road is a country path. No two cities are connected by more than one road, and no road connects a city to itself.
+
+Output
+In the output file OUTPUT.TXT, output a single integer – the number of ways to carry out the sabotage.

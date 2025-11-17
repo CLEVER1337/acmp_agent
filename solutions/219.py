@@ -1,5 +1,6 @@
 
 import sys
+from collections import deque
 
 def main():
     data = sys.stdin.read().split()
@@ -8,127 +9,98 @@ def main():
         return
         
     idx = 0
-    n = int(data[idx]); m = int(data[idx+1]); idx += 2
-    R = list(map(int, data[idx:idx+n])); idx += n
-    C = list(map(int, data[idx:idx+m])); idx += m
-    
+    N = int(data[idx]); M = int(data[idx+1]); idx += 2
+    R = list(map(int, data[idx:idx+N])); idx += N
+    C = list(map(int, data[idx:idx+M])); idx += M
     Z = []
-    for i in range(n):
-        row = list(map(int, data[idx:idx+m]))
-        idx += m
+    for i in range(N):
+        row = list(map(int, data[idx:idx+M]))
+        idx += M
         Z.append(row)
-    
-    total_sum = 0
-    fixed_sum = 0
-    row_sums = [0] * n
-    col_sums = [0] * m
-    
-    for i in range(n):
-        for j in range(m):
+        
+    total_fixed = 0
+    fixed_entries = []
+    row_fixed_sum = [0] * N
+    col_fixed_sum = [0] * M
+    for i in range(N):
+        for j in range(M):
             if Z[i][j] != -1:
-                fixed_sum += Z[i][j]
-                row_sums[i] += Z[i][j]
-                col_sums[j] += Z[i][j]
-    
-    INF = 10**18
-    from collections import deque
-    
-    class FlowGraph:
-        def __init__(self, n):
-            self.n = n
-            self.graph = [[] for _ in range(n)]
-            self.cap = []
-            self.flow = []
-            
-        def add_edge(self, u, v, cap):
-            idx1 = len(self.graph[u])
-            idx2 = len(self.graph[v])
-            self.graph[u].append((v, idx2))
-            self.graph[v].append((u, idx1))
-            self.cap.append(cap)
-            self.cap.append(0)
-            self.flow.append(0)
-            self.flow.append(0)
-            
-        def bfs(self, s, t):
-            dist = [-1] * self.n
-            dist[s] = 0
-            q = deque([s])
-            while q:
-                u = q.popleft()
-                for idx, (v, rev_idx) in enumerate(self.graph[u]):
-                    if dist[v] == -1 and self.flow[self.get_edge_idx(u, idx)] < self.cap[self.get_edge_idx(u, idx)]:
-                        dist[v] = dist[u] + 1
-                        q.append(v)
-            return dist[t] != -1
-            
-        def get_edge_idx(self, u, idx):
-            start_idx = sum(len(self.graph[i]) for i in range(u)) + idx
-            return start_idx
-            
-        def dfs(self, u, t, f):
-            if u == t:
-                return f
-            for idx, (v, rev_idx) in enumerate(self.graph[u]):
-                edge_idx = self.get_edge_idx(u, idx)
-                if self.flow[edge_idx] < self.cap[edge_idx]:
-                    if v != u:
-                        pushed = self.dfs(v, t, min(f, self.cap[edge_idx] - self.flow[edge_idx]))
-                        if pushed > 0:
-                            self.flow[edge_idx] += pushed
-                            rev_edge_idx = self.get_edge_idx(v, rev_idx)
-                            self.flow[rev_edge_idx] -= pushed
-                            return pushed
-            return 0
-            
-        def max_flow(self, s, t):
-            total_flow = 0
-            while self.bfs(s, t):
-                while True:
-                    f = self.dfs(s, t, INF)
-                    if f == 0:
-                        break
-                    total_flow += f
-            return total_flow
-    
-    s = n + m
-    t = s + 1
-    graph = FlowGraph(n + m + 2)
-    
-    for i in range(n):
-        graph.add_edge(s, i, R[i] - row_sums[i])
-        
-    for j in range(m):
-        graph.add_edge(n + j, t, C[j] - col_sums[j])
-        
-    for i in range(n):
-        for j in range(m):
-            if Z[i][j] == -1:
-                graph.add_edge(i, n + j, INF)
+                total_fixed += Z[i][j]
+                row_fixed_sum[i] += Z[i][j]
+                col_fixed_sum[j] += Z[i][j]
+                fixed_entries.append((i, j, Z[i][j]))
                 
-    max_flow = graph.max_flow(s, t)
+    for i in range(N):
+        if row_fixed_sum[i] > R[i]:
+            print(-1)
+            return
+            
+    for j in range(M):
+        if col_fixed_sum[j] > C[j]:
+            print(-1)
+            return
+            
+    n = N + M + 2
+    s = 0
+    t = n - 1
+    graph = [[] for _ in range(n)]
+    row_nodes = list(range(1, N+1))
+    col_nodes = list(range(N+1, N+M+1))
     
-    total_free = 0
-    for i in range(n):
-        total_free += R[i] - row_sums[i]
+    for i in range(N):
+        cap = R[i] - row_fixed_sum[i]
+        graph[s].append((row_nodes[i], cap))
+        graph[row_nodes[i]].append((s, 0))
         
-    if total_free != max_flow:
-        print(-1)
-        return
+    for j in range(M):
+        cap = C[j] - col_fixed_sum[j]
+        graph[col_nodes[j]].append((t, cap))
+        graph[t].append((col_nodes[j], 0))
         
-    result = fixed_sum
-    for i in range(n):
-        for j in range(m):
+    for i in range(N):
+        for j in range(M):
             if Z[i][j] == -1:
-                edge_idx = None
-                for idx, (v, rev_idx) in enumerate(graph.graph[i]):
-                    if v == n + j:
-                        edge_idx = graph.get_edge_idx(i, idx)
-                        break
-                if edge_idx is not None:
-                    result += graph.flow[edge_idx]
-                    
-    print(result)
+                graph[row_nodes[i]].append((col_nodes[j], float('inf')))
+                graph[col_nodes[j]].append((row_nodes[i], 0))
+                
+    def bfs():
+        parent = [-1] * n
+        min_cap = [0] * n
+        min_cap[s] = float('inf')
+        q = deque([s])
+        while q:
+            u = q.popleft()
+            for edge in graph[u]:
+                v, cap = edge
+                if cap > 0 and parent[v] == -1:
+                    parent[v] = u
+                    min_cap[v] = min(min_cap[u], cap)
+                    if v == t:
+                        return parent, min_cap[t]
+                    q.append(v)
+        return None, 0
+        
+    max_flow = 0
+    while True:
+        parent, flow = bfs()
+        if flow == 0:
+            break
+        max_flow += flow
+        v = t
+        while v != s:
+            u = parent[v]
+            for i in range(len(graph[u])):
+                if graph[u][i][0] == v:
+                    graph[u][i] = (v, graph[u][i][1] - flow)
+                    break
+            for i in range(len(graph[v])):
+                if graph[v][i][0] == u:
+                    graph[v][i] = (u, graph[v][i][1] + flow)
+                    break
+            v = u
+            
+    total = total_fixed + max_flow
+    print(total)
 
 if __name__ == "__main__":
     main()

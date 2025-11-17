@@ -1,0 +1,7 @@
+Let \( x \) be a natural number. We call \( y \) its divisor if \( 1 \leq y \leq x \) and the remainder of dividing \( x \) by \( y \) is zero. Given a number \( x \), find the number of its divisors that are divisible by every prime number that divides \( x \).
+
+Input  
+The input file INPUT.TXT contains an integer \( x \) (\( 1 \leq x \leq 10^{18} \)). All prime divisors of \( x \) do not exceed one thousand.
+
+Output  
+In the output file OUTPUT.TXT, print the answer to the problem.

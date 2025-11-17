@@ -1,0 +1,5 @@
+We will consider words composed of uppercase English letters and patterns consisting of uppercase English letters and the symbols '?' and '*'. It is said that a word matches a pattern if in the pattern each '?' can be replaced by an uppercase English letter, and each '*' can be replaced by a sequence (possibly empty) of uppercase English letters, so that the result is the required word. We need to write a program that determines whether a word matches a pattern.
+Input
+The first two lines of the input file INPUT.TXT contain the pattern and the word: one line contains the pattern - a sequence of uppercase English letters, '?' and '*', and the other - the word, consisting only of uppercase English letters. Both lines of the input file contain from 1 to 255 characters.
+Output
+The output file OUTPUT.TXT should contain the word "YES" if the word matches the pattern, and "NO" otherwise.

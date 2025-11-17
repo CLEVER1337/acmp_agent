@@ -1,0 +1,5 @@
+We call a number beautiful if the sum of its digits in the decimal system is divisible by the number of digits in it (in the decimal system). It is necessary to find the N-th beautiful number in ascending order.
+Input data
+The input file INPUT.TXT contains an integer N. (1 ≤ N ≤ 100,000)
+Output data
+Output the answer to the problem to the output file OUTPUT.TXT.

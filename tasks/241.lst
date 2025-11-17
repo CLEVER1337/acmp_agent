@@ -1,0 +1,9 @@
+The parliament of a certain country has adopted a new law on public holidays. According to this law, the first K days of the year, as well as February 23rd and March 8th, are declared holidays, and all other holidays are canceled. At the same time, all weekends (Saturday and Sunday) that fall on holidays are moved to the working days following these holidays.
+Depending on which day of the week January 1st falls on, the number of consecutive non-working days may vary.
+It is required to determine the maximum number of consecutive non-working days.
+
+Input
+The input file INPUT.TXT contains a single integer K (1 ≤ K ≤ 50).
+
+Output
+The output file OUTPUT.TXT must contain a single integer — the maximum number of consecutive non-working days.

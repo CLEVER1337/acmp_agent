@@ -1,0 +1,12 @@
+They decided to install a parquet floor in the room. Moreover, there is an idea to lay out a certain pattern on the floor. The parquet tiles used to pave the room's floor consist of 1×1 squares, each of which can be either white or black. The room itself has dimensions N×M. The room plan specifies what color each square of the room should be.
+There are several shapes of parquet tiles:
+The squares of one parquet tile can be colored differently. There may be several types of tiles of the same shape but colored differently. Tiles of different types can have different costs. The number of tiles of each type is unlimited. Tiles are allowed to be rotated arbitrarily (by angles multiples of 90 degrees). It is not allowed to break tiles or place them face down.
+Initially, some part of the floor may already be tiled. It is required to determine the minimum cost of tiles needed to pave the remaining part of the room.
+The first line of the input file INPUT.TXT contains three numbers: N, M (room dimensions) and K (number of available tile types). 1 ≤ N ≤ 8, 1 ≤ M ≤ 8, 1 ≤ K ≤ 10. Next is the description of the desired floor coloring. The description consists of N lines of M numbers each, where 0 denotes white, 1 denotes black, and 2 denotes that the square is already tiled. The last K lines contain descriptions of the available tile types in the following format:
+<shape> <cost> <coloring>
+<Shape> is a number from 1 to 4 describing the shape of the tile (see the figure above)
+<Cost> is a natural number not exceeding 10000, specifying the cost of one tile of this type
+Input data
+<Coloring> is from one to three numbers 0 or 1. The number of digits matches the number of squares that make up the tile. The numbers specify the colors of the tile's squares in the order in which the squares are numbered in the figure.
+Output data
+Output a single number to the OUTPUT.TXT file — the minimum laying cost or –1 if it is impossible to lay the tiles in the required way.

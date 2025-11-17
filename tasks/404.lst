@@ -1,0 +1,5 @@
+Game rules: Initially, there is a pile containing N stones on the table. Two players take turns taking stones from the pile. If the pile contains K stones before a player's move, that player can take from 1 to [sqrt(K)] (the integer part of the square root of K) stones, inclusive. For example, if the pile has 10 stones, the player is allowed to take 1, 2, or 3 stones. If no stones remain in the pile, the player whose turn it is to move loses. The task is to determine: can the first player win if both players follow an optimal strategy?
+Input
+The input file INPUT.TXT contains a natural number N – the number of stones in the pile (N ≤ 10^12).
+Output
+In the output file OUTPUT.TXT, output WIN if the first player can win regardless of the second player's actions, or LOSE if the second player can force the first player to lose.

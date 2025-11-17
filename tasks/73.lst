@@ -1,0 +1,5 @@
+Let's consider the operation of a simple cipher. The encrypted message consists of English letters in lowercase and the space character. Encryption is performed character by character. Each letter is assigned a number: a – 1, b – 2, … , z – 26, ' ' – 27. Then the character index is added to its position in the message modulo 27, and the result of the addition is represented in base-27 notation (0, 1, …, Q in uppercase). It is necessary to write a decoder.
+Input
+The input file INPUT.TXT contains a single line with the encoded string, 1 to 255 characters long. The string is written in uppercase.
+Output
+The output file OUTPUT.TXT should contain a single line with the decryption of the given string, with English alphabet characters output in lowercase.

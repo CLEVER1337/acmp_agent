@@ -1,0 +1,5 @@
+A computational expression needs to be evaluated, possibly containing real numbers, parentheses, spaces, and binary operations '+', '-', '*', '/'. Trigonometric functions 'cos(x)' and 'sin(x)' may also be present. The expression should be evaluated according to the syntax of the Delphi language.  
+Input Data  
+The input file, INPUT.TXT, contains one line with the arithmetic expression. The line length does not exceed 200 characters. It can contain any characters. It is guaranteed that no overflow will occur for a 6-byte real number type or division by zero during valid evaluation.  
+Output Data  
+The result of the specified arithmetic expression, accurate to at least 10^-3, should be printed in the output file, OUTPUT.TXT. If there are syntax errors in the expression, 'Error' should be output instead.

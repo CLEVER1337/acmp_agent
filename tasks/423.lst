@@ -1,0 +1,5 @@
+In a message consisting of uppercase Russian letters and spaces, each letter was replaced by its ordinal number in the Russian alphabet (A - 1, B - 2, ..., Я - 33), and a space was replaced by a zero. The task is to find the number of original messages that could have resulted in the given sequence of digits.
+Input data
+The input file INPUT.TXT contains a sequence of digits, consisting of no more than 100 digits.
+Output data
+Output the answer to the problem to the output file OUTPUT.TXT.

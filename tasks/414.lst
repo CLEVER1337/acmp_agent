@@ -1,0 +1,9 @@
+An investigation into a major case potentially involving police officers is underway at the city police department of a coastal town. A decision has been made to secretly install equipment for monitoring information coming through the Internet. Two departments are under suspicion, but securing funding for the purchase of two sets of equipment proved impossible. Fortunately, the department's internal network has a tree-like structure, meaning each department accesses the Internet through another department. The exception is the cybercrime division, which has direct Internet access via a modem line.
+The monitoring equipment could be installed directly in this department, but to prevent abuse, it is better to find a location that compromises the secrecy of as few additional departments as possible.
+As the most experienced employee in such matters, you have been tasked with solving this problem. Subordinates have already numbered all departments with natural numbers starting from 1, with the first number assigned to the cybercrime division.
+
+Input
+The first line of the input file INPUT.TXT contains a natural number N (N ≤ 30000) – the number of departments. The second line contains the numbers of the two departments that need to be monitored. The third line contains n-1 natural numbers; the i-th number is no greater than i and specifies the number of the department to which department i + 1 is connected.
+
+Output
+Output a single number in the output file OUTPUT.TXT – the number of the department where the monitoring equipment should be installed.

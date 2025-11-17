@@ -1,0 +1,5 @@
+The coordinates of three vertices of a rectangle are given. It is necessary to determine the coordinates of the fourth vertex.
+Input data
+The input file INPUT.TXT contains the coordinates of three vertices of the rectangle in an arbitrary order, separated by spaces, in the format x1 y1 x2 y2 x3 y3. All numbers are integers not exceeding 1000 in absolute value.
+Output data
+The output file OUTPUT.TXT should contain the coordinates of the fourth vertex of the rectangle, separated by a space.

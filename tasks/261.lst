@@ -1,0 +1,11 @@
+One of the TV channels holds the following lottery every week. During the week, participants place their bets. Each bet consists of naming a certain M-digit number in a base-K numeral system (that is, essentially, each participant names M digits, each ranging from 0 to K–1). Leading zeros in numbers are allowed.
+At some point, the acceptance of bets for the current draw is completed, and after that, the host announces the winning number on air (this is also an M-digit number in the base-K numeral system).
+After that, the viewers whose first digit of their number matches the first digit of the number named by the host receive a prize of A1 rubles. Those whose first two digits match receive A2 rubles (if a player's second digit matches but the first does not, they receive nothing). Similarly, those who guessed the first three digits correctly receive A3 rubles. And so on. Those who guess the entire number correctly receive AM rubles.
+It is important that if a player guesses the first t digits correctly, they receive At rubles but do not receive prizes for guessing t–1, t–2, etc., digits. If a player does not guess the first digit, they receive nothing.
+Write a program that, based on the known bets made by the viewers, finds the number that the host should announce so that the organizing company pays out the minimum amount in winnings. For your convenience, the bets made by the players are already sorted in non-decreasing order.
+
+Input
+The first line of the input file INPUT.TXT contains the numbers N (the number of viewers who placed bets, 1 ≤ N ≤ 100000), M (the length of the numbers, 1 ≤ M ≤ 10), and K (the base of the numeral system, 2 ≤ K ≤ 10). The next line contains M numbers A1, A2, ..., AM, specifying the prizes for matching only the first digit, the first two digits, ..., all digits (1 ≤ A1 ≤ A2 ≤ … ≤ AM ≤ 100000). Each of the following N lines contains one M-digit base-K number. The numbers are in non-decreasing order.
+
+Output
+In the output file OUTPUT.TXT, output the smallest amount that will have to be paid out as winnings.

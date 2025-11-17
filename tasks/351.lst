@@ -1,0 +1,7 @@
+Given a string of N characters consisting of lowercase English letters. It is necessary to move from the first character of the string to the last one, jumping no more than K characters at a time. The cost of a jump to the same character is 0, and the cost of a jump to a different character is 1. It is required to write a program that calculates the minimum cost to transition from the first to the last character.
+
+Input data
+The input file INPUT.TXT contains in the first line two integers: the length of the string N (2 ≤ N ≤ 10^5) and the maximum jump length K (1 ≤ K < N). The second line contains a string of N English letters.
+
+Output data
+The output file OUTPUT.TXT must contain a single number – the minimum transition cost.

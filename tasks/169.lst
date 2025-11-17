@@ -1,0 +1,5 @@
+A person is standing N steps away from the store. Every minute, they choose whether to take a step towards the store or in the opposite direction. Write a program that determines how many ways they can reach the store after taking exactly K steps, arriving at the store only after the final step.
+Input data
+The input file INPUT.TXT contains two numbers N and K separated by a space. It is known that 1 ≤ N ≤ K ≤ 37.
+Output data
+The output file OUTPUT.TXT must contain a single number – the number of ways to reach the store.

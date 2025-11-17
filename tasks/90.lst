@@ -1,0 +1,9 @@
+This story took place on a flat planet. Since time immemorial, there had been a city N located at point (xn, yn). Additionally, at various times, there existed countries on this same planet, each shaped like a triangle. Now historians faced a serious task: based on the available data about the triangular countries, determine which countries city N could have belonged to. A city could belong to a country if it lies strictly inside it.
+The first line of the input file contains two numbers: xn and yn - the coordinates of city N.
+The second line of the input file contains the number k of triangular countries (1 ≤ k ≤ 1000).
+Each of the next k lines describes one triangular country. The description of a triangular country consists of six integers x1, y1, x2, y2, x3, y3, where (x1, y1), (x2, y2), (x3, y3) are the coordinates of the vertices of this country.
+Input data
+It is guaranteed that all countries have a non-zero area. All coordinates do not exceed 10000 in absolute value.
+Output data
+On the first line of the output file, output the number of countries that city N could have belonged to.
+On the second line, output the numbers of these countries in ascending order, separated by spaces. Countries are numbered starting from one in the order they are given in the input file.

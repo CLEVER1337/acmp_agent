@@ -1,0 +1,7 @@
+A game for two players is defined by its tree. The opponents take turns making moves. The first player starts the game. The game ends either in a draw or with a victory for one of the players. The leaves of this game tree can have values equal to one of three numbers: +1 - victory for the first player, -1 - victory for the second player, 0 - a draw. Your task is to determine who will win if both opponents follow the correct strategy.
+
+Input
+The tree nodes are numbered with consecutive integers. The root of the tree always has number 1. The first line of the input file INPUT.TXT contains a natural number N - the number of nodes in the game tree (N ≤ 1000). The next N - 1 lines describe the nodes - one line for each node (except the first). The second line contains a description of the second node of the tree, the third - the third node, and so on. If a node is a leaf, the first character of the line is L, followed by a space, then the number of the parent node, another space, and the result of the game (+1 - victory for the first player, -1 - victory for the second, 0 - a draw). If the node is internal, the line contains N - the first character, then a space and the number of the parent node.
+
+Output
+Output to the file OUTPUT.TXT +1 if the first player wins, -1 if the second wins, and 0 in case of a draw.

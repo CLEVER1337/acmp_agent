@@ -1,0 +1,5 @@
+The calculator has two memory cells: the content of the first one is always displayed on the screen, the second one is a buffer. At the initial moment, the integer X is displayed on the calculator's screen, and the number 0 is stored in the buffer. The calculator has only two working keys: '+' and '='. Pressing '+' copies the number currently displayed on the screen into the buffer. Pressing '=' adds the number from the buffer to the number displayed on the screen, and the result is displayed on the screen; the number in the buffer remains unchanged. It is required to achieve the display of the number Y on the screen using the least number of key presses.
+Input data
+The input file INPUT.TXT contains two integers X and Y. Each of these numbers does not exceed 10^9 in absolute value.
+Output data
+Output one number to the output file OUTPUT.TXT — the number of key presses required to obtain the number Y. If it is impossible to obtain the number Y from the number X using the specified operations, output a single number –1 to the output file.

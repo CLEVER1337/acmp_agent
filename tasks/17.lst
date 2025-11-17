@@ -1,0 +1,7 @@
+For the game "Field of Wonders," a round drum divided into sectors and an arrow are used. Each sector contains a number. Different sectors may contain the same number. One day, the host decided to change the rules. He spun the drum himself and called out to the player (who could not see the drum) all the numbers in the order in which the arrow pointed to them during the spin. It turned out that the drum made a whole number of revolutions, meaning the last sector coincided with the first. After that, the host asked the contestant: what is the smallest number of sectors the drum could have? You are required to write a program that answers the host's question.
+
+Input
+The first line of the input file INPUT.TXT contains the number N – the count of numbers called by the host (2 ≤ N ≤ 30000). The second line contains N numbers that the arrow pointed to during the drum's rotation. The first number always matches the last (at the end, the arrow points to the same sector as at the beginning). The numbers written on the drum's sectors are natural numbers not exceeding 32000.
+
+Output
+The output file OUTPUT.TXT should contain a single number – the minimum number of sectors the drum could have.

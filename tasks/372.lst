@@ -1,0 +1,5 @@
+Print all valid bracket expressions of length N consisting of round and square brackets.
+Input data
+The input file INPUT.TXT contains a single even natural number N not exceeding 14.
+Output data
+In the output file OUTPUT.TXT, output all possible valid bracket expressions, one per line, in any order.

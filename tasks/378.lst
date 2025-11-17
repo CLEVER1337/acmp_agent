@@ -1,0 +1,5 @@
+Given N integers A1, A2, ..., AN. Find the number of distinct values of sums of the form k1A1 + k2A2 + ... + kNAN.
+Input
+The input file INPUT.TXT contains the integer N in the first line, and A1, A2, ..., AN separated by spaces in the second line. Constraints: all numbers are integers, 1 ≤ N ≤ 500, 0 ≤ Ai ≤ 100, 0 ≤ ki ≤ 1.
+Output
+Output the number of distinct sum values to the file OUTPUT.TXT.

@@ -1,0 +1,9 @@
+A group of new recruits arrived at military unit N666. After meeting the warrant officer, it became clear that only a miracle could save the soldiers from potato peeling duties in the kitchen. Unable to remember their last names, the warrant officer numbered the recruits from 1 to N. He then ordered them to line up by height (starting with the tallest). Even completely untrained recruits can handle this simple task, but the problem is that the warrant officer convinced himself that he knows for certain pairs of soldiers who is taller, and this does not always correspond to the truth.
+
+After three days of training, the recruits managed to find out what the warrant officer knows (or rather, thinks he knows). Using this knowledge, help them line up in a way that will satisfy the warrant officer.
+
+Input
+The input file INPUT.TXT starts with numbers N and M (1 ≤ N ≤ 100, 1 ≤ M ≤ 5000) - the number of soldiers in the company and the number of soldier pairs about whom the warrant officer knows who is taller. These are followed by these pairs of numbers A and B, one per line (1 ≤ A,B ≤ N), meaning that, according to the warrant officer, soldier A is taller than soldier B.
+
+Output
+In the output file OUTPUT.TXT, print "Yes" if it is possible to line up in a way that satisfies the warrant officer, and "No" if it is not possible.

@@ -1,0 +1,5 @@
+When Misha and Masha were buying a gift, an interesting situation arose. They only had one large bill, while the seller had a certain amount of change. Since it was morning, the seller needed to conserve change and wanted to give back the change using the minimum number of coins. After thinking for a while, they precisely determined the number of coins the seller would have to part with. Can you solve such a problem?
+Input
+The first line of the input file INPUT.TXT contains the number N (1 ≤ N ≤ 10) – the number of different coin denominations available in the cash register. It can be assumed that the number of coins of each denomination is sufficient. The next line contains N integers ai (0 < ai ≤ 2000) – the coin denominations. The third line contains one number K (1 ≤ K ≤ 10^6) – the sum that needs to be collected.
+Output
+In the output file OUTPUT.TXT, output the minimum number of coins the seller will have to give, or -1 if the seller cannot give them change at all.

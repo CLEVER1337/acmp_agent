@@ -1,0 +1,5 @@
+The string S was written many times in a row, after which a substring was taken from the resulting string and given to you. Your task is to determine the minimum possible length of the original string S.
+Input data
+The input file INPUT.TXT contains a single line with a string that contains only English letters; the length of the string does not exceed 50,000 characters.
+Output data
+Write one number to the output file OUTPUT.TXT - the answer to the problem.

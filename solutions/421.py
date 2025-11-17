@@ -1,88 +1,82 @@
 
 import sys
 
-def readints():
-    return list(map(int, sys.stdin.read().split()))
+def sqdist(p, q):
+    """squared Euclidean distance between two points p and q"""
+    dx = p[0] - q[0]
+    dy = p[1] - q[1]
+    return dx * dx + dy * dy
 
-def vec(a, b):
-    return (b[0] - a[0], b[1] - a[1])
-
-def cross(v1, v2):
-    return v1[0] * v2[1] - v1[1] * v2[0]
-
-def dot(v1, v2):
-    return v1[0] * v2[0] + v1[1] * v2[1]
-
-def length(v):
-    return (v[0]**2 + v[1]**2)**0.5
-
-def normalize(v):
-    l = length(v)
-    if l == 0:
-        return (0, 0)
-    return (v[0]/l, v[1]/l)
-
-def angle_between(v1, v2):
-    cos_theta = dot(normalize(v1), normalize(v2))
-    return cos_theta
-
-def triangle_signature(triangle):
-    a, b, c = triangle
-    ab = vec(a, b)
-    ac = vec(a, c)
-    bc = vec(b, c)
-    
-    sides = sorted([length(ab), length(ac), length(bc)])
-    angles = sorted([
-        angle_between(ab, ac),
-        angle_between(vec(b, a), vec(b, c)),
-        angle_between(vec(c, a), vec(c, b))
-    ])
-    
-    return (sides, angles)
-
-def main():
-    data = readints()
-    n = data[0]
-    triangles = []
-    index = 1
-    
-    for i in range(n):
-        points = []
-        for j in range(3):
-            x = data[index]
-            y = data[index+1]
-            index += 2
-            points.append((x, y))
-        triangles.append(points)
-    
-    if n == 0:
-        print("YES")
+def solve() -> None:
+    data = sys.stdin.read().strip().split()
+    if not data:
         return
-        
-    base_signature = triangle_signature(triangles[0])
-    
-    for i in range(1, n):
-        current_signature = triangle_signature(triangles[i])
-        
-        sides1, angles1 = base_signature
-        sides2, angles2 = current_signature
-        
-        if len(sides1) != len(sides2):
-            print("NO")
-            return
-            
-        for j in range(len(sides1)):
-            if abs(sides1[j] - sides2[j]) > 1e-9:
+    it = iter(data)
+    n = int(next(it))
+    triangles = []          # (points, sorted_distances)
+    shapes = set()
+
+    for _ in range(n):
+        pts = [(int(next(it)), int(next(it))) for __ in range(3)]
+        d01 = sqdist(pts[0], pts[1])
+        d12 = sqdist(pts[1], pts[2])
+        d20 = sqdist(pts[2], pts[0])
+        sorted_d = tuple(sorted([d01, d12, d20]))
+        triangles.append((pts, sorted_d))
+        shapes.add(sorted_d)
+
+    # all triangles must have the same side lengths
+    if len(shapes) != 1:
+        print("NO")
+        return
+
+    # check handedness only for scalene triangles
+    signs = set()
+    for pts, sd in triangles:
+        # sd[0] < sd[1] < sd[2]  <=>  scalene
+        if sd[0] < sd[1] < sd[2]:
+            # recompute the three distances
+            d01 = sqdist(pts[0], pts[1])
+            d12 = sqdist(pts[1], pts[2])
+            d20 = sqdist(pts[2], pts[0])
+
+            a, b, c = sd[0], sd[1], sd[2]
+
+            # find the unique edge of length a
+            if d01 == a:
+                u, v, w = 0, 1, 2
+            elif d12 == a:
+                u, v, w = 1, 2, 0
+            else:               # d20 == a
+                u, v, w = 2, 0, 1
+
+            # distances from w to u and v
+            dwu = sqdist(pts[w], pts[u])
+            dwv = sqdist(pts[w], pts[v])
+
+            # i is the endpoint adjacent to a and b
+            if dwu == b:
+                i, j = u, v
+            else:               # dwv == b
+                i, j = v, u
+
+            # cross product (k-i) × (j-i)
+            dx_base = pts[j][0] - pts[i][0]
+            dy_base = pts[j][1] - pts[i][1]
+            dx_apex = pts[w][0] - pts[i][0]
+            dy_apex = pts[w][1] - pts[i][1]
+
+            cross = dx_apex * dy_base - dy_apex * dx_base
+            if cross == 0:          # degenerate triangle – should not happen
                 print("NO")
                 return
-                
-        for j in range(len(angles1)):
-            if abs(angles1[j] - angles2[j]) > 1e-9:
-                print("NO")
-                return
-                
-    print("YES")
+            sign = 1 if cross > 0 else -1
+            signs.add(sign)
+            if len(signs) == 2:     # contradictory orientations already
+                break
+
+    # if all signs are equal (or there are no scalene triangles) -> YES
+    print("YES" if len(signs) <= 1 else "NO")
 
 if __name__ == "__main__":
-    main()
+    solve()

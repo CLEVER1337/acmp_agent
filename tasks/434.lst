@@ -1,0 +1,19 @@
+The well-known town of Saint-Tver decided to build a new microdistrict, which in plan is a rectangular area. The boundaries of the microdistrict and its streets, according to the project, are oriented strictly along the cardinal directions, and the streets divide the microdistrict into districts measuring 1 km × 1 km.
+
+During the alignment of the project with the territory, it was discovered that some districts of the microdistrict according to the project are either completely or partially located on a marshy area. The area occupied by the marsh is connected, and it is surrounded by adjacent districts that are to be built upon (the area is connected, meaning that it is possible to go from any point to any other point within it without leaving the area).
+
+To preserve the local ecology and ensure the safety of residents, the area occupied by the marsh will be fenced with a glass fence. The fence must run only along the boundaries of the microdistrict districts, separating the marsh, and it may also separate some districts not occupied by the marsh from the rest of the microdistrict.
+
+To save building materials, the fence must have the minimal possible length. Among all fences with minimal length, the one with the smallest area of the part of the microdistrict enclosed by the fence should be chosen.
+
+A program is required to design the fence with the above properties.
+
+The input file INPUT.TXT contains a description of a polygon — the boundaries of the area consisting of quadrants, some of which contain marshes. The sides of the polygon are parallel to the coordinate axes.
+
+Input data:
+
+The first line contains an integer N — the number of vertices in the polygon (4 ≤ N ≤ 10^5, N is even). The next N lines each contain two integers — the coordinates of the vertices in order when traversing the polygon counter-clockwise. All numbers do not exceed 10^9 in absolute value. No three consecutive vertices of the boundary lie on the same straight line. The boundary of the polygon does not have self-intersections or self-tangencies.
+
+Output data:
+
+The output file OUTPUT.TXT should contain a description of a polygon defining the desired fence. The format of the polygon's description is the same as that for the input data. No three consecutive vertices of this polygon should lie on the same straight line.

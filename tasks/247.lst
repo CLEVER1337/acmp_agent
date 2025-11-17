@@ -1,0 +1,7 @@
+A new cafe recently opened near Petya's university, which has the following discount system: for each purchase over 100 rubles, the customer receives a coupon entitling them to one free lunch (if the purchase is 100 rubles or less, the customer does not receive such a coupon). One day, Petya came across the price list for the next N days. After studying it carefully, he decided that he would have lunch at this cafe all N days, and each day he would buy exactly one lunch there. However, Petya's scholarship is small, so he wants to maximize the use of the discount system so that his total costs are minimized.
+
+Input
+The first line of the input file INPUT.TXT contains an integer N (0 ≤ N ≤ 100). Each of the next N lines contains one integer representing the cost of lunch in rubles on the corresponding day. The cost is a non-negative integer not exceeding 300.
+
+Output
+The first line of the output file OUTPUT.TXT should output the minimum possible total cost of lunches. The second line should output two numbers K1 and K2 — the number of coupons that remain unused by Petya after these N days and the number of coupons he used, respectively. If there are multiple solutions with the minimum total cost, output the one for which the value K1 is the largest (in case Petya ever decides to visit this cafe again).

@@ -1,0 +1,5 @@
+Given N segments on the number line and M points on the same line. For each given point, determine how many segments it belongs to. A point x is considered to belong to a segment with endpoints a and b if the double inequality min(a, b) ≤ x ≤ max(a, b) holds.
+Input
+The first line of the input file INPUT.TXT contains two integers N – the number of segments and M – the number of points (1 ≤ N, M ≤ 10^5). The next N lines each contain two integers ai and bi – the coordinates of the endpoints of the corresponding segment. The last line contains M integers – the coordinates of the points. All numbers in the input file do not exceed 10^9 in absolute value.
+Output
+Output M numbers to the output file OUTPUT.TXT – for each point, the number of segments that contain it.

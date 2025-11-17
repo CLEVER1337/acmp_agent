@@ -1,0 +1,7 @@
+During the construction of the new railway, problems arose. The road runs through hilly terrain, but the tracks themselves must be strictly horizontal. Therefore, the management of the construction company decided to level the ground surface in this section. The main problem is that bringing in or removing soil from the construction site costs $10,000 per cubic meter. Since the railway's budget is small, this is unaffordable. Therefore, the chief engineer decided to level the surface using only the soil from which the hills are made. Now the most difficult task is to determine the altitude above sea level at which the road will run. This important task has been assigned to you. Every meter from the start of the section, the altitude above sea level was measured. Write a program that calculates the desired altitude based on the measurement data.
+
+Input
+The first line of the input file INPUT.TXT contains the number N (1 < N ≤ 30000) of points where the altitude was measured. The second line contains the measurement results – the i-th number in the line contains the altitude above sea level of the point located at a distance of (i-1) meters from the start of the section. All altitudes are non-negative integers not exceeding 10000. Assume that the earth's surface between adjacent measurement points is strictly straight.
+
+Output
+Output the answer to the problem to the output file OUTPUT.TXT with an accuracy of at least 10^-5.

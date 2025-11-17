@@ -1,37 +1,49 @@
 
+import sys
+
+def parse_time(s):
+    parts = s.split(':')
+    if len(parts) == 1:
+        return 0, 0, int(parts[0])
+    elif len(parts) == 2:
+        return 0, int(parts[0]), int(parts[1])
+    else:
+        return int(parts[0]), int(parts[1]), int(parts[2])
+
+def normalize(h, m, s):
+    total_seconds = h * 3600 + m * 60 + s
+    days = total_seconds // 86400
+    remaining_seconds = total_seconds % 86400
+    h = remaining_seconds // 3600
+    remaining_seconds %= 3600
+    m = remaining_seconds // 60
+    s = remaining_seconds % 60
+    return days, h, m, s
+
 def main():
-    with open("INPUT.TXT", "r") as f:
-        current_time = f.readline().strip()
-        interval = f.readline().strip()
+    data = sys.stdin.read().splitlines()
+    current_time_str = data[0].strip()
+    interval_str = data[1].strip()
     
-    hh, mm, ss = map(int, current_time.split(':'))
+    hh, mm, ss = map(int, current_time_str.split(':'))
     total_current_seconds = hh * 3600 + mm * 60 + ss
     
-    parts = interval.split(':')
-    if len(parts) == 1:
-        hours, minutes, seconds = 0, 0, int(parts[0])
-    elif len(parts) == 2:
-        hours, minutes, seconds = 0, int(parts[0]), int(parts[1])
-    else:
-        hours, minutes, seconds = int(parts[0]), int(parts[1]), int(parts[2])
+    h_int, m_int, s_int = parse_time(interval_str)
+    total_interval_seconds = h_int * 3600 + m_int * 60 + s_int
     
-    total_interval_seconds = hours * 3600 + minutes * 60 + seconds
+    total_final_seconds = total_current_seconds + total_interval_seconds
+    days = total_final_seconds // 86400
+    remaining_seconds = total_final_seconds % 86400
     
-    total_result_seconds = total_current_seconds + total_interval_seconds
-    seconds_in_day = 24 * 3600
-    
-    days = total_result_seconds // seconds_in_day
-    remaining_seconds = total_result_seconds % seconds_in_day
-    
-    result_hh = remaining_seconds // 3600
+    h = remaining_seconds // 3600
     remaining_seconds %= 3600
-    result_mm = remaining_seconds // 60
-    result_ss = remaining_seconds % 60
+    m = remaining_seconds // 60
+    s = remaining_seconds % 60
     
-    with open("OUTPUT.TXT", "w") as f:
-        f.write(f"{result_hh:02d}:{result_mm:02d}:{result_ss:02d}")
-        if days > 0:
-            f.write(f"+{days} days")
+    if days > 0:
+        print(f"{h:02d}:{m:02d}:{s:02d}+{days} days")
+    else:
+        print(f"{h:02d}:{m:02d}:{s:02d}")
 
 if __name__ == "__main__":
     main()

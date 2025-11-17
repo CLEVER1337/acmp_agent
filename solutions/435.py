@@ -1,35 +1,41 @@
 
+import sys
+
 def main():
-    import sys
     data = sys.stdin.read().split()
-    N = int(data[0])
-    K = int(data[1])
-    total_sum = N * K
-    max_sum = total_sum // 2
-    dp = [0] * (max_sum + 1)
-    dp[0] = 1
+    n = int(data[0])
+    k = int(data[1])
     
-    for _ in range(N):
-        new_dp = [0] * (max_sum + 1)
-        for s in range(max_sum + 1):
-            if dp[s] == 0:
-                continue
-            for d in range(K + 1):
-                ns = s + d
-                if ns <= max_sum:
-                    new_dp[ns] += dp[s]
+    if n == 1:
+        print(0)
+        return
+        
+    total_sequences = (k + 1) ** n
+    half_max = 300 // 2
+    dp = {}
+    dp[(0, 0)] = 1
+    
+    for _ in range(n):
+        new_dp = {}
+        for (s, mask), count in dp.items():
+            for d in range(k + 1):
+                new_s = s + d
+                shifted = mask << d
+                new_mask = mask | shifted
+                new_dp[(new_s, new_mask)] = new_dp.get((new_s, new_mask), 0) + count
         dp = new_dp
-
-    total_numbers = (K + 1) ** N
-    happy_count = 0
-    for s in range(max_sum + 1):
-        happy_count += dp[s] * dp[s]
-    if total_sum % 2 == 0:
-        happy_count -= dp[max_sum] * dp[max_sum]
-        happy_count += dp[max_sum] * (dp[max_sum] + 1) // 2
-
-    result = total_numbers - happy_count
-    print(result)
+        
+    lucky_count = 0
+    for (s, mask), count in dp.items():
+        if s > 0:
+            if s % 2 == 0:
+                half = s // 2
+                if half < 300 and (mask & (1 << half)):
+                    lucky_count += count
+                    
+    total_digits = 2**(n - 1) - 1
+    unlucky_count = total_sequences - lucky_count - total_digits if n > 1 else total_sequences
+    print(unlucky_count)
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,7 @@
+Misha was tasked with solving the following problem: there is a start date and an end date of an event; the duration needs to be determined. He wrote a program and asked Masha to check it. After a while, Masha came and upset Misha: "Your program doesn't work correctly. I think you forgot that years can be leap years." Misha has very little free time and cannot fix his program. Please help him.
+A year is a leap year if and only if one of the following conditions is met:
+For example, years 400, 404, 496, 504, 2000, 2004 are leap years, while years 100, 200, 300, 503, 1000, 2001, 2005 are not.
+Input data
+The first line of the input file INPUT.TXT contains the start date of the event. The second line of the input file contains the end date of the event. It is guaranteed that the first date is earlier than the second. The dates are given in the format DD.MM.YYYY.
+Output data
+Output a single number to the output file OUTPUT.TXT – the duration of the event (in days).

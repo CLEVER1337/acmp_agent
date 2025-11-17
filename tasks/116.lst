@@ -1,0 +1,7 @@
+After solving the land tillage problem, the farmer wants to build the largest possible rectangular shed on this land. However, there are trees and farm buildings on his plot that he does not want to relocate. For simplicity, let's imagine the farm as a rectangular grid of size M×N. Each of the trees and buildings occupies one or more grid cells. The shed must be built on free grid cells. Help the farmer determine the maximum possible area of the shed.
+
+Input
+The first line of the input file INPUT.TXT contains two natural numbers N and M (1 ≤ N, M ≤ 1000) – the dimensions of the farm. Next, follow N lines, each containing a sequence (without spaces) of M zeros and ones, describing the farm. Ones correspond to areas free for construction.
+
+Output
+The output file OUTPUT.TXT should contain the maximum possible area of the shed that the farmer can build on his plot.

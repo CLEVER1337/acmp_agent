@@ -1,0 +1,6 @@
+Few people know that the first versions of the text editor from the previous task were written in Russia by a programmer named Kolya. To do this, he spent several months barely leaving the basement, where there was only a sofa and a computer. Here is one of the problems Kolya faced back then. While working, the user types some text and can also edit it. However, even if the final result fits entirely on the screen, individual lines might become too long during the process. We will not ask you to repeat Kolya's feat and rewrite the editor. Determine the maximum line length achieved during the text input, given the keys the user pressed and their order.
+The input file INPUT.TXT contains a string of various characters - the sequence of keyboard buttons pressed by the user. Line breaks are replaced by the symbol '\'. The first versions of the editor supported three control commands, which are encoded as follows:
+Input data
+All other characters contained in the file have codes from 32 (space) and above and should be interpreted as is. The number of key presses does not exceed 105.
+Output data
+Output a single integer to the OUTPUT.TXT file - the maximum line length achieved during the editor's operation.

@@ -1,8 +1,7 @@
 
+import sys
+
 def main():
-    import sys
-    from collections import deque
-    
     data = sys.stdin.read().splitlines()
     if not data:
         print("")
@@ -10,53 +9,64 @@ def main():
         
     n, m = map(int, data[0].split())
     grid = []
-    for i in range(1, 1 + n):
+    for i in range(1, 1+n):
         grid.append(list(data[i].strip()))
     
     words = []
-    for i in range(1 + n, 1 + n + m):
+    for i in range(1+n, 1+n+m):
         words.append(data[i].strip())
     
-    total_letters = sum(len(word) for word in words)
-    found_count = 0
-    marked = [[False] * n for _ in range(n)]
+    total_letters = []
+    for row in grid:
+        total_letters.extend(row)
     
-    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+    from collections import Counter
+    total_count = Counter(total_letters)
     
-    for word in words:
-        found = False
+    used_count = Counter()
+    
+    directions = [(0,1), (1,0), (0,-1), (-1,0)]
+    
+    def dfs(x, y, word, index, visited):
+        if index == len(word):
+            return True
+        if x < 0 or x >= n or y < 0 or y >= n:
+            return False
+        if visited[x][y]:
+            return False
+        if grid[x][y] != word[index]:
+            return False
+            
+        visited[x][y] = True
+        for dx, dy in directions:
+            nx, ny = x+dx, y+dy
+            if dfs(nx, ny, word, index+1, visited):
+                return True
+        visited[x][y] = False
+        return False
+        
+    def find_word(word):
         for i in range(n):
             for j in range(n):
-                if grid[i][j] == word[0] and not marked[i][j]:
-                    stack = deque()
-                    stack.append((i, j, 0, []))
-                    while stack and not found:
-                        x, y, idx, path = stack.pop()
-                        if idx == len(word) - 1:
-                            if grid[x][y] == word[idx]:
-                                for px, py in path:
-                                    marked[px][py] = True
-                                marked[x][y] = True
-                                found = True
-                                break
-                            continue
-                        
-                        if grid[x][y] != word[idx]:
-                            continue
-                            
-                        for dx, dy in directions:
-                            nx, ny = x + dx, y + dy
-                            if 0 <= nx < n and 0 <= ny < n and not marked[nx][ny]:
-                                stack.append((nx, ny, idx + 1, path + [(x, y)]))
+                visited = [[False]*n for _ in range(n)]
+                if dfs(i, j, word, 0, visited):
+                    for x in range(n):
+                        for y in range(n):
+                            if visited[x][y]:
+                                used_count[grid[x][y]] += 1
+                    return
+        return
     
-    result = []
-    for i in range(n):
-        for j in range(n):
-            if not marked[i][j]:
-                result.append(grid[i][j])
-                
-    result.sort()
-    print(''.join(result))
+    for word in words:
+        find_word(word)
+        
+    remaining = []
+    for char in total_count:
+        count_remaining = total_count[char] - used_count[char]
+        remaining.extend([char] * count_remaining)
+        
+    remaining.sort()
+    print(''.join(remaining))
 
 if __name__ == "__main__":
     main()

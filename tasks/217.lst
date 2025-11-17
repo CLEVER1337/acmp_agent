@@ -1,0 +1,9 @@
+The mayor of the city of Uryupinsk decided to plant blue spruces along the main avenue of the city, which runs from west to east. However, spruces can only be planted in specific places - on special flowerbeds left during the paving of the avenue.
+As it turned out, blue spruces come in M different varieties. For each spruce variety, the maximum length of its shadow during the day in the western and eastern directions (Wi and Ei, respectively) is known. It is also known that spruces grow much better if they are not in the shadow of other spruces during the day.
+The coordinate axis is directed along the avenue from west to east.
+Given the coordinates of the flowerbeds, calculate the maximum number of spruces that can be planted, adhering to the condition that no spruce should fall into the shadow of another spruce.
+The input file INPUT.TXT first contains a natural number M - the number of spruce varieties (1 ≤ M ≤ 100). This is followed by M pairs of numbers Wi, Ei, describing the maximum length of the shadow in the western and eastern directions during the day for each spruce variety (the numbers Wi, Ei are integers in the range from 0 to 30000). Next is a natural number N - the number of flowerbeds where spruces can be planted (1 ≤ N ≤ 100). This is followed by N numbers specifying the coordinates of the flowerbeds (the coordinates are integers, with an absolute value not exceeding 30000). The flowerbeds are listed from west to east (in order of increasing their coordinates).
+Input data
+If we plant a spruce on a flowerbed with coordinate X, whose maximum shadow in the eastern direction is E, then all flowerbeds with coordinates from X+1 to X+E–1 fall into the shadow of this spruce, while the flowerbed with coordinate X+E does not. Similarly for the shadow in the western direction.
+Output data
+Output to the file OUTPUT.TXT a number A - the maximum number of spruces that can be planted.

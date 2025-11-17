@@ -1,0 +1,7 @@
+Given the weight E of the empty piggy bank and the weight F of the piggy bank with coins. The piggy bank may contain coins of N types; for each type, the value Pi and the weight Wi of one coin are known. Find the minimum and maximum amounts of money that can be in the piggy bank.
+
+Input data
+The first line of the input file INPUT.TXT contains numbers E and F, the second line contains number N, followed by N lines each with two numbers, Pi and Wi. (1 ≤ E ≤ F ≤ 10000, 1 ≤ N ≤ 500, 1 ≤ Pi ≤ 50000, 1 ≤ Wi ≤ 10000).
+
+Output data
+Output two numbers separated by a space to the output file OUTPUT.TXT - the minimum and maximum amounts. If the piggy bank cannot have exactly the specified weight under the condition that it is filled with coins of the given types, output "This is impossible."

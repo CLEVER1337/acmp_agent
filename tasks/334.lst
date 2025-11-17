@@ -1,0 +1,11 @@
+Russian businessman Ivan Petrov purchased a large batch of wristwatches in China to sell them back home for half price (i.e., 5 times more than they cost in China). Ivan faced a problem: the Chinese watches turned out to be of poor quality. Not only did the watches work for only a few hours until they were bumped, but setting the time was also inconvenient: you could rotate not the minute hand, but only the second hand, and, worst of all, only in one direction, increasing the time. For example, to set the watch back by one second, it was necessary to make more than 700 full rotations of the second hand, which would take Ivan more than 10 minutes.
+
+To sell these watches wholesale, Ivan needs to create the appearance that the watches are functional at the time of the deal. To do this, he plans to stop all the watches and set them to the same time. And before the deal, he will hit the suitcase with the watches so that they all start ticking together.
+
+Help Ivan figure out: what time should be set on the watches so that Ivan spends as little time as possible setting all the watches.
+
+Input
+The first line of the input file INPUT.TXT contains a natural number N – the number of watches (N ≤ 50,000). The subsequent N lines show the readings of all watches in the format h:mm:ss, where h indicates the hour, mm – minutes, ss – seconds (1 ≤ h ≤ 12, 0 ≤ mm ≤ 59, 0 ≤ ss ≤ 59).
+
+Output
+The output file OUTPUT.TXT should contain the time to be set on all watches, in the format specified above. If the answer is ambiguous, output the earliest time.

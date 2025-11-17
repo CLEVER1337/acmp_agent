@@ -1,0 +1,7 @@
+To speed up the processing of "short" tasks on the computer, a batch mode with processor time quantum has been selected. This means that all tasks in the batch are allocated the processor in turn for an equal time of 10 seconds (a round-robin time-sharing algorithm). If a task completes within this time, it leaves the system and frees the processor. If the allocated time quantum is insufficient to complete the task, it is placed at the end of the queue—the batch. The last task in the batch is executed without interruptions. A batch is considered ready for input into the computer if it contains K tasks. A new batch is input into the computer after the previous one has been processed. Tasks arrive in the system at intervals of 60 ± 30 seconds and are characterized by a processor execution time of 50 ± 45 seconds. It is required to simulate the processing of N tasks and determine the start and end time of each process.
+
+Input Data
+The first line of the input file INPUT.TXT contains the numbers N and K—the number of processes and the number of processes in a batch (1 ≤ N ≤ 1000, 1 ≤ K ≤ 100). It is guaranteed that N is divisible by K. Then follow N lines with information about the creation time and the required execution time for each process. All processes start on the same day and are listed in ascending order of their input time into the system.
+
+Output Data
+Output to the output file OUTPUT.TXT, for each process on a separate line, its start time and end time separated by a space in the format HH:MM:SS.

@@ -1,0 +1,5 @@
+In a table of N rows and N columns, some cells are occupied by balls, others are free. A ball to be moved and the location to which it should be moved are selected. The selected ball moves in one step to a free cell adjacent horizontally or vertically. It is required to determine whether it is possible to move the ball from the starting cell to the given one, and if possible, to find a path with the least number of steps.
+Input
+The first line of the input file INPUT.TXT contains the number N, in the next N lines - N characters each. A period denotes a free cell, an uppercase English 'O' - a ball, '@' - the initial position of the ball that must move, an uppercase English 'X' - the final position of the ball. (2 ≤ N ≤ 40)
+Output
+In the output file OUTPUT.TXT, output "Yes" on the first line if movement is possible, or "No" if not. If movement is possible, then output N lines of N characters each - as in the input, but replace the letter 'X' and all the dots along the path with plus signs. If there are multiple solutions, output any one.

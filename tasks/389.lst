@@ -1,0 +1,5 @@
+Consider a cyclic sequence of pairwise distinct numbers {a0, a1, … , a2n-1}, 0 ≤ ai ≤ 2n-1. This sequence is called a Gray code if any ai differs from its left neighbor ai-1 and its right neighbor ai+1 by only one digit in the binary representation of these numbers. For a0, the left neighbor is a2n-1, and for a2n-1, the right neighbor is a0. Vasya wants to program a puzzle game that will allow the user to swap any two numbers ai and aj. The player's goal is to obtain a Gray code. Vasya is taking care of the module responsible for swapping the numbers. But your task is to write a program that will determine after each swap whether the sequence is a Gray code.
+Input
+The first line of the input file INPUT.TXT contains the number n. The next line lists the pairwise distinct numbers ai. The third line contains the number m – the number of swaps made by the user. The following m lines list the numbers (i, j) – the indices of the swapped elements. Constraints: 1 ≤ n ≤ 16; 1 ≤ m ≤ 105; i≠j, 0 ≤ i, j < 2n.
+Output
+To the output file OUTPUT.TXT, write m lines – in the i-th line write "Yes" if after the i-th swap the sequence becomes a Gray code, and "No" otherwise.

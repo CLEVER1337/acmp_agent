@@ -1,0 +1,5 @@
+We call a number smooth if its digits, starting from the most significant digit, form a non-decreasing sequence. We will order all such numbers in increasing order and assign each a number. Your task is to output the N-th smooth number given the number N.
+Input
+The input file INPUT.TXT contains the number N (1 ≤ N ≤ 2147483647).
+Output
+The output file OUTPUT.TXT must contain the sought-after N-th smooth number.

@@ -1,0 +1,7 @@
+A sequence of consecutive natural numbers from M to N is given (M < N). First, all numbers at odd positions are removed from the sequence. Then, from the remaining sequence, all numbers at even positions are removed. These operations are repeated until only one number remains. Write a program to find the remaining number.
+
+Input data  
+The input file INPUT.txt contains the number M in the first line and the number N in the second line (M < N < 10^9).  
+
+Output data  
+Output the remaining number in the output file OUTPUT.txt.

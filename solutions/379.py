@@ -1,47 +1,63 @@
 
-def main():
-    days_in_month = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-    day, month = map(int, input().split())
-    month -= 1
-    
-    n = 12
-    m = 31
-    dp = [[False] * (m + 1) for _ in range(n + 1)]
-    
-    dp[11][30] = True
-    
-    for mm in range(11, -1, -1):
-        max_day = days_in_month[mm] - 1 if mm == 11 else days_in_month[mm]
-        for dd in range(max_day, -1, -1):
-            if mm == 11 and dd == 30:
+import sys
+
+def solve() -> None:
+    data = sys.stdin.read().strip().split()
+    if not data:
+        return
+    day = int(data[0])
+    month = int(data[1])
+
+    # Days per month in leap year 2008 (February has 29 days)
+    days_in_month = [0,
+        31, 29, 31, 30, 31, 30,
+        31, 31, 30, 31, 30, 31]   # index 1..12
+
+    # win[day][month] – True if player to move from this date can force a win
+    # we use extra index 0 for simplicity, and allocate up to day 31
+    win = [[False] * 13 for _ in range(32)]
+
+    # Compute DP in reverse chronological order
+    for m in range(12, 0, -1):
+        max_day = days_in_month[m]
+        for d in range(max_day, 0, -1):
+            # (31,12) is a losing move – we never consider it as a safe target
+            if d == 31 and m == 12:
                 continue
-                
-            moves = []
-            if dd + 1 < days_in_month[mm]:
-                moves.append((mm, dd + 1))
-            if dd + 2 < days_in_month[mm]:
-                moves.append((mm, dd + 2))
-            if mm + 1 < 12:
-                new_days = min(days_in_month[mm + 1], dd)
-                if new_days > 0:
-                    moves.append((mm + 1, new_days - 1))
-            if mm + 2 < 12:
-                new_days = min(days_in_month[mm + 2], dd)
-                if new_days > 0:
-                    moves.append((mm + 2, new_days - 1))
-                    
+
             winning = False
-            for nm, nd in moves:
-                if nm == 11 and nd == 30:
+
+            # increase day by 1
+            nd = d + 1
+            if nd <= max_day and not (nd == 31 and m == 12):
+                if not win[nd][m]:
                     winning = True
-                    break
-                if not dp[nm][nd]:
-                    winning = True
-                    break
-                    
-            dp[mm][dd] = winning
-            
-    print(1 if dp[month][day] else 2)
+
+            # increase day by 2
+            if not winning:
+                nd = d + 2
+                if nd <= max_day and not (nd == 31 and m == 12):
+                    if not win[nd][m]:
+                        winning = True
+
+            # increase month by 1
+            if not winning:
+                nm = m + 1
+                if nm <= 12 and d <= days_in_month[nm] and not (d == 31 and nm == 12):
+                    if not win[d][nm]:
+                        winning = True
+
+            # increase month by 2
+            if not winning:
+                nm = m + 2
+                if nm <= 12 and d <= days_in_month[nm] and not (d == 31 and nm == 12):
+                    if not win[d][nm]:
+                        winning = True
+
+            win[d][m] = winning
+
+    result = 1 if win[day][month] else 2
+    sys.stdout.write(str(result))
 
 if __name__ == "__main__":
-    main()
+    solve()

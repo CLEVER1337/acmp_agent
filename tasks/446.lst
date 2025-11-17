@@ -1,0 +1,17 @@
+In one large city, on an ice hockey stadium, there is a large rectangular display. It has n rows and m columns (i.e., consists of n x m cells). During an ice hockey match, this display is used to show the score and the time elapsed in the period, but during breaks, it shows various advertisements. 
+
+In connection with this, there is a task to check the possibility of displaying a certain advertising break on this display. The break is also of size n rows and m columns, just like the display itself. Each cell of the break is painted one of four colors: the three primary ones—Red: R, Green: G, Blue: B—and black: . (dot). 
+
+Each cell of the display is characterized by its own color rendering capabilities. Every cell of the display can display the black color, which corresponds to not supplying any voltage to it. Additionally, each cell can display a certain subset of the primary color set. In this problem, these subsets will be encoded as follows:
+
+Write a program that, given the description of the display and the break, determines whether it is possible to display the break on the display. 
+
+The first line of the input file INPUT.TXT contains two integers n and m (1 ≤ n, m ≤ 100). The next n lines each contain m characters—one line per row—and describe the break. Each character in the break description belongs to the set {R, G, B, .}. Their meanings are described above.
+
+The input data
+
+After this, there is a description of the display. It contains n lines, each having m numbers separated by spaces. The values of the numbers are described above.
+
+Output data
+
+Output YES to the output file OUTPUT.TXT if the display can show the break, and NO otherwise.

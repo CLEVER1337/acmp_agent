@@ -1,0 +1,5 @@
+To the Professor Padegras ballroom dancing school, n students enrolled — boys and girls. The professor lined them up in a single row and wants to select for the first lesson a group of consecutive students in which the number of boys and girls is equal. How many choices does the professor have?
+Input data
+The first line of the input file INPUT.TXT contains the number n (1 ≤ N ≤ 10^6). The second line contains a description of the formed row of boys and girls — a string of n characters a and b (the character a corresponds to a girl, and the character b to a boy).
+Output data
+The single line of the output file OUTPUT.TXT should contain a single number — the number of choices for the required group.

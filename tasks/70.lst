@@ -1,0 +1,8 @@
+Let a string s = s1s2...sn be given. Its k-th power (k > 0) sk is the string sk = s1s2...sns1s2...sn......s1s2...sn (k times). For example, the third power of the string abc is the string abcabcabc.
+The k-th root of a string s is a string t (if it exists) such that tk = s.
+Your task is to write a program that finds the power of a string or its root.
+The first line of the input file INPUT.TXT contains the string s, which consists only of lowercase English letters and has a non-zero length not exceeding 1000.
+Input data
+The second line of the input file contains an integer k ≠ 0, |k| < 100001. If k > 0, you need to find the k-th power of the string s; if k < 0, you need to find the |k|-th root of s.
+Output data
+Output the string that is the answer to the problem in the output file OUTPUT.TXT. If the length of the answer exceeds 1023 characters, output only the first 1023 characters. If the desired string does not exist, output NO SOLUTION.

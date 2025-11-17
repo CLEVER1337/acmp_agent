@@ -1,0 +1,6 @@
+A team of experts discovered numerous hazardous areas within a non-residential zone, where contact poses a danger to human life. For safety reasons, it is necessary to establish a protective perimeter in the shape of a convex polygon to prevent human access to this area. Based on the given coordinates of the hazardous areas, the minimum possible area of the danger zone that will be enclosed within the protective perimeter must be calculated.
+The first line of the input file INPUT.TXT contains a natural number N – the number of hazardous areas. Each of the next N lines contains two numbers, Xi and Yi, representing the coordinates of the areas, whose sizes can be neglected. Note that the areas may repeat.
+Input data
+All numbers are integers and do not exceed 1000 in absolute value.
+Output data
+The output file OUTPUT.TXT must contain a single number – the area of the danger zone, rounded to the nearest integer.

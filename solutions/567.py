@@ -1,27 +1,21 @@
 
 import math
 
-def main():
-    r, l, d = map(int, input().split())
-    
-    if l <= d:
-        h = math.sqrt(l * l - r * r)
-        result = h + r
-    else:
-        h = math.sqrt(l * l - r * r)
-        if r + h <= d:
-            result = h + r
-        else:
-            theta = math.acos(d / l)
-            phi = math.asin(r / l)
-            alpha = math.pi - theta - phi
-            if alpha <= 0:
-                result = h + r
-            else:
-                arc_length = alpha * r
-                result = h + arc_length
-    
-    print("{:.6f}".format(result))
+def calculate_surface(d, r, l):
+    return 2 * math.pi * r * (r + l) - d**2 * math.pi / 4
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    with open('INPUT.TXT', 'r') as file:
+        r, l, d = map(int, file.read().split())
+    
+    left = 0
+    right = 1e6
+    while right - left > 1e-7:
+        mid = (left + right) / 2
+        if calculate_surface(mid, r, l) >= 2 * math.pi * r * (r + l):
+            right = mid
+        else:
+            left = mid
+    
+    with open('OUTPUT.TXT', 'w') as file:
+        file.write("{:.6f}".format(right))

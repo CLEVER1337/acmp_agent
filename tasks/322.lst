@@ -1,0 +1,5 @@
+The Fibonacci numbers are constructed as follows: the first two are ones, and each subsequent number is the sum of the two preceding ones. For example, the first ten Fibonacci numbers are: 1, 1, 2, 3, 5, 8, 13, 21, 34, 55. In the given text, the characters are numbered from left to right, starting with one. The task is to write a program that forms a word from characters whose positions coincide with the Fibonacci numbers.
+Input data
+The input file INPUT.TXT contains a single line of text consisting of English lowercase letters. The text contains between 1 and 30,000 characters.
+Output data
+The output file OUTPUT.TXT should contain the word composed of characters whose positions are Fibonacci numbers. The characters of the word appear in the same order as in the given text.

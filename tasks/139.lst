@@ -1,0 +1,7 @@
+In the country of Umlandia, an attraction called the "Labyrinth of Knowledge" was built. The labyrinth consists of N rooms numbered from 1 to N, with doors between some of them. When a person passes through a door, their knowledge indicator changes by a specific amount fixed for that door. The entrance to the labyrinth is in room 1, and the exit is in room N. Each student goes through the labyrinth exactly once and is assigned to a particular study group based on the amount of knowledge acquired (upon entering the labyrinth, this indicator is zero). Your task is to show the best possible result.
+
+Input
+The first line of the input file INPUT.TXT contains integers N (1 ≤ N ≤ 2000) - the number of rooms, and M (0 ≤ M ≤ 10000) - the number of doors. Each of the next M lines contains a description of a door - the numbers of the room it leads from and the room it leads to (the door can only be traversed in one direction), and an integer that is added to the knowledge amount when passing through the door (this number does not exceed 10000 in absolute value). Doors can lead from a room to itself, and there can be more than one door between two rooms.
+
+Output
+In the output file OUTPUT.TXT, output ":)" if it is possible to obtain an infinitely large amount of knowledge, ":(" if the labyrinth cannot be passed, and the maximum amount of knowledge acquired otherwise.

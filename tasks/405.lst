@@ -1,0 +1,6 @@
+Anton works at an intergalactic travel agency. Quite often, he has to plot a course from one planet to another using existing spaceship flights. Unfortunately, the number of flights is not large, so passengers often have to transfer at intermediate planets. Anton noticed that some planets are used as intermediate stops more often than others. He decided to conduct a study – for each planet A, he wants to know how many pairs of distinct planets (B, C) there are such that any path from planet B to planet C passes through planet A.
+Help Anton!
+Input
+The first line of the input file INPUT.TXT contains two integers: N and M – the number of planets and the number of spaceship flights, respectively (2 ≤ N ≤ 20,000, 1 ≤ M ≤ 200,000). The next M lines describe the spaceship flights. Each flight connects two planets and can be used in either direction. Any planet can be reached from any other.
+Output
+Output N integers to the output file OUTPUT.TXT – for each planet A, output the number of pairs of distinct planets such that any path from one planet to the other passes through A.

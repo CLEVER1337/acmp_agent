@@ -1,43 +1,62 @@
 
+import sys
+
 def main():
     import sys
-    data = sys.stdin.read().split()
-    n = int(data[0])
-    k = int(data[1])
-    p = int(data[2])
-    moves = list(map(int, data[3:3+p]))
+    input = sys.stdin.read().split()
+    idx = 0
+    N = int(input[idx])
+    idx += 1
+    K = int(input[idx])
+    idx += 1
+    P = int(input[idx])
+    idx += 1
+    moves = []
+    for _ in range(P):
+        moves.append(int(input[idx]))
+        idx += 1
     
-    winning_positions = set()
-    for i in range(1, n+1):
-        if i <= k:
-            winning_positions.add(i)
-        else:
-            found = False
-            for j in range(1, k+1):
-                if i - j not in winning_positions:
-                    found = True
-                    break
-            if found:
-                winning_positions.add(i)
+    # Создание DP таблицы
+    dp = [False] * (N + 1)
+    dp[0] = True  # базовый случай
+    for i in range(1, N + 1):
+        for j in range(1, K+1):
+            if i >= j and not dp[i - j]:
+                dp[i] = True
+                break
     
+    # Обработка ходов
+    history = []
+    remaining = N
+    for x in moves:
+        history.append(remaining)
+        remaining -= x
+    
+    # Проверка каждого хода
     results = []
-    current_n = n
-    for move in moves:
-        if current_n <= k:
-            if current_n == move:
-                results.append('T')
-            else:
-                results.append('F')
-            current_n -= move
+    for i in range(P):
+        x = history[i]  # количество билетов до хода
+        a = moves[i]     #말puter stesso
+        y = x - a
+        # Определить, сделать ход в y оставшолося снижает остав PyQt5 на False
+        if not dp[x]:  # если x'].'</symbol вул DP=False то любая choice錯誤 deveria dar F pois já estava numa posição perdente
+            results.append('F')
         else:
-            if current_n - move in winning_positions:
+            # Проверderived, è så hizo(gc все ходы j=1..K que permiten dejar#####
+            exists_correct = False
+            for j in range(1, K + 1):
+                if x >= j and not dp[x - j]:
+                    exists_correct = True
+                    if j == a:
+                        results.append('T')
+                    break
+            if not exists_correct:
                 results.append('F')
             else:
-                results.append('T')
-            current_n -= move
+                results.append('T' if a in [j for j in range(1, K+1) if x >= j and not dp[x - j]] else 'F')
     
     for res in results:
         print(res)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

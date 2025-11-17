@@ -1,51 +1,92 @@
 
+import sys
 import math
 
-def main():
-    import sys
-    data = sys.stdin.read().split()
+def solve() -> None:
+    data = sys.stdin.buffer.read().split()
     if not data:
+        return
+    it = iter(data)
+    N = int(next(it))
+    ox = float(next(it))
+    oy = float(next(it))
+
+    TWO_PI = 2.0 * math.pi
+    EPS = 1e-12
+
+    intervals = []
+
+    for _ in range(N):
+        x = float(next(it))
+        y = float(next(it))
+        r = float(next(it))
+
+        dx = x - ox
+        dy = y - oy
+        d = math.hypot(dx, dy)
+
+        # observer inside or on a tree – according to the statement this never happens,
+        # but we handle it for safety.
+        if d <= r + EPS:
+            print("YES")
+            return
+
+        # half angular width
+        ratio = r / d
+        if ratio > 1.0:
+            ratio = 1.0
+        alpha = math.asin(ratio)          # in (0, π/2)
+
+        theta0 = math.atan2(dy, dx)
+        if theta0 < 0.0:
+            theta0 += TWO_PI
+
+        # interval length
+        length = 2.0 * alpha               # > 0, < π
+
+        # bring start into [0, 2π)
+        start = theta0 - alpha
+        start_mod = start % TWO_PI
+
+        # end position (may be > 2π)
+        end = start_mod + length
+
+        # a single interval longer than the whole circle is impossible,
+        # but we keep the check for completeness.
+        if length >= TWO_PI - EPS:
+            print("YES")
+            return
+
+        if end <= TWO_PI:
+            intervals.append((start_mod, end))
+        else:
+            # split across the 0 angle
+            intervals.append((start_mod, TWO_PI))
+            intervals.append((0.0, end - TWO_PI))
+
+    if not intervals:
         print("NO")
         return
-        
-    n = int(data[0])
-    obs_x = float(data[1])
-    obs_y = float(data[2])
-    
-    trees = []
-    index = 3
-    for i in range(n):
-        x = float(data[index])
-        y = float(data[index+1])
-        r = float(data[index+2])
-        index += 3
-        trees.append((x, y, r))
-    
-    for x, y, r in trees:
-        dx = obs_x - x
-        dy = obs_y - y
-        dist_sq = dx*dx + dy*dy
-        r_sq = r*r
-        
-        if dist_sq <= r_sq:
+
+    intervals.sort()
+    current_end = 0.0
+    for l, r in intervals:
+        if l > current_end + EPS:
+            # a gap exists
             print("NO")
             return
-            
-    for i in range(n):
-        x1, y1, r1 = trees[i]
-        for j in range(i + 1, n):
-            x2, y2, r2 = trees[j]
-            dx = x2 - x1
-            dy = y2 - y1
-            dist_sq = dx*dx + dy*dy
-            sum_r = r1 + r2
-            diff_r = abs(r1 - r2)
-            
-            if dist_sq <= sum_r * sum_r and dist_sq >= diff_r * diff_r:
-                print("NO")
+        if r > current_end:
+            current_end = r
+            if current_end >= TWO_PI - EPS:
+                print("YES")
                 return
-                
-    print("YES")
+
+    # after processing all intervals
+    if current_end >= TWO_PI - EPS:
+        print("YES")
+    else:
+        print("NO")
+
 
 if __name__ == "__main__":
-    main()
+    solve()

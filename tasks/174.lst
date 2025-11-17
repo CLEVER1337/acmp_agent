@@ -1,0 +1,6 @@
+An enterprising and very attractive lady with the most charming name, Gorgona, decided to earn money for a luxurious life. N young men are so in love with her that they have proposed marriage. Unfortunately for them, Gorgona sees them only as bags of money. She plans to marry and then almost immediately divorce some of the young men for financial gain. All she needs is to earn as much money as possible (and, of course, remain unmarried). According to the laws of this beautiful country, in a divorce, each spouse receives half of all property.
+You are planning to publish an article describing all the meanness and mercenary nature of this person. To make the article especially colorful, you need to indicate the maximum amount of money Gorgona can get.
+Input
+The first line of the input file INPUT.TXT contains an integer N — the number of young men hopelessly in love with Gorgona (1 < N ≤ 40). This is followed by N numbers — the amount of money in each young man's account. The last line contains an integer A — the amount of money in Gorgona's account. The amounts of money in the accounts are non-negative integers not exceeding 10^9.
+Output
+In the output file OUTPUT.TXT, output a single number — the maximum amount of money Gorgona can possess after her machination. Output the answer in fixed-point format with exactly six digits after the decimal point.

@@ -1,0 +1,7 @@
+Dima recently started working at the "Numerical Sequences" Research Institute. As the name of the institute implies, its main focus is conducting various research in the field of numerical sequences.
+Recently, the head of the department where Dima started working encountered a very interesting sequence of numbers a1, a2, …, an, … while solving one of the problems, which is defined as follows: a1 = 0 and each subsequent number ai (1 < i ≤ n) is defined as the smallest larger natural number whose decimal representation does not contain any digits present in the decimal representation of ai-1.
+It is required to write a program that calculates the value of an for a given number n.
+Input data
+The input file INPUT.TXT contains a natural number N (N ≤ 500).
+Output data
+Output the sought number aN to the output file OUTPUT.TXT.

@@ -1,0 +1,9 @@
+During a military campaign, Marine Joe was assigned a critical task: to start a fire and keep it burning for exactly m minutes. For this, Joe has matches and n logs, and he knows the exact burning time for each log.
+Joe lights the fire at time t = 0 and immediately throws one or more logs into it. Then he must add new logs to the fire without letting it go out (i.e., if the last log in the fire burns out at time t, then a new log can be thrown into the fire no later than t – 1). Logs thrown into the fire ignite instantly. Joe can throw any number of logs into the fire at the same time. Joe must throw all n logs into the fire.
+Help Joe determine whether he can add logs to the fire in such a way that the fire burns for exactly m minutes.
+
+Input
+The first line of the input file INPUT.TXT contains integers n and m (1 ≤ n ≤ 100, 1 ≤ m ≤ 1000) – the number of logs and the time Joe must keep the fire burning. The second line of the input file contains n integers a1, a2, ..., an, where ai (2 ≤ ai ≤ 1000) is the burning time of the i-th log in minutes.
+
+Output
+Output the string "yes" to the output file OUTPUT.TXT if Joe can keep the fire burning for exactly m minutes, and the string "no" otherwise.

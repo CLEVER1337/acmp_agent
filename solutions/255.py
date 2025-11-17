@@ -4,24 +4,46 @@ import math
 def main():
     n = int(input().strip())
     if n % 2 == 0:
-        a = n // 2
-        b = n // 2
-        if math.gcd(a, b) == a:
-            print(a, b)
+        half = n // 2
+        if half % 2 == 0:
+            a = half - 1
+            b = half + 1
         else:
-            a = n // 2 - 1
-            b = n // 2 + 1
-            while math.gcd(a, b) != 1:
-                a -= 1
-                b += 1
-            print(a, b)
+            a = half
+            b = half
     else:
-        a = n // 2
-        b = n - a
-        while math.gcd(a, b) != 1:
-            a -= 1
-            b += 1
-        print(a, b)
+        k = n // 2
+        a = k
+        b = n - k
+        
+    d = math.gcd(a, b)
+    best_gcd = d
+    best_a = a
+    best_b = b
+    
+    divisors = set()
+    num = n
+    i = 1
+    while i * i <= num:
+        if num % i == 0:
+            divisors.add(i)
+            divisors.add(num // i)
+        i += 1
+    
+    for d in divisors:
+        if d >= n:
+            continue
+        candidate_a = d
+        candidate_b = n - d
+        if candidate_a > candidate_b:
+            continue
+        current_gcd = math.gcd(candidate_a, candidate_b)
+        if current_gcd > best_gcd or (current_gcd == best_gcd and candidate_a < best_a):
+            best_gcd = current_gcd
+            best_a = candidate_a
+            best_b = candidate_b
+            
+    print(f"{best_a} {best_b}")
 
 if __name__ == "__main__":
     main()

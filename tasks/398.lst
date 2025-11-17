@@ -1,0 +1,5 @@
+Given a natural number x. Find the number of ways to represent it as a sum of four natural numbers: x = a + b + c + d, where a ≤ b ≤ c ≤ d.
+Input
+The input file INPUT.TXT contains an integer x (1 ≤ x ≤ 1500).
+Output
+Output the answer to the problem to the output file OUTPUT.TXT.

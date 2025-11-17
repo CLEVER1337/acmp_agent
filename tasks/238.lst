@@ -1,0 +1,15 @@
+Imagine that you serve in the foreign intelligence of the Intergalactic Alliance of Republican Forces (IARF). One of the intelligence agents was very unlucky and was captured at a secret space base. Fortunately, IARF foreign intelligence managed to obtain the plan of this base. And now you are tasked with developing an escape plan.
+
+The base is a rectangle of size NxM, surrounded by walls on all sides, and consists of square compartments of unit area. The base has K exits, and the agent must reach one of them. Some compartments of the base contain walls. Your agent can move from a compartment to any of the four adjacent ones, provided there is no wall in the compartment he wants to move to.
+
+In addition, the base is equipped with a system of hypertunnels capable of transporting the agent from one compartment of the base (hypertunnel entrance) to another (hypertunnel exit). When the agent is in a compartment that has a hypertunnel entrance, he can (but is not obliged to) use it.
+
+The agent's initial position is known. You need to find the shortest escape path (i.e., the path passing through the minimum number of compartments).
+
+The first line of the input file INPUT.TXT contains the numbers N and M (2 ≤ N ≤ 100, 2 ≤ M ≤ 100), specifying the dimensions of the base: N is the number of rows in the base plan, M is the number of columns. The second line contains the agent's initial coordinates XA, YA (1 ≤ XA ≤ N, 1 ≤ YA ≤ M). The first coordinate specifies the row number, the second specifies the column number. Rows are numbered from top to bottom, columns from left to right. This is followed by N lines of M numbers each, describing the walls inside the base: 1 corresponds to a wall, 0 to its absence. Then, in a separate line, the number H (0 ≤ H ≤ 1000) is given — the number of hypertunnels. The subsequent H lines contain descriptions of the hypertunnels. Each hypertunnel is specified by 4 numbers: X1, Y1, X2, Y2 (1 ≤ X1, X2 ≤ N; 1 ≤ Y1, Y2 ≤ M) — the coordinates of the entrance and exit of the hypertunnel. No two hypertunnels share a common entrance. After this, in a separate line, the number K (1 ≤ K ≤ 10) is given — the number of base exits. The subsequent K lines contain descriptions of the base exits. Each exit is specified by two coordinates X and Y (1 ≤ X ≤ N; 1 ≤ Y ≤ M).
+
+Input data
+It is guaranteed that the agent's initial coordinates do not coincide with any of the exits and he is not standing in a compartment occupied by a wall. No hypertunnel entrances or exits, nor base exits, are located in compartments occupied by walls. No hypertunnel entrance coincides with a base exit.
+
+Output data
+If escape is impossible, output "Impossible" to the output file OUTPUT.TXT. Otherwise, output the number of compartments in the shortest escape path.

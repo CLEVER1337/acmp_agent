@@ -1,0 +1,6 @@
+Let's call the quality of a string the difference between the maximum and minimum index in the alphabet of the letters contained in the string. For example, the quality of the string ab is 2 - 1 = 1, and the quality of the string abcz is 26 - 1 = 25.
+Given a string S, you need to find a non-empty substring of this string that has the maximum quality, and among all such substrings, the one with the smallest length.
+Input data
+The input file INPUT.TXT contains a non-empty string S consisting of lowercase English letters. Its length does not exceed 2∙10^5 characters.
+Output data
+Output the desired substring to the output file OUTPUT.TXT. If there are multiple possible answers, output any of them.

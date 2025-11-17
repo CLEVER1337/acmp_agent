@@ -1,0 +1,7 @@
+To check how well her students can count, Maria Ivanovna gives them the same homework assignment every year—for a given natural number A, find the smallest natural number N such that N raised to the power of N (N multiplied by itself N times) is divisible by A. Only the number A changes from year to year. You have decided to help future generations. To do this, you need to write a program that solves this problem.
+
+Input
+The input file INPUT.TXT contains a single number A (1 ≤ A ≤ 10^9—just in case Maria Ivanovna gives a large number to "fail" someone...).
+
+Output
+The output file OUTPUT.TXT must contain a single number N.

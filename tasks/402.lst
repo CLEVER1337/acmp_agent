@@ -1,0 +1,7 @@
+Near the capital of Flatland, a company decided to build a cottage village. The construction company responsible for building the cottages decided to paint some cottages pink and the rest blue. However, they cannot decide which cottage to paint which color. The director of the company states that a coloring is cute if there is at least one pink cottage, at least one blue cottage, and it is possible to draw a straight line such that all pink cottages lie on one side of it and all blue cottages lie on the other side (no cottages should lie exactly on the line). To this, the chief designer objected that there are several ways to create a cute coloring. Help them determine how many different cute colorings exist.
+
+Input
+The first line of the input file INPUT.TXT contains the number N – the number of cottages (1 ≤ N ≤ 300). The next N lines contain the coordinates of the cottages, each line contains two integers xi and yi (-10^4 ≤ xi, yi ≤ 10^4).
+
+Output
+In the output file OUTPUT.TXT, output a single number – the answer to the problem.

@@ -1,98 +1,104 @@
 
+import sys
 import math
 
-def read_input():
-    import sys
-    data = sys.stdin.read().split()
-    n = int(data[0])
-    trees = []
-    index = 1
-    for i in range(n):
-        x = float(data[index])
-        y = float(data[index+1])
-        r = float(data[index+2])
-        index += 3
-        trees.append((x, y, r))
-    return trees
+EPS = 1e-9            # for strict inequalities
+TWOPI = 2.0 * math.pi
 
-def point_to_line_distance(p, line):
-    x0, y0 = p
-    a, b, c = line
-    return abs(a*x0 + b*y0 + c) / math.sqrt(a*a + b*b)
 
-def check_line_clearance(trees, line):
-    for tree in trees:
-        x, y, r = tree
-        dist = point_to_line_distance((x, y), line)
-        if dist < r - 1e-9:
-            return False
-    return True
+def has_gap(theta, xs, ys, rs):
+    """return True if for direction theta a bounded gap exists"""
+    ct = math.cos(theta)
+    st = math.sin(theta)
+    L = [0.0] * len(xs)
+    R = [0.0] * len(xs)
+    for i in range(len(xs)):
+        proj = xs[i] * ct + ys[i] * st
+        L[i] = proj - rs[i]
+        R[i] = proj + rs[i]
 
-def check_forest(trees):
-    n = len(trees)
-    if n <= 1:
-        return True
-        
-    for i in range(n):
-        for j in range(i+1, n):
-            x1, y1, r1 = trees[i]
-            x2, y2, r2 = trees[j]
-            
-            dx = x2 - x1
-            dy = y2 - y1
-            d = math.sqrt(dx*dx + dy*dy)
-            
-            if d <= abs(r1 - r2) + 1e-9:
-                continue
-                
-            angle = math.atan2(dy, dx)
-            alpha = math.asin((r1 + r2) / d)
-            
-            for sign in [-1, 1]:
-                theta = angle + sign * alpha
-                a = -math.sin(theta)
-                b = math.cos(theta)
-                c = -a*x1 - b*y1
-                
-                if check_line_clearance(trees, (a, b, c)):
-                    return False
-                    
-                c = -a*x2 - b*y2
-                if check_line_clearance(trees, (a, b, c)):
-                    return False
-                    
-            if d > abs(r1 - r2):
-                beta = math.asin((r1 - r2) / d)
-                for sign in [-1, 1]:
-                    theta = angle + sign * beta
-                    a = -math.sin(theta)
-                    b = math.cos(theta)
-                    c = -a*x1 - b*y1
-                    
-                    if check_line_clearance(trees, (a, b, c)):
-                        return False
-                        
-                    c = -a*x2 - b*y2
-                    if check_line_clearance(trees, (a, b, c)):
-                        return False
-    
-    for i in range(n):
-        x, y, r = trees[i]
-        for angle in [0, math.pi/4, math.pi/2, 3*math.pi/4]:
-            a = -math.sin(angle)
-            b = math.cos(angle)
-            c = -a*x - b*y
-            if check_line_clearance(trees, (a, b, c)):
-                return False
-                
-    return True
+    order = sorted(range(len(xs)), key=lambda k: L[k])
+    max_R = -1e100          # current maximal right end
+    for pos, i in enumerate(order):
+        if pos > 0 and L[i] > max_R + EPS:
+            return True    # interior gap found
+        if R[i] > max_R:
+            max_R = R[i]
+    return False
 
-def main():
-    trees = read_input()
-    if check_forest(trees):
+
+def solve() -> None:
+    data = sys.stdin.read().strip().split()
+    if not data:
+        return
+    it = iter(data)
+    n = int(next(it))
+    xs = []
+    ys = []
+    rs = []
+    for _ in range(n):
+        xs.append(float(next(it)))
+        ys.append(float(next(it)))
+        rs.append(float(next(it)))
+
+    if n <= 1:                 # a single tree – forest is dense
         print("YES")
-    else:
-        print("NO")
+        return
+
+    # ---- build candidate angles ---------------------------------
+    angles = []
+    for i in range(n):
+        xi, yi, ri = xs[i], ys[i], rs[i]
+        for j in range(i + 1, n):
+            dx = xi - xs[j]
+            dy = yi - ys[j]
+            dist = math.hypot(dx, dy)               # > ri+rj
+            sum_r = ri + rs[j]
+            base = math.atan2(dy, dx)                # direction of Δ
+            for s in (sum_r, -sum_r):
+                if abs(s) > dist + EPS:              # should not happen
+                    continue
+                cos_phi = s / dist
+                if cos_phi > 1.0:
+                    cos_phi = 1.0
+                if cos_phi < -1.0:
+                    cos_phi = -1.0
+                phi = math.acos(cos_phi)
+                a1 = base + phi
+                a2 = base - phi
+                angles.append(a1 % TWOPI)
+                angles.append(a2 % TWOPI)
+
+    # safety – should never be empty, but keep it
+    if not angles:
+        angles = [0.0, math.pi / 2]
+
+    angles.sort()
+    uniq = []
+    for a in angles:
+        if not uniq or a - uniq[-1] > 1e-12:
+            uniq.append(a)
+    m = len(uniq)
+
+    # ---- test every interval between consecutive candidate angles ----
+    found = False
+    for idx in range(m):
+        a = uniq[idx]
+        b = uniq[(idx + 1) % m] if idx + 1 < m else uniq[0] + TWOPI
+        mid = (a + b) * 0.5
+        if has_gap(mid, xs, ys, rs):
+            found = True
+            break
+
+    # a few generic directions as a safety net
+    if not found:
+        for generic in (0.0, math.pi / 4, math.pi / 2, math.pi, 3 * math.pi / 2):
+            if has_gap(generic, xs, ys, rs):
+                found = True
+                break
+
+    print("NO" if found else "YES")
+
 
 if __name__ == "__main__":
-    main()
+    solve()

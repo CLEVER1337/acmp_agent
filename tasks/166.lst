@@ -1,0 +1,5 @@
+The robot community lives by the following laws: At the beginning of the first year, there were K robots and all of them were newly assembled. It is required to write a program that will find the number of robots at the beginning of the Nth year.
+Input data
+The input file INPUT.TXT contains the numbers K (1 ≤ K ≤ 500) and N (1 ≤ N ≤ 100) separated by a space.
+Output data
+The output file OUTPUT.TXT must contain a single number - the number of robots at the beginning of the Nth year. The number of robots is less than 2^31.

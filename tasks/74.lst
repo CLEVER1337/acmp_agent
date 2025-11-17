@@ -1,0 +1,5 @@
+In the pole vault competition, an interesting phenomenon was observed: at each stage of the competition, successful and unsuccessful jump attempts alternated: successful, unsuccessful, successful, unsuccessful, etc. (the first was successful). Athletes were allowed only one attempt. Those who cleared the bar advanced to the next round (stage), while those who made an unsuccessful attempt were eliminated from the competition. Thus, the first athlete to be eliminated was always number 2, and the last was the winner, number 1. It is required to write a program that, given the number of participants and an athlete's number, will compute in which order this athlete was eliminated from the competition.
+Input
+The single line of the input file INPUT.TXT contains two natural numbers: the total number of athletes N and the starting list number of an athlete M. The numbers are separated by a space (1 ≤ M,N ≤ 10^9).
+Output
+The single line of the output file OUTPUT.TXT should output the order in which athlete M was eliminated from the competition. If this is the winner of the competition, output the number N.

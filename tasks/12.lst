@@ -1,0 +1,10 @@
+It is well known that summer residents are a strange bunch, almost as strange as programmers. They build their dachas in obscure locations and grow who-knows-what there, for who-knows-why. And how they get there is another story altogether: some by bus, some by commuter train, some by car, and some even walk all the way from home to their plot. So don't be surprised if you suddenly learn that a certain gardening association is located on an island, and the summer residents get there by plane. And what's more, this island might not even have a runway, so the only way to land on the island is by parachute (we won't even consider how they get back home from their dachas). Let's consider this unique case. The pilot always tries to drop the parachutists in such a way that the summer residents land as close as possible to their rectangular plots. The pilot is interested to know: how many summer residents will land on their own plots? Help him solve this problem!
+Input
+The first line of the input file INPUT.TXT contains a natural number N (1 ≤ N ≤ 1000) – the number of summer residents, followed by N lines, each describing the coordinates of each summer resident and their plot:
+X Y X1 Y1 X2 Y2 X3 Y3 X4 Y4
+where
+(X,Y) – the landing coordinates of the parachutist
+(X1, Y1, X2, Y2, X3, Y3, X4, Y4) – the coordinates of the rectangular plot on the plane, listed sequentially.
+All coordinates are integers not exceeding 50000 in absolute value.
+Output
+The output file OUTPUT.TXT should contain the number of summer residents who landed on their plot. Landing on the border of the plot is considered as landing on the plot.

@@ -1,0 +1,6 @@
+There are weights with masses: 1g, 2g, ..., N g.
+The task is to write a program that distributes these weights into the maximum possible number of pairs such that the sum of the weights in each pair is a simple number.
+Input data
+The INPUT.TXT file contains a single natural number N, not exceeding 500,000.
+Output data
+Output the found pairs in the OUTPUT.TXT file. Each pair is printed on one line with a space separating them.

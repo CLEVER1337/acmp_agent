@@ -1,0 +1,7 @@
+The radar is under attack from four points, which are the vertices of a square, with the radar located at its center. The radar is equipped with a special shield that can block a strike, but the shield can only protect the radar from one of the four sides, and rotating the shield requires time. Initially, the shield is aimed towards the vertex from which the first attack will come. The launch time and speed of the attacking missiles are known. The task is to determine how many missiles can be intercepted.
+
+Input Data
+The first four lines of the input file INPUT.TXT contain the launch time in seconds Tx (0 ≤ Tx ≤ 1000) and the flight speed in meters per second Vx of the x-th missile (0 < Vx ≤ 1000). The missiles are listed clockwise. Next, the time in seconds required to rotate the shield 90 degrees Tpov (0 < Tpov ≤ 1000) and half the diagonal of the square D – the distance in meters each missile must travel (0 < D < 1000) are given. All numbers are integers.
+
+Output Data
+Output "ALIVE" to the OUTPUT.TXT file if the radar survives all shots; otherwise, output the number of successfully intercepted missiles. If several missiles approach the radar simultaneously and the radar can defend against at least one of them, it defends against one missile, and its strike is considered intercepted.

@@ -1,0 +1,5 @@
+At the city festival, girls in red and blue skirts are dancing. They move in a chain and perform a complex dance pattern. One by one, the girls break away from the chain. The first one goes to the left edge of the stage, the second goes to the end of the original chain, the third goes to the left edge of the stage (to the right of the first), the fourth goes to the end of the original chain, and so on, until all the girls are lined up at the edge of the stage. Help the choreographer determine the initial arrangement of the girls if, at the edge of the stage, they are lined up so that their skirts alternate in color (from left to right): blue, red, blue, red, etc.
+Input
+The input file INPUT.TXT contains a natural number N – the number of dancing girls (N ≤ 1000).
+Output
+In the output file OUTPUT.TXT, output a string of N characters consisting of uppercase letters B and R, corresponding to the colors of the skirts – blue and red.

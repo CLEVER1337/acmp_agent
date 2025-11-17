@@ -1,0 +1,6 @@
+Vasya wants to send Petya a letter on a sheet of width K. He wants to print text on it consisting of N lines. It is necessary to change the number of leading and trailing spaces so that the lines are centered on the sheet, and their length becomes equal to K. Vasya believes that a line is centered on the sheet if the number of leading spaces does not exceed the number of trailing spaces and if shifting the line one character to the right (i.e., moving one space from the end of the line to its beginning) violates this property.
+The first line of the input file INPUT.TXT contains two integers K and N (1 ≤ K ≤ 100, 1 ≤ N ≤ 1000). The next N lines contain the text of Vasya's letter in a single-byte encoding (characters with codes from 32 to 255). Each line of the letter contains at least one non-space character. The length of each line in the input file does not exceed 100.
+Input data
+If Vasya can write a letter that meets all his requirements, then output the formatted text of the letter in the same encoding to the output file OUTPUT.TXT; otherwise, output the phrase "Impossible." (without quotes).
+Output data
+In the examples provided, for greater clarity, spaces are replaced with plus signs!

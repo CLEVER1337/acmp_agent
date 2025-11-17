@@ -1,0 +1,6 @@
+The rules of the game are very simple. There is a pile of K buttons in front of two players. The players take turns taking buttons from the pile, and in one move, each of them can take from 1 to L buttons. The athlete who manages to take the last button wins. The player who is chosen by lot to make the first move gets the opportunity to set the number K himself. The player who moves second, in turn, chooses the number L.
+You need to determine the best strategy for the participant who moves second.
+Input data
+The input file INPUT.TXT contains one natural number K (1 ≤ K ≤ 108) – the total number of buttons.
+Output data
+The output file OUTPUT.TXT must contain an integer L (2 ≤ L < K) – the maximum number of buttons that can be taken in one move, ensuring the victory of the second player. If there are several such numbers, the smallest one should be output. If there are no such numbers, the number 0 should be output.

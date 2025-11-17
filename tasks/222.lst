@@ -1,0 +1,9 @@
+We say that for an observer the forest is dense if, from their current position, the observer sees only trees. You are given a map of the forest and the coordinates of the point where the observer is located. You need to determine whether the forest seems dense to this observer.
+
+On the forest map, all trees are depicted as circles. In the forest, there can be fused trees (the images of such trees on the map intersect), and one tree can be inside another. The point where the observer stands is not inside or on the boundary of any tree.
+
+Input
+The input file INPUT.TXT first contains an integer N — the number of trees (1 ≤ N ≤ 50,000). Then there are two numbers specifying the coordinates of the observer. Then follow N triplets of numbers describing the trees. The first two numbers xi and yi specify the coordinates of the center, and the third number ri is the radius. All coordinates and radii of the trees are given exactly and are expressed as real numbers with no more than 2 decimal places (-10^5 ≤ xi, yi ≤ 10^5, 0 < ri ≤ 10^5).
+
+Output
+The output file OUTPUT.TXT should contain the message YES if the forest is dense, and NO otherwise.

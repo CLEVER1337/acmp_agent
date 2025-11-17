@@ -1,0 +1,8 @@
+There is a row of N light bulbs numbered from 1 to N. Initially, none of the bulbs are lit. Then, K consecutive linear inversions of this row occur. A linear inversion means inverting every P-th bulb in the row. For example, if P=3, the 3rd, 6th, 9th, etc. bulbs will be inverted.
+The task is to determine: how many lit bulbs will remain after performing all the specified linear inversions?
+
+Input Data
+The first line of the input file INPUT.TXT contains the numbers N and K – the number of bulbs and the number of linear inversions. The second line consists of K integers Pi, specifying the period of these inversions. (1 ≤ N ≤ 10^9, 1 ≤ K ≤ 100, 1 ≤ Pi ≤ 50)
+
+Output Data
+The answer to the problem should be written to the output file OUTPUT.TXT.

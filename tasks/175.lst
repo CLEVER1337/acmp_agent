@@ -1,0 +1,9 @@
+You have purchased a new digital wristwatch with an LCD display. The display shows hours and minutes using four elements, each displaying a single digit. Three of them consist of seven segments, each of which can be either white (indistinguishable from the background) or black. The appearance of such an element and the digits it displays are shown in the figure:
+The fourth element is intended to display the most significant digit of the hour. If it is zero, the element is completely inactive (all segments are white); otherwise, the corresponding digit is displayed. This is what this element looks like with digits:
+You want to check if everything is fine with your new purchase, specifically, whether there are any segments in any of the elements that are either always white or always black. You want to start the check at a certain initial time. You need to determine how many minutes it will take to verify the watch is working correctly.
+
+Input
+The first line of the input file INPUT.TXT contains the start time of the check in the format HH:MM. The hours and minutes are written with leading zeros if applicable. (00 ≤ HH ≤ 23, 00 ≤ MM ≤ 59).
+
+Output
+In the output file OUTPUT.TXT, output the minimum number of minutes required to check your watch, starting at the given time.

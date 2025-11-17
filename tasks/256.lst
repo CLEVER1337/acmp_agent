@@ -1,0 +1,7 @@
+The playing field for the new game "Hexagon" is divided into hexagons (see the figure). Starting from some initial hexagon, a player made several moves. Each move consists of moving the token to an adjacent hexagon (sharing a side with the one where the token was before the move) — thus, a move is made along one of the directions X, Y, or Z (see the figure). The player recorded all their moves, and if the token moved along a certain direction several times in a row, the record indicates the direction and the number of moves made. Write a program that will find the shortest path (by the number of moves) back to the starting cell from the one where the token ended up after the player's moves.
+
+Input data
+The first line of the input file INPUT.TXT contains the number N — the number of lines in the record of the token's movements (1 ≤ N ≤ 100). Then follow N lines with the move records: each line first contains a capital letter X, Y, or Z, specifying the direction, then a space, and then a number specifying the number of moves in that direction (the number can be negative if the player moved the token parallel to the axis but in the opposite direction of the axis). All numbers are modulo no more than 200.
+
+Output data
+In the output file OUTPUT.TXT, output the length of the shortest path back to the starting cell.

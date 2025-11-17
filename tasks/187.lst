@@ -1,0 +1,5 @@
+Imagine a honeycomb - a field of hexagonal cells with side N. In the top left cell A, there is a bee. In one move, it can crawl to the cell below, to the cell down-right, or to the cell up-right (the bee does not crawl up or left). It is required to write a program that will find the number of ways the bee can crawl from cell A to the opposite cell B.
+Input
+The input file INPUT.TXT contains a single number N - the dimensions of the hexagonal field (2 ≤ N ≤ 12).
+Output
+The output file OUTPUT.TXT must contain a single integer - the number of ways.

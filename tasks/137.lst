@@ -1,0 +1,6 @@
+Given a directed weighted graph. Based on its adjacency matrix, it is necessary to determine for each pair of vertices: whether a shortest path exists between them or not.
+A shortest path may not exist for two reasons: either there is no path at all, or there is a path with an arbitrarily small weight.
+Input
+The first line of the input file INPUT.TXT contains a single number N (1 ≤ N ≤ 100) - the number of vertices in the graph. The next N lines contain N integers each - the adjacency matrix of the graph (the j-th number in the i-th row corresponds to the weight of the edge from vertex i to vertex j), where the number 0 denotes the absence of an edge, and any other number indicates the presence of an edge with the corresponding weight. All numbers are integers with an absolute value not exceeding 100.
+Output
+In the output file OUTPUT.TXT, output N lines of N numbers each: the j-th number in the i-th row should be 0 if there is no path from i to j, 1 if a shortest path exists, and 2 if there is a path with an arbitrarily small weight.

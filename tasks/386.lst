@@ -1,0 +1,9 @@
+When preparing problems for informatics and programming olympiads, there is often a need to prepare tests. Since the number of tests is usually quite large, and each of them can contain a lot of data, it is reasonable to automate test generation.
+
+In geometry problems, it is often required to generate n points on a plane such that no three of them lie on the same straight line. This is your task. Write a program that, given a number N, will construct a set of N points with the specified property.
+
+Input data
+The input file INPUT.TXT contains an integer N (1 ≤ N ≤ 300).
+
+Output data
+If the required set of points can be constructed, output the word YES in the first line of the output file OUTPUT.TXT, followed by N lines, each of which should contain two numbers – the coordinates of the corresponding point. There should be no duplicate points. All coordinates must be integers not exceeding 10000 in absolute value. If the required set of points cannot be constructed, output the string NO in the output file.

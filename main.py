@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
 from dotenv import load_dotenv
 import os
 import time
@@ -7,7 +8,7 @@ import requests
 import json
 
 load_dotenv("config.env")
-
+#Mistral
 LOGIN = os.getenv("ACMP_LOGIN")
 PASSWORD = os.getenv("ACMP_PASSWORD")
 
@@ -30,70 +31,52 @@ def login(driver):
 
     time.sleep(3)
 
-def parse_task(driver, task_id):
+def get_solved_tasks(driver: webdriver.Chrome):
+    link = driver.find_element(By.LINK_TEXT, "Мои задачи")
+    link.click()
+
+    solved = driver.find_elements(By.CSS_SELECTOR, "p.text")[0].text
+
+    return [int(i) for i in solved.split(" ")]
+
+def parse_task(driver: webdriver.Chrome, task_id):
     try:
         url = f"https://acmp.ru/index.asp?main=task&id_task={task_id}"
         driver.get(url)
 
         paragraphs = driver.find_elements(By.CSS_SELECTOR, "p.text")
 
-        # for i in paragraphs:
-        #     print(i.text)
+        texts = [i.text for i in paragraphs]
+
+        if "Пояснение" in [i.text for i in driver.find_elements(By.TAG_NAME, "h2")]:
+            texts.pop()
+
+        texts.insert(-2, "\nВходные данные\n")
+        texts.insert(-1, "\nВыходные данные\n")
+
+        texts.append("\nПримеры:\n")
+        examples = driver.find_elements(By.CSS_SELECTOR, "td.table-example__data")
+        examples_text = []
+        for i in range(0, len(examples), 2):
+            texts.append(f"Пример номер {i}:\n")
+            texts.append(f"Input: {examples[i].get_attribute('data-example')}\n")
+            texts.append(f"Output: {examples[i + 1].get_attribute('data-example')}\n\n")
+        
     finally:
         print()
-    return [i.text for i in paragraphs]
+    return "".join(texts)
 
-key_id = 0
-def generate_code(task):
-    # payload = {
-    #     "model": "deepseek-coder:6.7b-instruct-q4_K_M",
-    #     "messages": [
-    #         {
-    #             "role": "system",
-    #             "content": "You are an AI programming assistant, utilizing the Deepseek Coder model, developed by Deepseek          \nCompany, and you only answer questions related to computer science. For politically sensitive           \nquestions, security and privacy issues, and other non-computer science questions, you will refuse to    \nanswer."
-    #         },
-    #         {
-    #             "role": "user",
-    #             "content": f"Реши задачу на python, сделай ввод из файла INPUT.TXT, а вывод в файл OUTPUT.TXT и в ответ верни только код самого решения: {task}"
-    #         }
-    #     ],
-    #     "stream": False,
-    #     "options": {
-    #         "temperature": 0.2,
-    #         "num_predict": 2048
-    #     }
-    # }
-    
-    global key_id
-
+def translate_task(task, key_id):
     data=json.dumps({
-        "model": "deepseek/deepseek-chat-v3.1:free",
+        "model": "deepseek/deepseek-r1-0528-qwen3-8b:free",
         "messages": [
             {
                 "role": "user",
-                "content": 
-f"""Ты — опытный программист, решающий олимпиадные задачи. Твоя задача — проанализировать предложенную проблему и предоставить только готовый код на Python без каких-либо пояснений, комментариев или примеров использования.
-
-Алгоритм работы:
-1. Внимательно проанализируй задачу и определи класс сложности.
-2. Продумай алгоритм решения, учитывая ограничения.
-3. Выбери оптимальные структуры данных.
-4. Убедись, что решение эффективно и проходит по времени.
-5. Напиши код.
-
-Требования к коду:
-- Используй стандартный ввод/вывод (input/print).
-- Не используй функции, если это не необходимо для структуры.
-- Учитывай все крайние случаи.
-- Код должен быть готов к компиляции и работе.
-
-Задача:
-{task}
-"""
+                "content": f"Переведи на английский, верни только перевод: \"{task}\""
             }
         ]
     })
-    
+
     try:
         st_code = 429
         st_code_cnt = 0
@@ -118,33 +101,168 @@ f"""Ты — опытный программист, решающий олимп�
         response.raise_for_status()
         
         result = response.json()
-        return result["choices"][0]["message"]["content"]    #["message"]["content"] #["response"]
+        #print(result)
+        return result["choices"][0]["message"]["content"]
         
     except requests.exceptions.RequestException as e:
         return f"Ошибка запроса: {e}"
     except KeyError:
         return "Ошибка: неверный формат ответа от сервера"
 
-def upload_with_selenium(driver, task_id):
+def select_lang(lang="PY"):
+    b = driver.find_element(By.XPATH, "//select[@name='lang']")
+
+    select = Select(b)
+
+    select.select_by_value(lang)
+
+def clean_code(code):
+    if "<think>" in code:
+        code = code.split("</think>")[1]
+
+    if "```python" in code:
+        code = code.split("```python")[1]
+    elif "```go" in code:
+        code = code.split("```go")[1]
+    return code.split("```")[0]
+
+key_id = 0
+def nn_generate_code(prompt):
+    global key_id
+
+    data=json.dumps({
+        "model": "minimax/minimax-m2:free",
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    })
+    
+    try:
+        st_code = 429
+        st_code_cnt = 0
+        while st_code == 429:
+            headers={
+                "Authorization": KEYS[key_id],
+                "Content-Type": "application/json"
+            }
+            
+            response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, data=data, timeout=1200)
+
+            st_code = response.status_code
+            print(st_code)
+            if st_code == 429:
+                st_code_cnt += 1
+                if st_code_cnt >= 10:
+                    key_id += 1
+                    st_code_cnt = 0
+                    if key_id == len(KEYS):
+                        exit(0)
+                time.sleep(10)
+
+        response.raise_for_status()
+        
+        result = response.json()
+        #print("\n\n\n")
+        #print(result["choices"][0]["message"]["content"]) #434
+        return clean_code(result["choices"][0]["message"]["content"])#, translated_task    #["message"]["content"] #["response"]
+        
+    except requests.exceptions.RequestException as e:
+        print(f"Ошибка запроса: {e}")
+        return None
+    except KeyError:
+        print("Ошибка: неверный формат ответа от сервера")
+        return None
+
+def generate_code(task, lang="py"):
+    try:
+        code = None
+        if lang == "py":
+            code = nn_generate_code(
+                prompt=f"""
+Реши задачу, верни только код:
+
+{task}
+
+Верни только законченный скрипт на Python. Используй конструкцию if __name__ == '__main__': для обработки ввода и вывода. Return only final code."""
+            )
+        elif lang == "go":
+            code = nn_generate_code(
+                prompt=f"""
+Реши задачу, верни только код:
+
+{task}
+
+Верни только законченный скрипт на Golang. Используй package main, import необходимые пакеты. Используй стандартный ввод и вывод вместо файлов. Return only final code."""
+            )
+        
+        return code
+    
+    except requests.exceptions.RequestException as e:
+        print(f"Ошибка запроса: {e}")
+        return None
+    except KeyError:
+        print("Ошибка: неверный формат ответа от сервера")
+
+def regenerate_code(task, code_old, error, lang="py"):
+    try:
+        code = None
+        if lang == "py":
+            code = nn_generate_code(
+                prompt=f"""
+Есть задача:
+
+{task}
+
+Эта задача была решена следукющим кодом:
+
+{code_old}
+
+Но этот код вызвал ошибку {error}
+
+Помоги исправить ошибку и верни только законченный скрипт на Python. Используй конструкцию if __name__ == '__main__': для обработки ввода и вывода. Return only final code."""
+            )
+        elif lang == "go":
+            code = nn_generate_code(
+                prompt=f"""
+Есть задача:
+
+{task}
+
+Эта задача была решена следукющим кодом:
+
+{code_old}
+
+Но этот код вызвал ошибку {error}
+
+Помоги исправить ошибку и верни только законченный скрипт на Golang. Используй package main, import необходимые пакеты. Используй стандартный ввод и вывод вместо файлов. Return only final code."""
+            )
+        
+        return code
+    
+    except requests.exceptions.RequestException as e:
+        print(f"Ошибка запроса: {e}")
+        return None
+    except KeyError:
+        print("Ошибка: неверный формат ответа от сервера")
+
+def upload_with_selenium(driver, task_id, lang="py"):
     #driver = webdriver.Chrome()  # или другой браузер
     
     try:
-        folder_path = "solutions"
-        files = os.listdir(folder_path)
-        py_files = [f for f in files if f.endswith('.py')]
-        py_files = sorted(py_files)
-        
-        # iter = 0
-        # for fi in py_files:
-        #     task_id = int(fi.replace(".py", ""))
         url = f"https://acmp.ru/index.asp?main=task&id_task={task_id}"
         driver.get(url)
         
-        print(f"{task_id} - iter")
+        #print(f"{task_id} - iter")
 
         textarea = driver.find_element(By.ID, "fname")
         textarea.clear()
-        textarea.send_keys(os.path.abspath(f"solutions/{task_id}.py"))
+        if lang == "py":
+            textarea.send_keys(os.path.abspath(f"solutions/{task_id}.py"))
+        elif lang == "go":
+            textarea.send_keys(os.path.abspath(f"solutions/{task_id}.go"))
         
         submit_btn = driver.find_element(By.XPATH, "//input[@type='button' and @value='Отправить']")
         submit_btn.click()
@@ -157,6 +275,25 @@ def upload_with_selenium(driver, task_id):
 
 #upload_with_selenium()
 
+def check_task_status(driver: webdriver.Chrome):
+    while True:
+        driver.get("https://acmp.ru/index.asp?main=status")
+
+        try:
+            lg = driver.find_elements(By.XPATH, "//tr[@class='lightgreen']")
+
+            print(lg[0].find_elements(By.TAG_NAME, "td")[5].find_element(By.TAG_NAME, "span").get_attribute("class"))
+            if lg[0].find_elements(By.TAG_NAME, "td")[5].find_element(By.TAG_NAME, "span").get_attribute("class") == "black":
+                time.sleep(10)
+                continue
+            elif lg[0].find_elements(By.TAG_NAME, "td")[5].find_element(By.TAG_NAME, "span").get_attribute("class") == "green":
+                return "Ok"
+            else:
+                return lg[0].find_elements(By.TAG_NAME, "td")[5].find_element(By.TAG_NAME, "span").text
+        except:
+            continue
+
+
 options = webdriver.ChromeOptions()
 options.add_argument("--headless")
 
@@ -166,45 +303,83 @@ login(driver)
 
 #upload_with_selenium(driver)
 
-start_id = 0
-with open(f"last_task_id.lst", "r") as file:
-    start_id = int(file.read())
+excepted = get_solved_tasks(driver)
 
-excepted = ""
-with open(f"excepted.lst", "r") as file:
-    excepted = file.read()
+print(f"Already solved are these tasks: {excepted}\n\n\n")
 
-print(len(KEYS))
-
-except_list = [int(i) for i in excepted.split(" ")]
-for task_id in range(start_id, 1001):
-    if task_id not in except_list:
+for task_id in range(1, 1001):
+    if task_id not in excepted:
+        print(f"Current task is {task_id}")
         try:
-            print(f"Current task is {task_id}")
+            code = None
             task_text = parse_task(driver, task_id)
-
-            task_text.insert(-2, "\nВходные данные\n")
-            task_text.insert(-1, "\nВыходные данные\n")
-
-            code = generate_code("".join(task_text))
-
-            if "```" in code:
-                code = code.split("```python")[1]
-                code = code.split("```")[0]
             
+            select_lang("PY")
+
+            while code == None:
+                code = generate_code(task_text, "py")
+                
             with open(f"solutions/{task_id}.py", "w") as file:
                 file.write(code)
 
-            # time.sleep(10)
-            # upload_with_selenium(driver, task_id)
-            # time.sleep(10)
-            # os.system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches")
-            # os.system("free -h")
-            # time.sleep(10)
-
             upload_with_selenium(driver, task_id)
+            status = check_task_status(driver)
+
+            if status != "Ok":
+                task_text = parse_task(driver, task_id)
+                
+                select_lang("PY")
+
+                while True:
+                    code = regenerate_code(task_text, code, status, "py")
+                    if code != None:
+                        break
+                    
+                with open(f"solutions/{task_id}.py", "w") as file:
+                    file.write(code)
+
+                upload_with_selenium(driver, task_id)
+                status = check_task_status(driver)
+
+                if status != "Ok":
+                    task_text = parse_task(driver, task_id)
+            
+                    select_lang("GO")
+
+                    while True:
+                        code = generate_code(task_text, "go")
+                        if code != None:
+                            break
+                        
+                    with open(f"solutions/{task_id}.go", "w") as file:
+                        file.write(code)
+
+                    upload_with_selenium(driver, task_id, "go")
+                    status = check_task_status(driver)
+
+                    if status != "Ok":
+                        task_text = parse_task(driver, task_id)
+                        
+                        select_lang("GO")
+
+                        while True:
+                            code = regenerate_code(task_text, code, status, "go")
+                            if code != None:
+                                break
+                            
+                        with open(f"solutions/{task_id}.go", "w") as file:
+                            file.write(code)
+
+                        upload_with_selenium(driver, task_id, "go")
+                        status = check_task_status(driver)
 
         finally:
-            with open(f"last_task_id.lst", "w") as file:
-                file.write(str(task_id))
-            print(f"Task {task_id} is completed")
+            print(f"Task {task_id} is completed, maybe not solved, but completed")
+# TODO
+# Context
+# English prompts
+# AnyLLM Mozilla
+# Clean code
+# json task_id result - reference for last code done? error
+
+# SOEMHOW IT STOPPED WORKING WITH PYTHON

@@ -1,0 +1,7 @@
+Three numbers are given: a, b, c. It is necessary to determine whether the digits in numbers a and b can be rearranged such that their sum equals c.
+
+Input data
+The input file INPUT.TXT contains three integers: a, b, c (0 ≤ a, b, c < 10^9). The numbers are separated by a space.
+
+Output data
+The output file OUTPUT.TXT should output YES if the desired digit rearrangement is possible, otherwise output NO. If the answer is positive, the second line should output the number x, obtained by rearranging the digits of number a, and the number y, obtained by rearranging the digits of number b, whose sum equals c. The numbers x and y should not contain leading zeros when output. The numbers in the line are separated by a space. If there are multiple solutions, output the pair in which the number x is minimal.

@@ -1,0 +1,5 @@
+Petya works at an exchange point in Flatland. Recently, Petya received a set of digits from his management to display the exchange rate. Unfortunately, the set contains only two copies of each digit. Now Petya wants to find out how many different exchange rates he can display. Petya exchanges Flatland dollars for Krayland tugriks. Petya is sure that the exchange rate will be an integer that falls within the range from L to R, inclusive.
+Input
+The input file INPUT.TXT contains two integers L and R (1 ≤ L ≤ R ≤ 10^18).
+Output
+The output file OUTPUT.TXT should contain one integer - the number of exchange rates that Petya can display using the received set.

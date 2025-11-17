@@ -1,0 +1,6 @@
+A timer is a clock that can emit an audible signal after a certain period of time. Write a program that determines when the signal should be emitted.
+The first line of the input file INPUT.TXT contains the current time in the format HH:MM:SS (with leading zeros). It satisfies the constraints: HH - from 00 to 23, MM and SS - from 00 to 59.
+Input data
+The second line contains the time interval to be measured. The interval is written in the format H:M:S (where H, M, and S are from 0 to 109, without leading zeros). Additionally, if H=0 (or H=0 and M=0), they can be omitted. For example, 100:60 actually means 100 minutes 60 seconds, which is the same as 101:0 or 1:41:0. And 42 means 42 seconds. 100:100:100 - 100 hours, 100 minutes, 100 seconds, which is the same as 101:41:40.
+Output data
+In the output file OUTPUT.TXT, output in the format HH:MM:SS the time when the signal will sound. If the signal does not sound on the current day, the entry +<number> days should follow. For example, if the signal sounds the next day – then +1 days.

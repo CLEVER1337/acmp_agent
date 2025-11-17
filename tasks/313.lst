@@ -1,0 +1,5 @@
+A bus arrives at the stop every minute, each from one of the routes. The dispatch service collected data for N minutes – the route numbers of each bus. The task is to determine the maximum possible waiting time for a passenger wishing to leave on a specific route. That is, in this sequence of route numbers, we need to find two identical numbers that are the farthest apart, with no other identical numbers between them. For example, for the sequence 2, 11, 2, 2, 25, 11, 25, 11 the maximum waiting time is 4 (for route number 11).
+Input data
+The input file INPUT.TXT contains the number N (2 ≤ N ≤ 10^6) in the first line. The second line contains N numbers – the route numbers. All numbers are natural and do not exceed 100. Each route number appears at least twice.
+Output data
+Output the answer to the problem into the output file OUTPUT.TXT.

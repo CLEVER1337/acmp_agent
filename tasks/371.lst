@@ -1,0 +1,5 @@
+Two distinct natural numbers are called amicable if the first equals the sum of the divisors of the second number, excluding the second number itself, and the second equals the sum of the divisors of the first number, excluding the first number itself. It is required to find all pairs of amicable numbers, both of which belong to the interval from M to N.
+Input
+The input file INPUT.TXT in the first line contains natural numbers M and N, separated by a space, not exceeding 10^6.
+Output
+In the output file OUTPUT.TXT, output each pair of numbers separated by a space on a separate line. The first number of the pair must be less than the second. The lines must be sorted in ascending order of the first number of the pair. If there are no amicable pairs in the interval, output "Absent".

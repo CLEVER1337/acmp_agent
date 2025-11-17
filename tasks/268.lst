@@ -1,0 +1,10 @@
+A word is called a palindrome if its first letter is the same as the last, the second is the same as the second to last, and so on. For example: "abba", "madam", "x".
+For a given number K, a word is called an almost palindrome if it is possible to change no more than K of its letters (any letters) to make it a palindrome. For example, with K = 2, the words "reactor", "kolobok", "madam" are almost palindromes (the letters that can be replaced to form a palindrome are underlined).
+A substring of a given word is any word obtained by deleting several (possibly one or zero) letters from the beginning and several from the end. For example, the substrings of the word "cat" are "c", "a", "t", "ca", "at", and the word "cat" itself (but "ct" is not a substring of "cat").
+The task is to determine, for a given number K, how many substrings of a given word S are almost palindromes.
+
+Input data
+The first line of the input file INPUT.TXT contains two natural numbers: N (1 ≤ N ≤ 5,000) – the length of the word, and K (0 ≤ K ≤ N). The second line contains the word S, consisting of N lowercase English letters.
+
+Output data
+The output file OUTPUT.TXT should contain a single number – the number of substrings of the word S that are almost palindromes (for the given K).

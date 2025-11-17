@@ -1,0 +1,7 @@
+Define the sequences an and bn as follows: a1 = 2, a2 = 3, a3 = 4, a4 = 7, a5 = 13, an = bn−1 + bn−3, n > 5, bn is the sequence of numbers not included in an, listed in increasing order.  
+Thus, the sequence an will look like this: 2, 3, 4, 7, 13, 15,..., and the sequence bn will look like: 1, 5, 6, 8, 9, 10,....  
+Your task is to find an and bn.  
+Input  
+The input file contains an integer n (1 ≤ n ≤ 10000).  
+Output  
+On the first line of the output file, output an, on the second line – bn.

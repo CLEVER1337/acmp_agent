@@ -1,0 +1,7 @@
+Martians Misha and Masha decided to choose a gift for Katya's birthday together. When they finally found what they wanted and wrapped the item in a beautiful box, they had to decide how to sign the gift. The friends thought that the best solution would be to create a common signature that contained their names as substrings. Note that on Mars, it is customary to sign with full names, and these can be quite long for Martians.
+
+Input
+The input file INPUT.TXT contains two lines with the full names of the friends. Strangely enough, the names consist of English letters, with only the first one being uppercase. The name length is from 1 to 1000 characters.
+
+Output
+In the output file OUTPUT.TXT, output the shortest string that contains both Misha's and Masha's names simultaneously. The letters that start the names in this string should be capitalized. If there are multiple solutions, output the one that is lexicographically smallest (it should be considered that any uppercase letter is smaller than any lowercase letter).

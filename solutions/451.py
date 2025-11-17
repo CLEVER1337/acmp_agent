@@ -2,146 +2,148 @@
 import math
 import sys
 
+sys.setrecursionlimit(100000)
+
 def main():
-    s = sys.stdin.readline().strip()
-    if not s:
-        print("Error")
-        return
-        
     try:
+        with open('INPUT.TXT', 'r') as f:
+            s = f.readline().strip()
+        if not s:
+            with open('OUTPUT.TXT', 'w') as f:
+                f.write('Error')
+            return
         tokens = tokenize(s)
-        if tokens is None:
-            print("Error")
-            return
-            
-        rpn = shunting_yard(tokens)
-        if rpn is None:
-            print("Error")
-            return
-            
-        result = evaluate_rpn(rpn)
-        if result is None:
-            print("Error")
-        else:
-            print("{:.15g}".format(result).rstrip('0').rstrip('.'))
-    except:
-        print("Error")
+        parser = Parser(tokens)
+        expr = parser.parse_expression()
+        if parser.current < len(tokens) and tokens[parser.current] != ')': 
+            raise Exception("Unexpected token")
+        result = evaluate(expr)
+        with open('OUTPUT.TXT', 'w') as f:
+            f.write(str(result))
+    except Exception as e:
+        with open('OUTPUT.TXT', 'w') as f:
+            f.write('Error')
 
 def tokenize(s):
     tokens = []
     i = 0
     n = len(s)
-    
     while i < n:
-        if s[i].isspace():
+        if s[i] in ' \t':
             i += 1
             continue
-            
         if s[i] in '+-*/()':
             tokens.append(s[i])
             i += 1
-            continue
-            
-        if s[i:i+3].lower() == 'sin':
-            tokens.append('sin')
-            i += 3
-            continue
-            
-        if s[i:i+3].lower() == 'cos':
-            tokens.append('cos')
-            i += 3
-            continue
-            
-        if s[i].isdigit() or s[i] == '.':
+        elif s[i].isdigit() or s[i] == '.':
             j = i
-            dot_seen = False
             while j < n and (s[j].isdigit() or s[j] == '.'):
-                if s[j] == '.':
-                    if dot_seen:
-                        return None
-                    dot_seen = True
                 j += 1
-                
-            if j > i:
-                try:
-                    num = float(s[i:j])
-                    tokens.append(num)
-                    i = j
-                    continue
-                except:
-                    return None
-                    
-        return None
-        
+            tokens.append(s[i:j])
+            i = j
+        elif s[i].isalpha():
+            j = i
+            while j < n and s[j].isalpha():
+                j += 1
+            token = s[i:j]
+            tokens.append(token)
+            i = j
+        else:
+            i += 1
     return tokens
 
-def shunting_yard(tokens):
-    output = []
-    stack = []
-    precedence = {'+': 1, '-': 1, '*': 2, '/': 2, 'sin': 3, 'cos': 3}
-    
-    for token in tokens:
-        if isinstance(token, float):
-            output.append(token)
-        elif token in ['sin', 'cos']:
-            stack.append(token)
-        elif token in ['+', '-', '*', '/']:
-            while (stack and stack[-1] != '(' and 
-                   precedence.get(stack[-1], 0) >= precedence[token]):
-                output.append(stack.pop())
-            stack.append(token)
-        elif token == '(':
-            stack.append(token)
-        elif token == ')':
-            while stack and stack[-1] != '(':
-                output.append(stack.pop())
-            if not stack or stack[-1] != '(':
-                return None
-            stack.pop()
-            if stack and stack[-1] in ['sin', 'cos']:
-                output.append(stack.pop())
-                
-    while stack:
-        if stack[-1] == '(':
-            return None
-        output.append(stack.pop())
-        
-    return output
+class Node:
+    def __init__(self, type, value=None, left=None, right=None):
+        self.type = type
+        self.value = value
+        self.left = left
+        self.right = right
 
-def evaluate_rpn(rpn):
-    stack = []
-    
-    for token in rpn:
-        if isinstance(token, float):
-            stack.append(token)
-        elif token in ['sin', 'cos']:
-            if len(stack) < 1:
-                return None
-            a = stack.pop()
-            if token == 'sin':
-                stack.append(math.sin(a))
-            else:
-                stack.append(math.cos(a))
-        else:
-            if len(stack) < 2:
-                return None
-            b = stack.pop()
-            a = stack.pop()
-            if token == '+':
-                stack.append(a + b)
-            elif token == '-':
-                stack.append(a - b)
-            elif token == '*':
-                stack.append(a * b)
-            elif token == '/':
-                if abs(b) < 1e-15:
-                    return None
-                stack.append(a / b)
-                
-    if len(stack) != 1:
+class Parser:
+    def __init__(self, tokens):
+        self.tokens = tokens
+        self.current = 0
+
+    def peek(self):
+        if self.current < len(self.tokens):
+            return self.tokens[self.current]
         return None
-        
-    return stack[0]
 
-if __name__ == "__main__":
+    def eat(self, token):
+        if self.peek() == token:
+            self.current += 1
+        else:
+            raise Exception("Unexpected token")
+
+    def parse_expression(self):
+        return self.parse_add_sub()
+
+    def parse_add_sub(self):
+        left = self.parse_mul_div()
+        while self.peek() in ('+', '-'):
+            op = self.peek()
+            self.eat(op)
+            right = self.parse_mul_div()
+            left = Node('op', op, left, right)
+        return left
+
+    def parse_mul_div(self):
+        left = self.parse_factor()
+        while self.peek() in ('*', '/'):
+            op = self.peek()
+            self.eat(op)
+            right = self.parse_factor()
+            left = Node('op', op, left, right)
+        return left
+
+    def parse_factor(self):
+        if self.peek() == '(':
+            self.eat('(')
+            expr = self.parse_expression()
+            self.eat(')')
+            return expr
+        elif self.peek() in ('+', '-'):
+            op = self.peek()
+            self.eat(op)
+            if op == '+':
+                return self.parse_factor()
+            else:
+                node = self.parse_factor()
+                return Node('op', '-', None, node)
+        elif self.peek().isdigit() or self.peek().startswith('.') or (self.peek()[0] == '-' and len(self.peek()) > 1 and self.peek()[1:].isdigit()):
+            num = self.peek()
+            self.eat(num)
+            return Node('num', float(num))
+        elif self.peek() in ('sin', 'cos'):
+            func = self.peek()
+            self.eat(func)
+            self.eat('(')
+            arg = self.parse_expression()
+            self.eat(')')
+            return Node('func', func, arg)
+        else:
+            raise Exception("Unexpected token")
+
+def evaluate(node):
+    if node.type == 'num':
+        return node.value
+    elif node.type == 'op':
+        left_val = evaluate(node.left)
+        right_val = evaluate(node.right)
+        if node.value == '+':
+            return left_val + right_val
+        elif node.value == '-':
+            return left_val - right_val
+        elif node.value == '*':
+            return left_val * right_val
+        elif node.value == '/':
+            return left_val / right_val
+    elif node.type == 'func':
+        arg = evaluate(node.left)
+        if node.value == 'sin':
+            return math.sin(arg)
+        elif node.value == 'cos':
+            return math.cos(arg)
+
+if __name__ == '__main__':
     main()

@@ -1,29 +1,31 @@
+import sys
 
 def main():
-    import sys
     data = sys.stdin.read().split()
     n = int(data[0])
-    numbers = list(map(int, data[1:1+n]))
+    sequence = list(map(int, data[1:1+n]))
     
-    if n == 2:
-        print(1)
-        return
-        
-    for k in range(1, n):
-        if n % k != 0:
-            continue
-            
+    # Находим все делители (n-1)
+    divisors = []
+    for i in range(1, n + 1):
+        if (n - 1) % i == 0:
+            divisors.append(i)
+    
+    # Проверяем делители от наименьшего к наибольшему
+    for k in divisors:
         valid = True
-        for i in range(k, n):
-            if numbers[i] != numbers[i % k]:
+        # Проверяем периодичность для первых n-1 элементов
+        for i in range(n - 1):
+            if sequence[i] != sequence[i % k]:
                 valid = False
                 break
-                
+        # Проверяем, что последний равен первому
+        if sequence[n-1] != sequence[0]:
+            valid = False
+            
         if valid:
             print(k)
             return
-            
-    print(n - 1)
 
 if __name__ == "__main__":
     main()

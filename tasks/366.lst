@@ -1,0 +1,7 @@
+Given N integers X1, X2, …, XN. It is required to place the signs "+" and "-" between them so that the value of the resulting expression equals the given integer S.
+
+Input data
+The input file INPUT.TXT contains the numbers N and S in the first line. The next line contains N numbers separated by a space. Constraints: 2 ≤ N ≤ 24, 0 ≤ Xi ≤ 5*10^7, -10^9 ≤ S ≤ 10^9.
+
+Output data
+Output "No solution" to the output file OUTPUT.TXT if it is impossible to achieve such a result; otherwise, output the resulting equality. If there are multiple solutions, output any one of them.

@@ -1,62 +1,71 @@
 
 import sys
 
-def main():
-    data = sys.stdin.read().split()
-    idx = 0
-    U = int(data[idx]); idx += 1
-    H = int(data[idx]); idx += 1
-    T = int(data[idx]); idx += 1
-    L = int(data[idx]); idx += 1
-    N = int(data[idx]); idx += 1
-    X = list(map(int, data[idx:idx+N]))
-    
-    if L < U:
-        print(0)
-        return
-        
-    lines = []
-    for i in range(N):
-        lines.append(X[i])
-    
-    total_scroll_steps = (L - U + T - 1) // T
-    if total_scroll_steps < 0:
-        total_scroll_steps = 0
-    
-    events = []
-    for x in lines:
-        start_pos = x
-        end_pos = x - U + 1
-        if end_pos > total_scroll_steps * T:
-            continue
-        if start_pos < 0:
-            start_pos = 0
-        first_step = (start_pos + T - 1) // T
-        last_step = end_pos // T
-        if last_step < 0:
-            last_step = -1
-        if first_step <= last_step:
-            events.append((first_step, 1))
-            events.append((last_step + 1, -1))
-    
-    events.sort(key=lambda x: (x[0], x[1]))
-    
-    min_crossings = float('inf')
-    current = 0
-    event_index = 0
-    total_events = len(events)
-    
-    for step in range(total_scroll_steps + 1):
-        while event_index < total_events and events[event_index][0] == step:
-            current += events[event_index][1]
-            event_index += 1
-        if current < min_crossings:
-            min_crossings = current
-            
-    if min_crossings == float('inf'):
-        min_crossings = 0
-        
-    print(min_crossings)
+def ceil_div(a: int, b: int) -> int:
+    """ceil(a / b) for b > 0, works for negative a as well."""
+    return -((-a) // b)
 
-if __name__ == "__main__":
-    main()
+
+def solve() -> None:
+    data = list(map(int, sys.stdin.buffer.read().split()))
+    it = iter(data)
+
+    U = next(it)          # screen height
+    H = next(it)          # cursor height
+    T = next(it)          # scroll step
+    L = next(it)          # table height
+    N = next(it)          # number of lines
+    X = [next(it) for _ in range(N)]
+
+    max_y = U - H                     # biggest possible top of cursor
+
+    # number of performed scroll steps (see formula (2))
+    if L <= U:
+        K = 0
+    else:
+        K = (L - U + T - 1) // T      # ceil((L-U)/T)
+
+    # occ[s] – how many line appearances happen on screen row s
+    occ = [0] * U
+
+    # local copies for speed
+    U_minus_1 = U - 1
+    T_val = T
+    K_val = K
+    H_val = H
+    occ_local = occ          # alias
+
+    for xi in X:
+        # first scroll step where the line can be visible
+        k_start = ceil_div(xi - U_minus_1, T_val)
+        if k_start < 0:
+            k_start = 0
+        # last scroll step where the line can be visible
+        k_end = xi // T_val
+        if k_end > K_val:
+            k_end = K_val
+        if k_start > k_end:
+            continue                # line never appears
+
+        # first screen row of this line
+        s = xi - k_start * T_val
+        m = k_end - k_start + 1      # number of appearances
+
+        # add all its appearances
+        for _ in range(m):
+            occ_local[s] += 1
+            s -= T_val               # next screen row (decreasing)
+
+    # sliding window of size H over occ[]
+    cur = sum(occ[:H])
+    ans = cur
+    for y in range(1, max_y + 1):
+        cur += occ[y + H - 1] - occ[y - 1]
+        if cur < ans:
+            ans = cur
+
+    sys.stdout.write(str(ans))
+
+
+if __name__ == '__main__':
+    solve()

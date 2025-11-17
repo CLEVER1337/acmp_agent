@@ -1,0 +1,5 @@
+Given non-negative integers M and N. It is required to find the product of these numbers.
+Input data
+The input file INPUT.TXT contains the number M on the first line, and the number N on the second line. (0 ≤ M, N ≤ 102500)
+Output data
+Output the product of numbers M and N to the output file OUTPUT.TXT.

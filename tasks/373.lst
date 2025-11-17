@@ -1,0 +1,7 @@
+Given an N×N matrix filled with positive numbers. The path on the matrix starts in the top-left corner. In one move, you can go to an adjacent cell vertically or horizontally (if it exists). Moving diagonally is not allowed, and staying in place is not allowed. It is required to find the maximum sum of the numbers in the cells along a path of length K (a cell can be visited multiple times).
+
+Input data
+The input file INPUT.TXT in the first line contains the numbers N and K separated by a space. Then follow N lines with N numbers each – the table data. The elements of the matrix are integers from 1 to 9999, 2 ≤ N ≤ 100, 1 ≤ K ≤ 2000.
+
+Output data
+In the output file OUTPUT.TXT, output a single number – the maximum sum.

@@ -1,0 +1,7 @@
+" In today's time, creators of office applications strive to do everything for user convenience. Therefore, even such a small detail as the representation of lists of numbers on the screen, for example, for displaying page numbers, must be carefully designed. You must implement a function that, given a set of integers, will form a string that is its shortest textual representation. The textual representation is a string consisting of numbers separated by commas and ranges formatted as <a, ..., b>, which are used to record sets of all numbers from a to b. However, all numbers included in the string must be ordered in ascending order, following the sequence they appear in the string.  
+
+Input data  
+The input file INPUT.TXT contains an integer N (1 ≤ N ≤ 1000) — the size of the set. The second line contains N integers describing the set, separated by spaces, each with an absolute value not exceeding 10000. A number may appear multiple times in this description.  
+
+Output data  
+Output one of the shortest textual representations of the given set of numbers. Pay attention to correct spacing. In the example, the output file contains exactly four spaces."

@@ -1,0 +1,7 @@
+In the thirtieth kingdom, there are N villages. Some pairs of villages are connected by roads. For the sake of economy, there are no "redundant" roads, i.e., there is exactly one unique way to travel from any village to any other by roads.
+Recent research has shown that the thirtieth kingdom is located in a seismically hazardous zone. Therefore, the head of state wanted to find out what kind of damage an earthquake could cause to his realm. Specifically, he wants to know the minimum number of roads that must be destroyed so that an isolated group of exactly P villages is formed, such that from any village in this group to any other village in this group, it will still be possible to travel via non-destroyed roads (a group is isolated from the others if no non-destroyed road connects a village in this group to a village not in this group).
+You must write a program to help him with this.
+Input data
+The first line of the input file INPUT.TXT contains two numbers: N and P (1 ≤ P ≤ N ≤ 150). All other lines contain descriptions of the roads, one per line: a road description consists of the two village numbers (from 1 to N) that the road connects. All numbers in the input file are separated by spaces and/or line breaks.
+Output data
+Output a single number to the output file OUTPUT.TXT – the required number of roads.

@@ -1,0 +1,6 @@
+When processing various information, it is often necessary to operate with date data. In this task, you need to write a program that can output the day of the month, the month, and the day of the week that will occur K days after January 1, 2008. Recall that this was a Tuesday.
+The input file INPUT.TXT contains a single integer K (0 ≤ K ≤ 1000) - the number of days after January 1 when the date of interest will occur (or occurred).
+Input data
+Your program should write to the output file OUTPUT.TXT which day of the week, day of the month, and month will occur after the specified time has passed. The results are checked automatically, so you should adhere to the format shown in the examples.
+Output data
+In English, the days of the week are called: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday.

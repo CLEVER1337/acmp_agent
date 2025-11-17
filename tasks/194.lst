@@ -1,0 +1,6 @@
+Once the head of the family ordered a photograph of his large family, consisting of N people, whose ages are 1 year, 2 years, ..., N-1 years and N years. The photograph must include all the relatives, and for this, they must line up in a single row. At first, it was decided to arrange the relatives by seniority, starting with the youngest. But the photographer said that it might look unnatural in the photo. Then it was decided to use the following arrangement:
+Indeed, in the photograph, everyone will still appear as if arranged by seniority (after all, among people aged, for example, 25 and 27 years, it is not so easy to determine the older one). There are, obviously, several such seating arrangements. The photographer captured all such ways. How many photographs were taken in the end?
+Input
+The input file INPUT.TXT contains the number N (1 ≤ N ≤ 55) – the number of members of the large family.
+Output
+The output file OUTPUT.TXT should contain the required number of photographs.

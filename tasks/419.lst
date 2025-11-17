@@ -1,0 +1,6 @@
+One of the well-known word games is creating palindromes. A palindrome is a sentence that, after removing all spaces and punctuation marks, reads the same forwards and backwards. The developers of a well-known text editor are writing a new version of the spell-checking module. They want to implement a feature that shows a hint to the user in case they made a typo while typing a palindrome. Of course, they decided to turn to you.
+More precisely, for a given string, you need to determine whether it can be the result of replacing, deleting, or adding at most one character in some palindrome. Note that uppercase and lowercase English letters are not considered different, and all other characters should be ignored.
+Input
+The input file INPUT.TXT contains the given string. It is guaranteed that it contains at least one letter. The length of the string does not exceed 105.
+Output
+On the first line of the output file OUTPUT.TXT, print YES if the string can be obtained by any of the described operations from some palindrome, and NO otherwise. In the case of a positive answer, print on the second line one of the palindromes in which the user could have made a typo.
